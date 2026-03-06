@@ -1,0 +1,983 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================
+   FASHION STUDIO — DESIGN SYSTEM
+   Based on UI/UX Design Brief
+   ============================================ */
+
+/* Google Fonts loaded via <link> in layout.js */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Brand Colors */
+  --color-brand-primary: #C2185B;
+  --color-brand-primary-hover: #A01548;
+  --color-brand-primary-light: rgba(194, 24, 91, 0.1);
+  --color-brand-secondary: #1A1A2E;
+  --color-brand-secondary-light: #2A2A40;
+  --color-brand-accent: #F8E8F0;
+
+  /* Surfaces */
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #FAFAFA;
+  --color-surface-3: #F4F0F8;
+
+  /* Text */
+  --color-text-dark: #0D0D0D;
+  --color-text-mid: #555555;
+  --color-text-light: #999999;
+
+  /* Status Colors */
+  --color-status-success: #2E7D32;
+  --color-status-warning: #E65100;
+  --color-status-error: #C62828;
+  --color-status-info: #1565C0;
+
+  /* Font Families */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Shadcn Theme Mapping */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  --radius: 0.375rem;
+  /* 6px as per UI/UX spec */
+
+  /* Shadcn color overrides — Brand-aligned */
+  --background: #FFFFFF;
+  --foreground: #0D0D0D;
+  --card: #FFFFFF;
+  --card-foreground: #0D0D0D;
+  --popover: #FFFFFF;
+  --popover-foreground: #0D0D0D;
+  --primary: #C2185B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A1A2E;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F4F0F8;
+  --muted-foreground: #555555;
+  --accent: #F8E8F0;
+  --accent-foreground: #0D0D0D;
+  --destructive: #C62828;
+  --border: rgba(0, 0, 0, 0.06);
+  --input: #E0E0E0;
+  --ring: #C2185B;
+  --chart-1: #C2185B;
+  --chart-2: #1A1A2E;
+  --chart-3: #6A1B9A;
+  --chart-4: #1565C0;
+  --chart-5: #2E7D32;
+  --sidebar: #1A1A2E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #C2185B;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.08);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #C2185B;
+
+  /* ---- Fluid Typography ---- */
+  --fs-xs: clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem);
+  --fs-sm: clamp(0.8125rem, 0.78rem + 0.1vw, 0.875rem);
+  --fs-base: clamp(0.9375rem, 0.9rem + 0.12vw, 1rem);
+  --fs-md: clamp(1.125rem, 1.05rem + 0.25vw, 1.25rem);
+  --fs-lg: clamp(1.5rem, 1.35rem + 0.5vw, 1.75rem);
+  --fs-xl: clamp(2rem, 1.75rem + 0.8vw, 2.375rem);
+  --fs-2xl: clamp(3rem, 2.5rem + 1.5vw, 3.5rem);
+  --fs-3xl: clamp(4rem, 3.25rem + 2.5vw, 4.5rem);
+  --fs-4xl: clamp(5rem, 4rem + 3vw, 6rem);
+
+  /* ---- Spacing ---- */
+  --space-unit: 8px;
+  --page-padding-mobile: 24px;
+  --page-padding-tablet: 48px;
+  --page-padding-desktop: 80px;
+  --page-max-width: 1280px;
+  --section-gap-mobile: 80px;
+  --section-gap-tablet: 120px;
+  --section-gap-desktop: 160px;
+
+  /* ---- Motion ---- */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --duration-micro: 100ms;
+  --duration-short: 200ms;
+  --duration-medium: 400ms;
+  --duration-long: 600ms;
+  --duration-cinematic: 800ms;
+
+  /* ---- Nav & Sidebar ---- */
+  --nav-height: 64px;
+  --nav-height-mobile: 56px;
+  --sidebar-width: 240px;
+  --sidebar-collapsed-width: 64px;
+}
+
+.dark {
+  --background: #0D0D0D;
+  --foreground: #F4F0F8;
+  --card: #1A1A2E;
+  --card-foreground: #F4F0F8;
+  --popover: #1A1A2E;
+  --popover-foreground: #F4F0F8;
+  --primary: #E91E6B;
+  --primary-foreground: #FFFFFF;
+  --secondary: #2A2A40;
+  --secondary-foreground: #F4F0F8;
+  --muted: #2A2A40;
+  --muted-foreground: #999999;
+  --accent: #2A2A40;
+  --accent-foreground: #F8E8F0;
+  --destructive: #EF5350;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #E91E6B;
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-size: var(--fs-base);
+    line-height: 1.6;
+    color: var(--color-text-dark);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    line-height: 1.15;
+  }
+
+  h1 {
+    font-size: var(--fs-3xl);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+  }
+
+  h2 {
+    font-size: var(--fs-2xl);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h4 {
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  h5 {
+    font-size: var(--fs-md);
+    font-weight: 600;
+  }
+
+  /* Focus ring per UI/UX spec */
+  :focus-visible {
+    outline: 2px solid var(--color-brand-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* ============================================
+   COMPONENT UTILITIES
+   ============================================ */
+
+@layer utilities {
+
+  /* Page container */
+  .page-container {
+    max-width: var(--page-max-width);
+    margin-inline: auto;
+    padding-inline: var(--page-padding-mobile);
+  }
+
+  @media (min-width: 640px) {
+    .page-container {
+      padding-inline: var(--page-padding-tablet);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .page-container {
+      padding-inline: var(--page-padding-desktop);
+    }
+  }
+
+  /* Section spacing */
+  .section-gap {
+    padding-block: var(--section-gap-mobile);
+  }
+
+  @media (min-width: 640px) {
+    .section-gap {
+      padding-block: var(--section-gap-tablet);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-gap {
+      padding-block: var(--section-gap-desktop);
+    }
+  }
+
+  /* Typography helpers */
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-mono-data {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Glassmorphism nav */
+  .glass-nav {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .glass-nav-transparent {
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom: none;
+  }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform var(--duration-short) var(--ease-spring),
+      border-color var(--duration-short) var(--ease-spring);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-2px);
+    border-color: rgba(0, 0, 0, 0.12);
+  }
+
+  /* Scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ============================================
+   ORDER STATUS COLOURS (precise from design)
+   ============================================ */
+
+.status-pending-review {
+  background: #FFF8E1;
+  color: #F9A825;
+}
+
+.status-awaiting-client-response {
+  background: #E3F2FD;
+  color: #1565C0;
+}
+
+.status-agreed-awaiting-payment {
+  background: #E8F5E9;
+  color: #2E7D32;
+}
+
+.status-in-progress {
+  background: #F3E5F5;
+  color: #6A1B9A;
+}
+
+.status-cutting {
+  background: #EDE7F6;
+  color: #4527A0;
+}
+
+.status-sewing {
+  background: #E8EAF6;
+  color: #283593;
+}
+
+.status-finishing {
+  background: #E0F7FA;
+  color: #00695C;
+}
+
+.status-awaiting-final-payment {
+  background: #FFF3E0;
+  color: #E65100;
+}
+
+.status-ready-for-pickup {
+  background: #F9FBE7;
+  color: #558B2F;
+}
+
+.status-out-for-delivery {
+  background: #E8F5E9;
+  color: #1B5E20;
+}
+
+.status-completed {
+  background: #1A1A2E;
+  color: #FFFFFF;
+}
+
+.status-cancelled {
+  background: #FFEBEE;
+  color: #B71C1C;
+}
+
+/* ============================================
+   SKELETON SHIMMER
+   ============================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+      #F4F0F8 0%,
+      #E8E4EC 50%,
+      #F4F0F8 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* ============================================
+   TOAST PROGRESS BAR
+   ============================================ */
+
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.toast-progress-bar {
+  animation: toast-progress 4s linear forwards;
+}
+
+/* ============================================
+   NUMBER COUNTER ANIMATION
+   ============================================ */
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-count-up {
+  animation: count-up 600ms var(--ease-spring) forwards;
+}
+
+/* ============================================
+   PORTFOLIO LOOKBOOK STYLES
+   ============================================ */
+
+/* Scroll to explore hint — used in standard hero */
+.lookbook-scroll-hint {
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.lookbook-scroll-hint span {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.42);
+  animation: lbPulse 2s infinite;
+}
+
+@keyframes lbPulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Scroll Container */
+.lookbook-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 40px var(--page-padding-mobile) 56px;
+  scrollbar-width: none;
+  background: white !important;
+}
+
+.lookbook-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .lookbook-wrap {
+    padding: 48px var(--page-padding-tablet) 64px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lookbook-wrap {
+    padding: 56px var(--page-padding-desktop) 72px;
+  }
+}
+
+.lookbook-track {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  height: 600px;
+  width: max-content;
+}
+
+/* Category Divider */
+.lookbook-cat-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  flex-shrink: 0;
+  position: relative;
+  margin: 0 20px;
+}
+
+.lookbook-cat-divider::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom,
+      transparent 0%,
+      var(--color-brand-primary) 30%,
+      var(--color-brand-primary) 70%,
+      transparent 100%);
+  opacity: 0.4;
+}
+
+.lookbook-cat-divider-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+  background: white !important;
+  padding: 12px 0;
+  z-index: 1;
+}
+
+/* Portfolio Items */
+.lookbook-item {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #F4F0F8 !important;
+  cursor: pointer;
+}
+
+.lookbook-item+.lookbook-item {
+  margin-left: 12px;
+}
+
+/* Size Variants */
+.lookbook-item-portrait {
+  width: 340px;
+  height: 100%;
+}
+
+.lookbook-item-square {
+  width: 440px;
+  height: 100%;
+}
+
+.lookbook-item-landscape {
+  width: 680px;
+  height: 100%;
+}
+
+.lookbook-item-wide {
+  width: 520px;
+  height: 100%;
+}
+
+.lookbook-item-tall {
+  width: 300px;
+  height: 100%;
+}
+
+@media (max-width: 640px) {
+  .lookbook-wrap {
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--page-padding-mobile);
+  }
+
+  .lookbook-item {
+    scroll-snap-align: center;
+  }
+
+  .lookbook-item-portrait,
+  .lookbook-item-square,
+  .lookbook-item-landscape,
+  .lookbook-item-wide,
+  .lookbook-item-tall {
+    width: 85vw;
+  }
+}
+
+/* Image / Placeholder */
+.lookbook-item-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s var(--ease-spring);
+}
+
+.lookbook-item-ph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.8s var(--ease-spring);
+  position: relative;
+}
+
+.lookbook-item-ph-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 96px;
+  color: rgba(194, 24, 91, 0.06);
+  user-select: none;
+  position: absolute;
+  font-weight: 200;
+}
+
+/* Hover Overlay */
+.lookbook-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top,
+      rgba(26, 26, 46, 0.9) 0%,
+      rgba(26, 26, 46, 0.4) 40%,
+      transparent 70%);
+  opacity: 0;
+  transition: opacity var(--duration-medium) ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 28px 28px 32px;
+}
+
+.lookbook-item:hover .lookbook-item-ph,
+.lookbook-item:hover .lookbook-item-img {
+  transform: scale(1.04);
+}
+
+.lookbook-item:hover .lookbook-item-overlay {
+  opacity: 1;
+}
+
+.lookbook-item-expand {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: rotate(-45deg) scale(0.8);
+  transition: all 0.35s var(--ease-spring);
+}
+
+.lookbook-item:hover .lookbook-item-expand {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.lookbook-item-cat {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+  margin-bottom: 6px;
+}
+
+.lookbook-item-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 500;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+/* Spacers */
+.lookbook-spacer {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.lookbook-spacer-sm {
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* Lightbox */
+.lookbook-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.lookbook-lb-inner {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  width: min(1100px, 92vw);
+  height: min(680px, 88vh);
+  background: var(--color-surface-1);
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+  .lookbook-lb-inner {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    height: min(85vh, 600px);
+  }
+}
+
+.lookbook-lb-img-wrap {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-3);
+}
+
+.lookbook-lb-placeholder-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 160px;
+  color: rgba(194, 24, 91, 0.06);
+  font-weight: 200;
+}
+
+.lookbook-lb-info {
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-left: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--color-surface-1);
+}
+
+@media (max-width: 768px) {
+  .lookbook-lb-info {
+    padding: 24px;
+    border-left: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+}
+
+.lookbook-lb-eyebrow {
+  font-size: var(--fs-xs);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-brand-primary);
+  margin-bottom: 16px;
+}
+
+.lookbook-lb-title {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--color-text-dark);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.lookbook-lb-desc {
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  line-height: 1.8;
+  color: var(--color-text-mid);
+  flex: 1;
+}
+
+.lookbook-lb-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.lookbook-lb-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-short) ease;
+}
+
+.lookbook-lb-btn:hover {
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  background: rgba(194, 24, 91, 0.05);
+}
+
+.lookbook-lb-count {
+  font-size: var(--fs-xs);
+  color: var(--color-text-light);
+  letter-spacing: 0.1em;
+  flex: 1;
+  text-align: center;
+}
+
+.lookbook-lb-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  background: var(--color-surface-1);
+  color: var(--color-text-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--duration-short) ease;
+  z-index: 10;
+}
+
+.lookbook-lb-close:hover {
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  background: rgba(194, 24, 91, 0.05);
+}
+
+/* Lightbox Thumbnail Gallery */
+.lookbook-lb-thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+}
+
+.lookbook-lb-thumbs::-webkit-scrollbar {
+  display: none;
+}
+
+.lookbook-lb-thumb {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  opacity: 0.5;
+  transition: all var(--duration-short) ease;
+  background: #F4F0F8;
+}
+
+.lookbook-lb-thumb.active {
+  border-color: var(--color-brand-primary);
+  opacity: 1;
+}
+
+.lookbook-lb-thumb:hover {
+  opacity: 0.85;
+}
+
+.lookbook-lb-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lookbook-lb-thumb-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F4F0F8;
+  font-size: 10px;
+  color: var(--color-text-light);
+  font-weight: 600;
+}
+
+body[data-scroll-locked] {
+  padding-right: 0 !important;
+
+}
+
+[data-radix-scroll-area-viewport] {
+  padding-right: 0 !important;
+
+}
+
+html {
+  overflow-y: scroll !important;
+
+}
+
+body[data-scroll-locked] {
+  padding-right: 0px !important;
+  margin-right: 0px !important;
+  pointer-events: auto !important;
+
+}

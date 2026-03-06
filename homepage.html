@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atelier — Bespoke Fashion, Lagos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary:#7B2D8B; --primary-dk:#5a1f68; --primary-lt:#a35ab5;
+  --secondary:#1A1A2E; --sec-lt:#252540;
+  --accent:#F8E8F0; --accent2:#e8c4da;
+  --surface1:#ffffff; --surface2:#FAF7FC; --surface3:#EDE6F5;
+  --text:#1A1A2E; --muted:#6B6880; --white:#ffffff; --gold:#C9993A;
+  --ff-display:'Cormorant Garamond',Georgia,serif;
+  --ff-body:'Jost',sans-serif;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--ff-body);color:var(--text);background:var(--surface1);overflow-x:hidden}
+
+.btn-primary{display:inline-block;padding:14px 32px;background:var(--primary);color:var(--white);font-family:var(--ff-body);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:2px solid var(--primary);transition:all .25s;cursor:pointer}
+.btn-primary:hover{background:var(--primary-dk);border-color:var(--primary-dk);transform:translateY(-2px)}
+.btn-outline{display:inline-block;padding:14px 32px;background:transparent;color:var(--white);font-family:var(--ff-body);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:2px solid rgba(255,255,255,.5);transition:all .25s;cursor:pointer}
+.btn-outline:hover{border-color:var(--white);background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.section-eyebrow{font-family:var(--ff-body);font-size:10px;font-weight:500;letter-spacing:.35em;text-transform:uppercase;color:var(--primary);margin-bottom:14px}
+.section-headline{font-family:var(--ff-display);font-size:clamp(32px,4vw,52px);font-weight:400;line-height:1.1;color:var(--text)}
+.section-headline.light{color:var(--white)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 64px;height:72px;background:rgba(26,26,46,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06)}
+.nav-logo{font-family:var(--ff-display);font-size:22px;font-weight:600;color:var(--white);letter-spacing:.06em;text-decoration:none}
+.nav-logo span{color:var(--accent2);font-style:italic}
+.nav-links{display:flex;gap:36px}
+.nav-links a{font-size:11px;font-weight:400;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--accent2)}
+.nav-cta{font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;padding:9px 22px;background:var(--primary);color:var(--white);text-decoration:none;border:2px solid var(--primary);transition:all .2s}
+.nav-cta:hover{background:transparent;color:var(--accent2);border-color:var(--accent2)}
+
+/* HERO */
+.hero{min-height:100dvh;display:grid;grid-template-columns:60% 40%;padding-top:72px;overflow:hidden}
+.hero-left{background:var(--secondary);display:flex;flex-direction:column;justify-content:center;padding:80px 72px 80px 64px;position:relative;overflow:hidden}
+.hero-left::before{content:'';position:absolute;top:-120px;left:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(123,45,139,.25) 0%,transparent 70%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:var(--accent2);margin-bottom:32px;opacity:0;animation:fadeUp .7s .2s var(--ease-out) forwards}
+.hero-tag::before{content:'';display:block;width:28px;height:1px;background:var(--accent2)}
+.hero-headline{font-family:var(--ff-display);font-size:clamp(44px,5.5vw,76px);font-weight:300;line-height:.95;letter-spacing:-.01em;color:var(--white);margin-bottom:24px;opacity:0;animation:fadeUp .8s .4s var(--ease-out) forwards}
+.hero-headline em{font-style:italic;color:var(--accent2)}
+.hero-cycling-wrap{position:relative;height:38px;overflow:hidden;margin-bottom:40px;opacity:0;animation:fadeUp .8s .55s var(--ease-out) forwards}
+.cycle-word{display:block;font-family:var(--ff-display);font-size:clamp(18px,2.2vw,26px);font-weight:300;font-style:italic;color:var(--accent);opacity:0;transform:translateY(16px);animation:cycleWord 9s infinite;position:absolute;white-space:nowrap}
+.cycle-word:nth-child(1){animation-delay:0s}
+.cycle-word:nth-child(2){animation-delay:3s}
+.cycle-word:nth-child(3){animation-delay:6s}
+@keyframes cycleWord{0%{opacity:0;transform:translateY(16px)}6%{opacity:1;transform:translateY(0)}28%{opacity:1;transform:translateY(0)}34%{opacity:0;transform:translateY(-14px)}100%{opacity:0;transform:translateY(-14px)}}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;opacity:0;animation:fadeUp .8s .75s var(--ease-out) forwards}
+.hero-footnote{margin-top:52px;padding-top:28px;border-top:1px solid rgba(255,255,255,.1);display:flex;gap:40px;opacity:0;animation:fadeUp .6s 1s var(--ease-out) forwards}
+.hero-stat-num{font-family:var(--ff-display);font-size:28px;font-weight:300;color:var(--white);line-height:1}
+.hero-stat-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(248,232,240,.5);margin-top:3px}
+
+/* HERO RIGHT */
+.hero-right{background:var(--sec-lt);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.geo{position:absolute;pointer-events:none}
+.geo-1{width:280px;height:380px;background:rgba(123,45,139,.35);top:10%;left:8%;transform:rotate(-8deg)}
+.geo-2{width:200px;height:260px;background:rgba(248,232,240,.07);top:20%;right:6%;transform:rotate(5deg);border:1px solid rgba(248,232,240,.15)}
+.geo-3{width:320px;height:120px;background:rgba(123,45,139,.18);bottom:18%;left:0;transform:rotate(3deg)}
+.geo-4{width:60px;height:60px;background:var(--accent2);opacity:.25;top:12%;right:22%}
+.geo-5{width:2px;height:180px;background:linear-gradient(to bottom,transparent,var(--accent2),transparent);top:30%;right:35%;opacity:.5}
+.portrait-frame-wrap{position:relative;z-index:2;width:260px;height:360px}
+.portrait-frame-offset{position:absolute;top:-16px;left:-20px;width:100%;height:100%;background:var(--primary);opacity:.55;z-index:0}
+.portrait-frame{position:relative;z-index:1;width:100%;height:100%;background:linear-gradient(145deg,#2a1a30 0%,#1a1020 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(248,232,240,.12)}
+.portrait-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.portrait-ph-icon{font-family:var(--ff-display);font-size:72px;font-style:italic;color:rgba(248,232,240,.1);line-height:1}
+.portrait-ph-label{font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:rgba(248,232,240,.25)}
+.est-badge{position:absolute;bottom:-18px;right:-22px;z-index:3;width:72px;height:72px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center}
+.est-badge span:first-child{font-size:7px;letter-spacing:.2em;text-transform:uppercase;color:rgba(26,16,6,.7);line-height:1}
+.est-badge span:last-child{font-family:var(--ff-display);font-size:16px;font-weight:600;color:#1a1006;line-height:1.1}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+
+/* HOW IT WORKS */
+.hiw{padding:112px 64px;background:var(--surface2)}
+.hiw-header{text-align:center;margin-bottom:64px}
+.hiw-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.hiw-card{background:var(--white);padding:48px 36px 40px;border:1px solid rgba(123,45,139,.1);position:relative;overflow:hidden;opacity:0;transform:translateY(32px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out),box-shadow .3s}
+.hiw-card.revealed{opacity:1;transform:translateY(0)}
+.hiw-card:hover{box-shadow:0 20px 48px rgba(123,45,139,.1)}
+.hiw-card:nth-child(2){transition-delay:.12s}
+.hiw-card:nth-child(3){transition-delay:.24s}
+.hiw-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--primary),var(--accent2));transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease-out)}
+.hiw-card:hover::before{transform:scaleX(1)}
+.hiw-num{font-family:var(--ff-display);font-size:72px;font-weight:300;font-style:italic;color:rgba(123,45,139,.12);line-height:1;margin-bottom:20px}
+.hiw-icon{width:44px;height:44px;background:rgba(123,45,139,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:20px;font-size:20px}
+.hiw-title{font-family:var(--ff-display);font-size:22px;font-weight:400;line-height:1.2;margin-bottom:14px;color:var(--text)}
+.hiw-body{font-size:14px;font-weight:300;line-height:1.75;color:var(--muted);margin-bottom:24px}
+.hiw-link{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--primary);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:gap .2s}
+.hiw-link:hover{gap:14px}
+
+/* FEATURED STYLES */
+.styles{padding:112px 64px;background:var(--surface1)}
+.styles-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px}
+.styles-viewall{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--primary);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:gap .2s}
+.styles-viewall:hover{gap:14px}
+.styles-grid{display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:340px 240px;gap:4px}
+.style-item{position:relative;overflow:hidden;cursor:pointer;background:var(--surface3)}
+.style-item:nth-child(1){grid-column:1;grid-row:1/3}
+.style-item:nth-child(2){grid-column:2;grid-row:1}
+.style-item:nth-child(3){grid-column:3;grid-row:1}
+.style-item:nth-child(4){grid-column:2/4;grid-row:2}
+.style-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform .7s var(--ease-out)}
+.style-ph-label{font-family:var(--ff-display);font-size:clamp(28px,4vw,56px);font-style:italic;color:rgba(123,45,139,.15);user-select:none}
+.style-item:hover .style-ph{transform:scale(1.05)}
+.style-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,26,46,.88) 0%,transparent 55%);opacity:0;transition:opacity .35s;display:flex;flex-direction:column;justify-content:flex-end;padding:24px 22px}
+.style-item:hover .style-overlay{opacity:1}
+.style-name{font-family:var(--ff-display);font-size:20px;font-weight:400;color:var(--white);margin-bottom:6px}
+.style-view{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent2);display:flex;align-items:center;gap:8px}
+.style-item:nth-child(1) .style-ph{background:linear-gradient(155deg,#ede0f5 0%,#d8c4e8 100%)}
+.style-item:nth-child(2) .style-ph{background:linear-gradient(135deg,#f0e8f8 0%,#e2d0ef 100%)}
+.style-item:nth-child(3) .style-ph{background:linear-gradient(45deg,#e8ddf2 0%,#d4bfe8 100%)}
+.style-item:nth-child(4) .style-ph{background:linear-gradient(100deg,#ebe2f5 0%,#dcccea 100%)}
+
+/* RTW */
+.rtw{padding:112px 0 112px 64px;background:var(--secondary);overflow:hidden}
+.rtw-header{margin-bottom:48px;padding-right:64px}
+.rtw-scroll{display:flex;gap:20px;overflow-x:auto;padding-right:64px;padding-bottom:16px;scrollbar-width:thin;scrollbar-color:rgba(123,45,139,.5) transparent}
+.rtw-scroll::-webkit-scrollbar{height:2px}
+.rtw-scroll::-webkit-scrollbar-thumb{background:rgba(123,45,139,.5)}
+.rtw-card{flex-shrink:0;width:260px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);overflow:hidden;transition:transform .3s var(--ease-out),border-color .3s}
+.rtw-card:hover{transform:translateY(-6px);border-color:rgba(163,90,181,.4)}
+.rtw-img{width:100%;height:300px;background:linear-gradient(145deg,#2a1a35 0%,#1a0f20 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.rtw-img-ph{font-family:var(--ff-display);font-size:64px;font-style:italic;color:rgba(248,232,240,.08)}
+.rtw-img-label{position:absolute;bottom:12px;left:12px;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:rgba(248,232,240,.3)}
+.rtw-info{padding:22px 20px}
+.rtw-name{font-family:var(--ff-display);font-size:18px;font-weight:400;color:var(--white);margin-bottom:6px;line-height:1.2}
+.rtw-price{font-size:13px;font-weight:500;color:var(--accent2);letter-spacing:.05em;margin-bottom:14px}
+.rtw-sizes{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.rtw-size{font-size:9px;font-weight:500;letter-spacing:.12em;padding:4px 9px;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45)}
+.rtw-size.avail{border-color:rgba(163,90,181,.5);color:var(--accent2)}
+.rtw-btn{width:100%;padding:10px;background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.6);font-family:var(--ff-body);font-size:10px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .25s}
+.rtw-card:hover .rtw-btn{background:var(--primary);border-color:var(--primary);color:var(--white)}
+
+/* PORTFOLIO */
+.portfolio{padding:112px 64px;background:var(--surface1)}
+.portfolio-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:48px}
+.portfolio-link{font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;color:var(--primary);text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:gap .2s}
+.portfolio-link:hover{gap:14px}
+.portfolio-grid{display:flex;flex-direction:column;gap:4px}
+.pf-block-a{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:440px;gap:4px}
+.pf-sidebar{display:grid;grid-template-rows:1fr 1fr;gap:4px}
+.pf-block-b{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:260px;gap:4px}
+.pf-block-c{display:grid;grid-template-columns:1fr 2fr;grid-template-rows:360px;gap:4px}
+.pf-item{position:relative;overflow:hidden;cursor:pointer;background:var(--surface3)}
+.pf-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transition:transform .7s var(--ease-out)}
+.pf-item:hover .pf-ph{transform:scale(1.04)}
+.pf-ph-num{font-family:var(--ff-display);font-size:clamp(36px,5vw,72px);font-style:italic;color:rgba(123,45,139,.13);user-select:none}
+.pf-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(26,26,46,.85) 0%,transparent 55%);opacity:0;transition:opacity .35s;display:flex;flex-direction:column;justify-content:flex-end;padding:22px 20px}
+.pf-item:hover .pf-overlay{opacity:1}
+.pf-cat{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent2);margin-bottom:4px}
+.pf-desc{font-family:var(--ff-display);font-size:16px;color:var(--white);line-height:1.3}
+.pf-ph-1{background:linear-gradient(140deg,#e8ddf4 0%,#d4bfe6 100%)}
+.pf-ph-2{background:linear-gradient(200deg,#ede4f6 0%,#dcccea 100%)}
+.pf-ph-3{background:linear-gradient(60deg,#e2d5f0 0%,#cdbae3 100%)}
+.pf-ph-4{background:linear-gradient(120deg,#eae0f6 0%,#d6c5e8 100%)}
+.pf-ph-5{background:linear-gradient(170deg,#e6dcf3 0%,#d0bce5 100%)}
+.pf-ph-6{background:linear-gradient(30deg,#ede3f6 0%,#dac8eb 100%)}
+.pf-ph-7{background:linear-gradient(90deg,#e4d9f1 0%,#cfbbe3 100%)}
+.pf-text-panel{background:var(--secondary);display:flex;flex-direction:column;justify-content:space-between;padding:36px 30px}
+.pf-text-eyebrow{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent2);margin-bottom:12px}
+.pf-text-headline{font-family:var(--ff-display);font-size:clamp(22px,2.5vw,32px);font-weight:300;line-height:1.2;color:var(--white)}
+.pf-text-headline em{font-style:italic;color:var(--accent2)}
+.pf-text-body{font-size:13px;font-weight:300;line-height:1.8;color:rgba(248,232,240,.55);margin-top:16px;flex:1;display:flex;align-items:flex-end}
+
+/* TESTIMONIALS */
+.testimonials{padding:112px 64px;background:var(--surface3);position:relative;overflow:hidden}
+.testimonials::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent,transparent 40px,rgba(123,45,139,.03) 40px,rgba(123,45,139,.03) 41px);pointer-events:none}
+.testimonials-header{text-align:center;margin-bottom:64px}
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;position:relative;z-index:1}
+.testi-card{background:var(--white);padding:44px 36px 36px;position:relative;overflow:hidden;opacity:0;transform:translateY(20px) rotate(.5deg);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out);box-shadow:0 4px 24px rgba(123,45,139,.06)}
+.testi-card.revealed{opacity:1;transform:translateY(0) rotate(0deg)}
+.testi-card:nth-child(2){transition-delay:.12s}
+.testi-card:nth-child(3){transition-delay:.24s}
+.testi-quote-bg{position:absolute;top:-10px;left:20px;font-family:Georgia,serif;font-size:120px;font-weight:700;color:var(--primary);opacity:.07;line-height:1;user-select:none;pointer-events:none}
+.testi-stars{display:flex;gap:3px;margin-bottom:16px;color:var(--gold);font-size:14px}
+.testi-text{font-family:var(--ff-display);font-size:17px;font-weight:300;font-style:italic;line-height:1.7;color:var(--text);margin-bottom:24px;position:relative;z-index:1}
+.testi-name{font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--primary)}
+.testi-detail{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* CTA BAND */
+.cta-band{padding:100px 64px;background:var(--primary);position:relative;overflow:hidden;text-align:center}
+.cta-band::before{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(60deg,transparent,transparent 30px,rgba(255,255,255,.03) 30px,rgba(255,255,255,.03) 31px);pointer-events:none}
+.cta-band::after{content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,255,255,.06) 0%,transparent 70%);pointer-events:none}
+.cta-band-eyebrow{color:rgba(255,255,255,.55);margin-bottom:16px}
+.cta-band-headline{font-family:var(--ff-display);font-size:clamp(28px,4vw,52px);font-weight:300;line-height:1.1;color:var(--white);margin-bottom:20px;position:relative;z-index:1}
+.cta-band-sub{font-size:14px;font-weight:300;line-height:1.75;color:rgba(255,255,255,.65);max-width:480px;margin:0 auto 40px;position:relative;z-index:1}
+.btn-white{display:inline-block;padding:16px 48px;background:var(--white);color:var(--primary);font-family:var(--ff-body);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;border:2px solid var(--white);transition:all .25s;position:relative;z-index:1}
+.btn-white:hover{background:transparent;color:var(--white);transform:translateY(-2px)}
+
+/* FOOTER */
+footer{background:var(--secondary);padding:80px 64px 0;border-top:1px solid rgba(255,255,255,.06)}
+.footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.2fr;gap:48px;padding-bottom:64px;border-bottom:1px solid rgba(255,255,255,.08)}
+.footer-logo{font-family:var(--ff-display);font-size:26px;font-weight:600;color:var(--white);letter-spacing:.06em;margin-bottom:14px;display:block;text-decoration:none}
+.footer-logo span{color:var(--accent2);font-style:italic}
+.footer-tagline{font-size:12px;font-weight:300;line-height:1.7;color:rgba(255,255,255,.4);margin-bottom:28px;max-width:200px}
+.footer-socials{display:flex;gap:14px}
+.footer-social{width:36px;height:36px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.45);text-decoration:none;font-size:13px;transition:all .2s}
+.footer-social:hover{border-color:var(--accent2);color:var(--accent2)}
+.footer-social.ig{border-color:rgba(163,90,181,.4);color:var(--accent2)}
+.footer-col-title{font-size:10px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:20px}
+.footer-links{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links a{font-size:13px;font-weight:300;color:rgba(255,255,255,.55);text-decoration:none;transition:color .2s;display:block}
+.footer-links a:hover{color:var(--accent2)}
+.footer-contact-item{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.footer-contact-icon{font-size:14px;opacity:.5;margin-top:1px;flex-shrink:0}
+.footer-contact-text{font-size:13px;font-weight:300;color:rgba(255,255,255,.55);text-decoration:none;line-height:1.5}
+.footer-contact-text:hover{color:var(--accent2)}
+.footer-whatsapp{display:inline-flex;align-items:center;gap:8px;margin-top:18px;padding:9px 20px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);color:#25d166;font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;text-decoration:none;transition:all .2s}
+.footer-whatsapp:hover{background:rgba(37,211,102,.18)}
+.footer-bar{padding:22px 0;display:flex;align-items:center;justify-content:space-between}
+.footer-bar-copy{font-size:11px;color:rgba(255,255,255,.2);font-weight:300}
+.footer-bar-links{display:flex;gap:24px}
+.footer-bar-links a{font-size:11px;color:rgba(255,255,255,.2);text-decoration:none;transition:color .2s}
+.footer-bar-links a:hover{color:rgba(255,255,255,.5)}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out)}
+.reveal.revealed{opacity:1;transform:translateY(0)}
+
+@media(max-width:900px){
+  nav{padding:0 24px}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;grid-template-rows:auto auto}
+  .hero-left{padding:60px 24px 48px}
+  .hero-right{height:320px;order:-1}
+  .hiw{padding:72px 24px}
+  .hiw-cards{grid-template-columns:1fr;gap:16px;overflow-x:auto;display:flex;padding-bottom:16px}
+  .hiw-card{min-width:280px;flex-shrink:0}
+  .styles{padding:72px 24px}
+  .styles-grid{grid-template-columns:1fr 1fr;grid-template-rows:240px 200px 200px}
+  .style-item:nth-child(1){grid-column:1/3;grid-row:1}
+  .style-item:nth-child(4){grid-column:1/3}
+  .rtw{padding:72px 0 72px 24px}
+  .portfolio{padding:72px 24px}
+  .pf-block-a{grid-template-columns:1fr;grid-template-rows:320px}
+  .pf-block-b{grid-template-columns:1fr 1fr;grid-template-rows:200px 200px}
+  .pf-block-c{grid-template-columns:1fr;grid-template-rows:auto 280px}
+  .testimonials{padding:72px 24px}
+  .testi-grid{grid-template-columns:1fr}
+  .cta-band{padding:72px 24px}
+  footer{padding:60px 24px 0}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+  .footer-bar{flex-direction:column;gap:12px;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="#">Atél<span>ier</span></a>
+  <div class="nav-links">
+    <a href="#">Catalogue</a>
+    <a href="#">Portfolio</a>
+    <a href="#">Process</a>
+    <a href="#">Testimonials</a>
+  </div>
+  <a class="nav-cta" href="#">Book a Fitting</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">Lagos · Bespoke Tailoring</div>
+    <h1 class="hero-headline">Fashion that<br><em>fits your</em><br>story.</h1>
+    <div class="hero-cycling-wrap">
+      <span class="cycle-word">Designed for you</span>
+      <span class="cycle-word">Crafted in Lagos</span>
+      <span class="cycle-word">Made to last</span>
+    </div>
+    <div class="hero-ctas">
+      <a class="btn-primary" href="#">Explore Our Styles</a>
+      <a class="btn-outline" href="#">Book a Fitting</a>
+    </div>
+    <div class="hero-footnote">
+      <div class="hero-stat"><div class="hero-stat-num">400+</div><div class="hero-stat-label">Garments made</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">98%</div><div class="hero-stat-label">Satisfaction rate</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">6 yrs</div><div class="hero-stat-label">In the craft</div></div>
+    </div>
+  </div>
+  <div class="hero-right" id="heroRight">
+    <div class="geo geo-1" data-parallax="0.08"></div>
+    <div class="geo geo-2" data-parallax="0.14"></div>
+    <div class="geo geo-3" data-parallax="0.06"></div>
+    <div class="geo geo-4" data-parallax="0.18"></div>
+    <div class="geo geo-5" data-parallax="0.12"></div>
+    <div class="portrait-frame-wrap" data-parallax="0.05">
+      <div class="portrait-frame-offset"></div>
+      <div class="portrait-frame">
+        <div class="portrait-ph">
+          <div class="portrait-ph-icon">A</div>
+          <div class="portrait-ph-label">Garment portrait</div>
+        </div>
+      </div>
+      <div class="est-badge"><span>Est.</span><span>2019</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="hiw">
+  <div class="hiw-header reveal">
+    <div class="section-eyebrow">How it works</div>
+    <h2 class="section-headline">Three ways to work with us</h2>
+  </div>
+  <div class="hiw-cards">
+    <div class="hiw-card">
+      <div class="hiw-num">01</div>
+      <div class="hiw-icon">🧵</div>
+      <div class="hiw-title">You bring the fabric</div>
+      <p class="hiw-body">Already have your material? Bring it in and we'll handle the rest — from pattern drafting to the finished garment, made entirely to your measurements.</p>
+      <a class="hiw-link" href="#">Learn more →</a>
+    </div>
+    <div class="hiw-card">
+      <div class="hiw-num">02</div>
+      <div class="hiw-icon">🪡</div>
+      <div class="hiw-title">We source it for you</div>
+      <p class="hiw-body">Not sure where to start? We'll guide you through our curated fabric selection and source the perfect material for your style, occasion, and budget.</p>
+      <a class="hiw-link" href="#">Learn more →</a>
+    </div>
+    <div class="hiw-card">
+      <div class="hiw-num">03</div>
+      <div class="hiw-icon">👗</div>
+      <div class="hiw-title">Ready to wear now</div>
+      <p class="hiw-body">Browse our curated ready-to-wear pieces — thoughtfully constructed with the same quality and care as our bespoke work. Available in select sizes.</p>
+      <a class="hiw-link" href="#">Learn more →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED STYLES -->
+<section class="styles">
+  <div class="styles-header reveal">
+    <div>
+      <div class="section-eyebrow">Our craft</div>
+      <h2 class="section-headline">Styles we create</h2>
+    </div>
+    <a class="styles-viewall" href="#">View all styles →</a>
+  </div>
+  <div class="styles-grid reveal">
+    <div class="style-item"><div class="style-ph"><span class="style-ph-label">Agbada</span></div><div class="style-overlay"><div class="style-name">Agbada Series</div><div class="style-view">View →</div></div></div>
+    <div class="style-item"><div class="style-ph"><span class="style-ph-label">Kaftan</span></div><div class="style-overlay"><div class="style-name">Kaftan Collection</div><div class="style-view">View →</div></div></div>
+    <div class="style-item"><div class="style-ph"><span class="style-ph-label">Iro</span></div><div class="style-overlay"><div class="style-name">Iro & Buba</div><div class="style-view">View →</div></div></div>
+    <div class="style-item"><div class="style-ph"><span class="style-ph-label">Suit</span></div><div class="style-overlay"><div class="style-name">Tailored Suiting</div><div class="style-view">View →</div></div></div>
+  </div>
+</section>
+
+<!-- READY TO WEAR -->
+<section class="rtw">
+  <div class="rtw-header reveal">
+    <div class="section-eyebrow" style="color:var(--accent2)">Ready to wear</div>
+    <h2 class="section-headline light">Pieces ready for you now</h2>
+  </div>
+  <div class="rtw-scroll">
+    <div class="rtw-card"><div class="rtw-img"><div class="rtw-img-ph">I</div><div class="rtw-img-label">RTW — 001</div></div><div class="rtw-info"><div class="rtw-name">Indigo Kaftan No. 3</div><div class="rtw-price">₦ 85,000</div><div class="rtw-sizes"><span class="rtw-size avail">S</span><span class="rtw-size avail">M</span><span class="rtw-size">L</span><span class="rtw-size avail">XL</span></div><button class="rtw-btn">View piece</button></div></div>
+    <div class="rtw-card"><div class="rtw-img" style="background:linear-gradient(145deg,#1d1530,#120d20)"><div class="rtw-img-ph">II</div><div class="rtw-img-label">RTW — 002</div></div><div class="rtw-info"><div class="rtw-name">Plum Agbada Set</div><div class="rtw-price">₦ 142,000</div><div class="rtw-sizes"><span class="rtw-size">S</span><span class="rtw-size avail">M</span><span class="rtw-size avail">L</span><span class="rtw-size avail">XL</span></div><button class="rtw-btn">View piece</button></div></div>
+    <div class="rtw-card"><div class="rtw-img" style="background:linear-gradient(145deg,#1a1828,#111020)"><div class="rtw-img-ph">III</div><div class="rtw-img-label">RTW — 003</div></div><div class="rtw-info"><div class="rtw-name">Midnight Senator</div><div class="rtw-price">₦ 96,000</div><div class="rtw-sizes"><span class="rtw-size avail">S</span><span class="rtw-size avail">M</span><span class="rtw-size avail">L</span><span class="rtw-size">XL</span></div><button class="rtw-btn">View piece</button></div></div>
+    <div class="rtw-card"><div class="rtw-img" style="background:linear-gradient(145deg,#251520,#160c14)"><div class="rtw-img-ph">IV</div><div class="rtw-img-label">RTW — 004</div></div><div class="rtw-info"><div class="rtw-name">Rosewood Iro Set</div><div class="rtw-price">₦ 78,000</div><div class="rtw-sizes"><span class="rtw-size avail">XS</span><span class="rtw-size avail">S</span><span class="rtw-size avail">M</span><span class="rtw-size">L</span></div><button class="rtw-btn">View piece</button></div></div>
+    <div class="rtw-card"><div class="rtw-img" style="background:linear-gradient(145deg,#1e1828,#13101e)"><div class="rtw-img-ph">V</div><div class="rtw-img-label">RTW — 005</div></div><div class="rtw-info"><div class="rtw-name">Ember Boubou</div><div class="rtw-price">₦ 110,000</div><div class="rtw-sizes"><span class="rtw-size">S</span><span class="rtw-size avail">M</span><span class="rtw-size avail">L</span><span class="rtw-size avail">XL</span></div><button class="rtw-btn">View piece</button></div></div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio">
+  <div class="portfolio-header reveal">
+    <div>
+      <div class="section-eyebrow">Studio work</div>
+      <h2 class="section-headline">From our studio to your wardrobe</h2>
+    </div>
+    <a class="portfolio-link" href="#">See the full portfolio →</a>
+  </div>
+  <div class="portfolio-grid reveal">
+    <div class="pf-block-a">
+      <div class="pf-item"><div class="pf-ph pf-ph-1"><div class="pf-ph-num">A1</div></div><div class="pf-overlay"><div class="pf-cat">Bespoke · Agbada</div><div class="pf-desc">Grand ceremony piece in hand-woven Aso-oke with goldwork embroidery.</div></div></div>
+      <div class="pf-sidebar">
+        <div class="pf-item"><div class="pf-ph pf-ph-2"><div class="pf-ph-num">A2</div></div><div class="pf-overlay"><div class="pf-cat">Ready to Wear</div><div class="pf-desc">Structured kaftan in dupioni silk blend.</div></div></div>
+        <div class="pf-item"><div class="pf-ph pf-ph-3"><div class="pf-ph-num">A3</div></div><div class="pf-overlay"><div class="pf-cat">Bridal</div><div class="pf-desc">Reception gown with hand-pleated detailing.</div></div></div>
+      </div>
+    </div>
+    <div class="pf-block-b">
+      <div class="pf-item"><div class="pf-ph pf-ph-4"><div class="pf-ph-num">B1</div></div><div class="pf-overlay"><div class="pf-cat">Suiting</div><div class="pf-desc">Two-piece tailored suit in charcoal worsted.</div></div></div>
+      <div class="pf-item"><div class="pf-ph pf-ph-5"><div class="pf-ph-num">B2</div></div><div class="pf-overlay"><div class="pf-cat">Editorial</div><div class="pf-desc">Campaign looks, styled and shot in-studio.</div></div></div>
+      <div class="pf-item"><div class="pf-ph pf-ph-6"><div class="pf-ph-num">B3</div></div><div class="pf-overlay"><div class="pf-cat">Occasion Wear</div><div class="pf-desc">Coral iro &amp; buba for a traditional ceremony.</div></div></div>
+    </div>
+    <div class="pf-block-c">
+      <div class="pf-text-panel"><div><div class="pf-text-eyebrow">Studio ethos</div><div class="pf-text-headline">Every piece is<br><em>a collaboration</em></div></div><div class="pf-text-body">We don't just make clothes — we make garments that carry meaning, memory, and precision.</div></div>
+      <div class="pf-item"><div class="pf-ph pf-ph-7"><div class="pf-ph-num">C1</div></div><div class="pf-overlay"><div class="pf-cat">Bespoke · Bridal</div><div class="pf-desc">Full bridal party coordination — four outfits, unified palette.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="testimonials-header reveal">
+    <div class="section-eyebrow">What our clients say</div>
+    <h2 class="section-headline">Words from the wardrobe</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card"><div class="testi-quote-bg">"</div><div class="testi-stars">★★★★★</div><p class="testi-text">"I brought in a fabric I'd been holding onto for two years. They turned it into the most beautiful agbada I've ever worn. The fit was extraordinary."</p><div class="testi-name">Chukwuemeka</div><div class="testi-detail">Traditional wedding, Abuja</div></div>
+    <div class="testi-card"><div class="testi-quote-bg">"</div><div class="testi-stars">★★★★★</div><p class="testi-text">"The measurement process was so thorough I was genuinely impressed. When the dress came back, it fit me in a way off-the-rack never has. I cried a little."</p><div class="testi-name">Amaka</div><div class="testi-detail">Bespoke bridal gown, Lagos</div></div>
+    <div class="testi-card"><div class="testi-quote-bg">"</div><div class="testi-stars">★★★★★</div><p class="testi-text">"The ready-to-wear pieces punch way above their price. The senator I ordered arrived looking like something from a couture rack. Quick turnaround, no stress."</p><div class="testi-name">Tunde</div><div class="testi-detail">Ready-to-wear, delivered nationwide</div></div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section class="cta-band">
+  <div class="section-eyebrow cta-band-eyebrow">Bespoke tailoring</div>
+  <h2 class="cta-band-headline">Your measurements,<br>your fit — every time.</h2>
+  <p class="cta-band-sub">Book a fitting session and let us take your measurements in person. Every garment we make starts here — with precision that lasts for life.</p>
+  <a class="btn-white" href="#">Book a Fitting</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a class="footer-logo" href="#">Atél<span>ier</span></a>
+      <p class="footer-tagline">Bespoke tailoring and ready-to-wear fashion, made with intention in Lagos.</p>
+      <div class="footer-socials">
+        <a class="footer-social ig" href="#" title="Instagram">◎</a>
+        <a class="footer-social" href="#" title="Facebook">f</a>
+        <a class="footer-social" href="#" title="X">𝕏</a>
+        <a class="footer-social" href="#" title="TikTok">♪</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Quick links</div>
+      <ul class="footer-links"><li><a href="#">Home</a></li><li><a href="#">Catalogue</a></li><li><a href="#">Portfolio</a></li><li><a href="#">Testimonials</a></li><li><a href="#">About the studio</a></li></ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Client area</div>
+      <ul class="footer-links"><li><a href="#">My Orders</a></li><li><a href="#">My Measurements</a></li><li><a href="#">My Profile</a></li><li><a href="#">Track my order</a></li><li><a href="#">Book a fitting</a></li></ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Get in touch</div>
+      <div class="footer-contact-item"><span class="footer-contact-icon">📍</span><span class="footer-contact-text">Victoria Island, Lagos, Nigeria</span></div>
+      <div class="footer-contact-item"><span class="footer-contact-icon">✉</span><a class="footer-contact-text" href="#">hello@atelierlagos.com</a></div>
+      <div class="footer-contact-item"><span class="footer-contact-icon">🕐</span><span class="footer-contact-text">Mon – Sat · 9am – 7pm WAT</span></div>
+      <a class="footer-whatsapp" href="#">💬 Chat on WhatsApp</a>
+    </div>
+  </div>
+  <div class="footer-bar">
+    <span class="footer-bar-copy">© 2025 Atélier Lagos. All rights reserved.</span>
+    <div class="footer-bar-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Refund Policy</a></div>
+  </div>
+</footer>
+
+<script>
+const heroRight = document.getElementById('heroRight');
+window.addEventListener('scroll', () => {
+  const s = window.scrollY;
+  heroRight.querySelectorAll('[data-parallax]').forEach(el => {
+    el.style.transform = `translateY(${s * parseFloat(el.dataset.parallax)}px)`;
+  });
+});
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); obs.unobserve(e.target); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal, .hiw-card, .testi-card').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

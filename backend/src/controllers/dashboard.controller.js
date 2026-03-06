@@ -1,0 +1,386 @@
+import prisma from "../config/prisma.js";
+import { successResponse } from "../utils/apiResponse.js";
+import { format as formatCsv } from "fast-csv";
+import PDFDocument from "pdfkit";
+
+// ─── GET /admin/dashboard ─────────────────────────────────────────────────
+// Returns aggregated business metrics. Accepts optional ?from=&to= for
+// period-based filtering. Includes time-series data for charts.
+
+export const getDashboardStats = async (req, res) => {
+  const { from, to } = req.query;
+
+  // Build date filter for period-based metrics — supports from-only, to-only, or both
+  const dateFilter = {};
+  if (from || to) {
+    dateFilter.createdAt = {};
+    if (from) dateFilter.createdAt.gte = new Date(from);
+    if (to) dateFilter.createdAt.lte = new Date(to);
+  }
+
+  const paymentDateFilter = {};
+  if (from || to) {
+    paymentDateFilter.confirmedAt = {};
+    if (from) paymentDateFilter.confirmedAt.gte = new Date(from);
+    if (to) paymentDateFilter.confirmedAt.lte = new Date(to);
+  }
+
+  // ── Run all queries in parallel ──────────────────────────────────────────
+  const [
+    totalClients,
+    totalOrders,
+    activeOrders,
+    pendingPayments,
+    pendingTestimonials,
+    totalRevenue,
+    ordersInPeriod,
+    revenueInPeriod,
+    newClientsInPeriod,
+    ordersByStatus,
+    ordersByType,
+    recentOrders,
+    unreadChats,
+    revenueTimeSeries,
+    ordersTimeSeries,
+  ] = await Promise.all([
+    // Snapshot counts (always current)
+    prisma.user.count({ where: { role: "CLIENT" } }),
+    prisma.order.count(),
+    prisma.order.count({
+      where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
+    }),
+    prisma.payment.count({ where: { status: "PENDING" } }),
+    prisma.testimonial.count({ where: { status: "PENDING" } }),
+
+    // All-time revenue
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "CONFIRMED" },
+    }),
+
+    // Period-based counts
+    prisma.order.count({ where: dateFilter }),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "CONFIRMED", ...paymentDateFilter },
+    }),
+    prisma.user.count({ where: { role: "CLIENT", ...dateFilter } }),
+
+    // Breakdowns (filtered by period)
+    prisma.order.groupBy({
+      by: ["status"],
+      _count: true,
+      where: dateFilter,
+    }),
+    prisma.order.groupBy({
+      by: ["orderType"],
+      _count: true,
+      where: dateFilter,
+    }),
+
+    // Recent orders (last 5)
+    prisma.order.findMany({
+      take: 5,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        orderNumber: true,
+        orderType: true,
+        status: true,
+        totalAgreedFee: true,
+        createdAt: true,
+        client: { select: { fullName: true } },
+      },
+    }),
+
+    // Unread chat messages (sent by clients, not yet read)
+    prisma.chatMessage.count({
+      where: { senderRole: "CLIENT", isRead: false },
+    }),
+
+    // Revenue time-series (last 12 months)
+    prisma.$queryRaw`
+      SELECT
+        TO_CHAR("confirmedAt", 'YYYY-MM') AS month,
+        COALESCE(SUM(amount), 0) AS revenue
+      FROM payments
+      WHERE status = 'CONFIRMED'
+        AND "confirmedAt" >= NOW() - INTERVAL '12 months'
+      GROUP BY month
+      ORDER BY month ASC
+    `,
+
+    // Orders time-series (last 12 months)
+    prisma.$queryRaw`
+      SELECT
+        TO_CHAR("createdAt", 'YYYY-MM') AS month,
+        COUNT(*)::int AS count
+      FROM orders
+      WHERE "createdAt" >= NOW() - INTERVAL '12 months'
+      GROUP BY month
+      ORDER BY month ASC
+    `,
+  ]);
+
+  // ── Format response ────────────────────────────────────────────────────
+  const statusBreakdown = {};
+  for (const row of ordersByStatus) {
+    statusBreakdown[row.status] = row._count;
+  }
+
+  const typeBreakdown = {};
+  for (const row of ordersByType) {
+    typeBreakdown[row.orderType] = row._count;
+  }
+
+  // Build period label
+  let periodLabel = "All time";
+  if (from && to) {
+    periodLabel = `${new Date(from).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })} – ${new Date(to).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`;
+  }
+
+  return successResponse(res, 200, "Dashboard stats retrieved", {
+    // Snapshot counts
+    totalClients,
+    activeOrders,
+    pendingPayments,
+    pendingTestimonials,
+    unreadChats,
+
+    // Period-based metrics
+    periodLabel,
+    ordersInPeriod,
+    revenueInPeriod: Number(revenueInPeriod._sum.amount || 0),
+    newClientsInPeriod,
+
+    // All-time totals
+    totalOrders,
+    totalRevenue: Number(totalRevenue._sum.amount || 0),
+
+    // Breakdowns
+    ordersByStatus: statusBreakdown,
+    ordersByType: typeBreakdown,
+
+    // Time-series (chart-ready)
+    revenueTimeSeries: revenueTimeSeries.map((r) => ({
+      month: r.month,
+      revenue: Number(r.revenue),
+    })),
+    ordersTimeSeries: ordersTimeSeries.map((r) => ({
+      month: r.month,
+      count: Number(r.count),
+    })),
+
+    // Recent activity
+    recentOrders,
+  });
+};
+
+// ─── GET /admin/dashboard/export ──────────────────────────────────────────
+// Exports dashboard data as CSV or PDF.
+// Query params: ?format=csv|pdf&from=&to=
+
+export const exportDashboard = async (req, res) => {
+  const { format, from, to } = req.query;
+
+  if (!format || !["csv", "pdf"].includes(format)) {
+    return res.status(400).json({
+      success: false,
+      message: "format query parameter is required (csv or pdf)",
+    });
+  }
+
+  // Build date filter
+  const dateFilter =
+    from && to ? { createdAt: { gte: new Date(from), lte: new Date(to) } } : {};
+
+  const paymentDateFilter =
+    from && to
+      ? { confirmedAt: { gte: new Date(from), lte: new Date(to) } }
+      : {};
+
+  // Get key stats
+  const [
+    totalClients,
+    totalOrders,
+    activeOrders,
+    totalRevenue,
+    ordersInPeriod,
+    revenueInPeriod,
+    newClientsInPeriod,
+    ordersByStatus,
+    ordersByType,
+  ] = await Promise.all([
+    prisma.user.count({ where: { role: "CLIENT" } }),
+    prisma.order.count(),
+    prisma.order.count({
+      where: { status: { notIn: ["COMPLETED", "CANCELLED"] } },
+    }),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "CONFIRMED" },
+    }),
+    prisma.order.count({ where: dateFilter }),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: { status: "CONFIRMED", ...paymentDateFilter },
+    }),
+    prisma.user.count({ where: { role: "CLIENT", ...dateFilter } }),
+    prisma.order.groupBy({
+      by: ["status"],
+      _count: true,
+      where: dateFilter,
+    }),
+    prisma.order.groupBy({
+      by: ["orderType"],
+      _count: true,
+      where: dateFilter,
+    }),
+  ]);
+
+  const periodLabel =
+    from && to
+      ? `${new Date(from).toLocaleDateString()} – ${new Date(to).toLocaleDateString()}`
+      : "All time";
+
+  if (format === "csv") {
+    // ── CSV Export ──────────────────────────────────────────────────────
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="dashboard-${new Date().toISOString().split("T")[0]}.csv"`,
+    );
+
+    const csvStream = formatCsv({ headers: true });
+    csvStream.pipe(res);
+
+    // Summary row
+    csvStream.write({
+      Metric: "Period",
+      Value: periodLabel,
+    });
+    csvStream.write({ Metric: "Total Clients", Value: totalClients });
+    csvStream.write({ Metric: "Total Orders", Value: totalOrders });
+    csvStream.write({ Metric: "Active Orders", Value: activeOrders });
+    csvStream.write({
+      Metric: "Total Revenue",
+      Value: Number(totalRevenue._sum.amount || 0),
+    });
+    csvStream.write({
+      Metric: "Orders in Period",
+      Value: ordersInPeriod,
+    });
+    csvStream.write({
+      Metric: "Revenue in Period",
+      Value: Number(revenueInPeriod._sum.amount || 0),
+    });
+    csvStream.write({
+      Metric: "New Clients in Period",
+      Value: newClientsInPeriod,
+    });
+
+    // Status breakdown
+    for (const row of ordersByStatus) {
+      csvStream.write({
+        Metric: `Orders — ${row.status}`,
+        Value: row._count,
+      });
+    }
+
+    // Type breakdown
+    for (const row of ordersByType) {
+      csvStream.write({
+        Metric: `Orders — ${row.orderType}`,
+        Value: row._count,
+      });
+    }
+
+    csvStream.end();
+  } else {
+    // ── PDF Export ──────────────────────────────────────────────────────
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="dashboard-${new Date().toISOString().split("T")[0]}.pdf"`,
+    );
+
+    const doc = new PDFDocument({ margin: 50 });
+    doc.pipe(res);
+
+    // Title
+    doc
+      .fontSize(20)
+      .font("Helvetica-Bold")
+      .text("Dashboard Report", { align: "center" });
+    doc.moveDown(0.5);
+    doc
+      .fontSize(10)
+      .font("Helvetica")
+      .fillColor("#999999")
+      .text(`Generated: ${new Date().toLocaleDateString()}`, {
+        align: "center",
+      });
+    doc.text(`Period: ${periodLabel}`, { align: "center" });
+    doc.moveDown(1.5);
+
+    // Summary section
+    doc
+      .fontSize(14)
+      .font("Helvetica-Bold")
+      .fillColor("#333333")
+      .text("Summary");
+    doc.moveDown(0.5);
+    doc.fontSize(11).font("Helvetica").fillColor("#555555");
+
+    const summaryData = [
+      ["Total Clients", totalClients],
+      ["Total Orders", totalOrders],
+      ["Active Orders", activeOrders],
+      [
+        "Total Revenue",
+        `₦${Number(totalRevenue._sum.amount || 0).toLocaleString()}`,
+      ],
+      ["Orders in Period", ordersInPeriod],
+      [
+        "Revenue in Period",
+        `₦${Number(revenueInPeriod._sum.amount || 0).toLocaleString()}`,
+      ],
+      ["New Clients in Period", newClientsInPeriod],
+    ];
+
+    for (const [label, value] of summaryData) {
+      doc.text(`${label}: ${value}`);
+    }
+
+    doc.moveDown(1);
+
+    // Order breakdown
+    doc
+      .fontSize(14)
+      .font("Helvetica-Bold")
+      .fillColor("#333333")
+      .text("Orders by Status");
+    doc.moveDown(0.5);
+    doc.fontSize(11).font("Helvetica").fillColor("#555555");
+
+    for (const row of ordersByStatus) {
+      doc.text(`${row.status}: ${row._count}`);
+    }
+
+    doc.moveDown(1);
+
+    doc
+      .fontSize(14)
+      .font("Helvetica-Bold")
+      .fillColor("#333333")
+      .text("Orders by Type");
+    doc.moveDown(0.5);
+    doc.fontSize(11).font("Helvetica").fillColor("#555555");
+
+    for (const row of ordersByType) {
+      doc.text(`${row.orderType}: ${row._count}`);
+    }
+
+    doc.end();
+  }
+};
