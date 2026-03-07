@@ -117,7 +117,7 @@ export default function ClientProfilePage() {
         : "—";
 
     return (
-        <div className="pb-[80px] lg:pb-[160px] max-w-3xl">
+        <div className="pb-[80px] lg:pb-[160px] max-w-5xl">
             <h1 className="text-2xl font-bold text-[#0D0D0D] mb-6">My Profile</h1>
 
             {/* ─── Email Verification Banner ─── */}

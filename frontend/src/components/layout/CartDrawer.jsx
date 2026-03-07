@@ -169,7 +169,7 @@ export default function CartDrawer() {
                                     Delivery fees calculated at checkout
                                 </p>
                                 <Link
-                                    href="/checkout"
+                                    href="/client/checkout"
                                     onClick={closeCart}
                                     className="flex items-center justify-center gap-2 w-full py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors"
                                 >

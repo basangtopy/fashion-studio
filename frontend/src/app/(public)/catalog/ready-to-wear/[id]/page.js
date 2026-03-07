@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -18,14 +18,27 @@ import { CatalogItemNotFound } from "@/components/shared/EmptyStates";
 
 const STOCK_STATUS = { IN_STOCK: { label: "In Stock", color: "#2E7D32" }, LOW_STOCK: { label: "Low Stock", color: "#E65100" }, OUT_OF_STOCK: { label: "Sold Out", color: "#B71C1C" } };
 
+// Suspense boundary — required because useSearchParams() is used inside the component
 export default function RTWDetailPage() {
+    return (
+        <Suspense fallback={<RTWDetailSkeleton />}>
+            <RTWDetailContent />
+        </Suspense>
+    );
+}
+
+function RTWDetailContent() {
     const { id } = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const { isAuthenticated } = useAuth();
-    const { addToCart } = useCart();
+    const { addToCart, closeCart } = useCart();
     const toast = useToast();
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedSize, setSelectedSize] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    // Track whether we've already consumed a post-login action to avoid re-firing
+    const actionConsumed = useRef(false);
 
     const { data: item, isLoading } = useQuery({
         queryKey: ["rtw", id],
@@ -34,6 +47,52 @@ export default function RTWDetailPage() {
             return data.data?.item || data.data?.readyToWear || data.data;
         },
     });
+
+    // ── Post-login callback: auto-resume Add to Cart or Buy Now ───────────────
+    // When the user was redirected to login, we encode the intent (addToCart / buyNow)
+    // as a search param. After successful login they land back here — this effect
+    // fires the appropriate action automatically without requiring a second click.
+    useEffect(() => {
+        const action = searchParams.get("action");
+        if (!action || !isAuthenticated || !item || actionConsumed.current) return;
+
+        // We need a size to proceed — pick first available if none is selected yet
+        const targetSize = selectedSize || item.availableSizes?.[0];
+        if (!targetSize) return;
+
+        if (selectedSize !== targetSize) {
+            setSelectedSize(targetSize);
+        }
+
+        if (action === "addToCart") {
+            actionConsumed.current = true;
+            // Small delay so state update settles
+            setTimeout(() => {
+                addToCart.mutate(
+                    { readyToWearId: item.id, selectedSize: targetSize, quantity },
+                    {
+                        onSuccess: () => toast.success("Added to cart", `${item.name} added to your cart.`),
+                        onError: (err) => toast.error("Error", err.response?.data?.message || "Could not add to cart."),
+                    }
+                );
+            }, 100);
+        } else if (action === "buyNow") {
+            actionConsumed.current = true;
+            setTimeout(() => {
+                addToCart.mutate(
+                    { readyToWearId: item.id, selectedSize: targetSize, quantity },
+                    {
+                        onSuccess: () => {
+                            closeCart();
+                            router.push("/client/checkout");
+                        },
+                        onError: (err) => toast.error("Error", err.response?.data?.message || "Could not add to cart."),
+                    }
+                );
+            }, 100);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated, item, searchParams]);
 
     if (isLoading) {
         return <RTWDetailSkeleton />;
@@ -48,9 +107,15 @@ export default function RTWDetailPage() {
     const stock = STOCK_STATUS[item.stockStatus] || STOCK_STATUS.IN_STOCK;
     const isOutOfStock = item.stockStatus === "OUT_OF_STOCK";
 
+    // ── Redirect to login preserving intent ──────────────────────────────────
+    const redirectToLogin = (action) => {
+        const currentPath = `/catalog/ready-to-wear/${id}`;
+        router.push(`/login?redirectURL=${encodeURIComponent(currentPath)}&action=${action}`);
+    };
+
     const handleAddToCart = () => {
         if (!isAuthenticated) {
-            window.location.href = "/login";
+            redirectToLogin("addToCart");
             return;
         }
         if (!selectedSize) {
@@ -68,7 +133,7 @@ export default function RTWDetailPage() {
 
     const handleBuyNow = () => {
         if (!isAuthenticated) {
-            window.location.href = "/login";
+            redirectToLogin("buyNow");
             return;
         }
         if (!selectedSize) {
@@ -78,7 +143,10 @@ export default function RTWDetailPage() {
         addToCart.mutate(
             { readyToWearId: item.id, selectedSize, quantity },
             {
-                onSuccess: () => { window.location.href = "/checkout"; },
+                onSuccess: () => {
+                    closeCart();
+                    router.push("/client/checkout")
+                },
                 onError: (err) => toast.error("Error", err.response?.data?.message || "Could not add to cart."),
             }
         );

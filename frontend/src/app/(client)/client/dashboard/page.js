@@ -125,6 +125,15 @@ export default function ClientDashboard() {
         refetchInterval: 30000,
     });
 
+    const { data: pendingAppointment } = useQuery({
+        queryKey: ["pendingAppointment"],
+        queryFn: async () => {
+            const { data } = await api.get("/appointments/own");
+            const appointments = data.data?.appointments || data.data || [];
+            return appointments.find((a) => a.status === "REQUESTED" || a.status === "CONFIRMED") || null;
+        }
+    });
+
     const allOrders = Array.isArray(orders) ? orders : [];
     const activeOrders = allOrders.filter(
         (o) => !["COMPLETED", "CANCELLED"].includes(o.status)
@@ -146,6 +155,9 @@ export default function ClientDashboard() {
         month: "long",
         day: "numeric",
     });
+
+    const pendingAppointmentDate = pendingAppointment?.requestedDate;
+    const pendingAppointmentStatus = pendingAppointment?.status;
 
     return (
         <div className="pb-20 lg:pb-0">
@@ -190,10 +202,16 @@ export default function ClientDashboard() {
                         />
                         <StatCard
                             label="Upcoming Appointment"
-                            value="None booked"
+                            value={pendingAppointmentDate ? new Date(pendingAppointmentDate).toLocaleDateString("en-NG", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            }) : "None booked"}
                             icon={Calendar}
                             color="#1565C0"
                             delay={0.18}
+                            contextLine={pendingAppointmentStatus ? pendingAppointmentStatus === "REQUESTED" ? "Pending confirmation" : pendingAppointmentStatus === "CONFIRMED" ? "Fitting appointment confirmed" : "" : ""}
                         />
                     </>
                 )}
@@ -267,12 +285,13 @@ export default function ClientDashboard() {
                     {[
                         { href: "/catalog/styles", icon: ShoppingBag, label: "Place New Order", color: "#C2185B" },
                         { href: "/client/measurements", icon: Ruler, label: "Update Measurements", color: "#6A1B9A" },
-                        { href: "/client/appointments", icon: Calendar, label: "Book Appointment", color: "#1565C0" },
+                        { href: user ? "?action=book_appointment" : `/login?redirectURL=${pathname}&action=book_appointment`, icon: Calendar, label: "Book Appointment", color: "#1565C0" },
                         { href: "/portfolio", icon: Eye, label: "View Portfolio", color: "#2E7D32" },
                     ].map((action) => (
                         <motion.div key={action.label} variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
                             <Link
                                 href={action.href}
+                                {...action.href.includes("?action=") && { scroll: false }}
                                 className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
                             >
                                 <div

@@ -58,6 +58,7 @@ const PAGE_TITLES = {
     "/client/measurements": "Measurements",
     "/client/payments": "Payments",
     "/client/profile": "Profile",
+    "/client/checkout": "Checkout",
 };
 
 function getPageTitle(pathname) {

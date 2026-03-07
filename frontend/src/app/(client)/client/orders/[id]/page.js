@@ -28,6 +28,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { formatCurrency, ORDER_STATUS, ORDER_TYPES, PAYMENT_STATUS } from "@/config/branding";
 import StatusPill from "@/components/shared/StatusPill";
+import PaymentInfoCard from "@/components/shared/PaymentInfoCard";
 import { useToast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthContext";
 
@@ -633,164 +634,170 @@ export default function OrderDetailPage() {
                 </div>
 
                 {/* ═══ RIGHT COLUMN — Chat Panel ═══ */}
-                <div
-                    className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none lg:block lg:z-auto lg:col-span-2 transition-opacity duration-300 ${mobileChatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'
-                        }`}
-                    onClick={(e) => {
-                        // Close if clicked on the overlay background
-                        if (e.target === e.currentTarget) setMobileChatOpen(false);
-                    }}
-                >
+                <div className="lg:col-span-2 lg:space-y-6">
                     <div
-                        className={`absolute bottom-0 left-0 right-0 h-[100dvh] lg:static lg:h-[calc(100vh-145px)] flex flex-col rounded-t-2xl lg:rounded-xl border-0 lg:border border-[rgba(0,0,0,0.06)] bg-white lg:overflow-hidden lg:sticky lg:top-[72px] transform transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileChatOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'
+                        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none lg:block lg:z-auto transition-opacity duration-300 ${mobileChatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'
                             }`}
+                        onClick={(e) => {
+                            // Close if clicked on the overlay background
+                            if (e.target === e.currentTarget) setMobileChatOpen(false);
+                        }}
                     >
-                        {/* Chat header */}
-                        <div className="px-5 py-3 border-b border-[rgba(0,0,0,0.06)] flex items-center gap-2 bg-white shrink-0">
-                            <MessageSquare size={16} className="text-[#C2185B]" />
-                            <h3 className="text-sm font-semibold text-[#0D0D0D]">Order Chat</h3>
-                            <span className="text-[10px] text-[#999] ml-auto">{messages.length} messages</span>
-                            <button className="lg:hidden ml-2 p-1.5 rounded-full hover:bg-[#F4F0F8] text-[#555] transition-colors" onClick={() => setMobileChatOpen(false)}>
-                                <X size={16} />
-                            </button>
-                        </div>
+                        <div
+                            className={`absolute bottom-0 left-0 right-0 h-[100dvh] lg:static lg:h-[calc(100vh-145px)] flex flex-col rounded-t-2xl lg:rounded-xl border-0 lg:border border-[rgba(0,0,0,0.06)] bg-white lg:overflow-hidden lg:sticky lg:top-[72px] transform transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileChatOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'
+                                }`}
+                        >
+                            {/* Chat header */}
+                            <div className="px-5 py-3 border-b border-[rgba(0,0,0,0.06)] flex items-center gap-2 bg-white shrink-0">
+                                <MessageSquare size={16} className="text-[#C2185B]" />
+                                <h3 className="text-sm font-semibold text-[#0D0D0D]">Order Chat</h3>
+                                <span className="text-[10px] text-[#999] ml-auto">{messages.length} messages</span>
+                                <button className="lg:hidden ml-2 p-1.5 rounded-full hover:bg-[#F4F0F8] text-[#555] transition-colors" onClick={() => setMobileChatOpen(false)}>
+                                    <X size={16} />
+                                </button>
+                            </div>
 
-                        {/* Messages */}
-                        <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
-                            {messages.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full text-center">
-                                    <MessageSquare size={24} className="text-[#E0E0E0] mb-2" />
-                                    <p className="text-sm text-[#999]">No messages yet.</p>
-                                    <p className="text-xs text-[#999] mt-1">Send a message to start the conversation.</p>
-                                </div>
-                            ) : (
-                                messages.map((msg, idx) => {
-                                    const msgDate = new Date(msg.createdAt).setHours(0, 0, 0, 0);
-                                    const prevMsgDate = idx > 0 ? new Date(messages[idx - 1].createdAt).setHours(0, 0, 0, 0) : null;
-                                    const showDateSeparator = msgDate !== prevMsgDate;
+                            {/* Messages */}
+                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
+                                {messages.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-center">
+                                        <MessageSquare size={24} className="text-[#E0E0E0] mb-2" />
+                                        <p className="text-sm text-[#999]">No messages yet.</p>
+                                        <p className="text-xs text-[#999] mt-1">Send a message to start the conversation.</p>
+                                    </div>
+                                ) : (
+                                    messages.map((msg, idx) => {
+                                        const msgDate = new Date(msg.createdAt).setHours(0, 0, 0, 0);
+                                        const prevMsgDate = idx > 0 ? new Date(messages[idx - 1].createdAt).setHours(0, 0, 0, 0) : null;
+                                        const showDateSeparator = msgDate !== prevMsgDate;
 
-                                    return (
-                                        <div key={msg.id} className="flex flex-col gap-3">
-                                            {showDateSeparator && (
-                                                <div className="flex items-center justify-center my-1">
-                                                    <span className="px-3 py-1 bg-[#F4F0F8] rounded-full text-[10px] font-semibold text-[#999] tracking-wider uppercase">
-                                                        {new Date(msg.createdAt).toLocaleDateString("en-NG", {
-                                                            weekday: "short",
-                                                            day: "numeric",
-                                                            month: "short",
-                                                            year: new Date(msg.createdAt).getFullYear() !== new Date().getFullYear() ? "numeric" : undefined
-                                                        })}
-                                                    </span>
-                                                </div>
-                                            )}
-                                            <div
-                                                className={`flex ${msg.senderRole === "CLIENT" ? "justify-end" : "justify-start"} ${!msg.isRead && msg.senderRole !== "CLIENT" ? "chat-msg-unread" : ""}`}
-                                                data-unread={!msg.isRead && msg.senderRole !== "CLIENT" ? "true" : "false"}
-                                            >
-                                                <div
-                                                    className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm ${msg.senderRole === "CLIENT"
-                                                        ? "bg-[#C2185B] text-white rounded-br-md"
-                                                        : "bg-white text-[#0D0D0D] rounded-bl-md shadow-sm border border-[rgba(0,0,0,0.06)]"
-                                                        }`}
-                                                >
-                                                    {/* Image attachments — clickable for lightbox */}
-                                                    {msg.attachments?.length > 0 && (
-                                                        <div className="mb-2 grid gap-1">
-                                                            {msg.attachments.map((img, i) => (
-                                                                <button
-                                                                    key={i}
-                                                                    onClick={() => setLightboxImage(img)}
-                                                                    className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
-                                                                >
-                                                                    <Image src={img} alt="" fill className="object-cover" />
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {/* Legacy images field fallback */}
-                                                    {!msg.attachments?.length && msg.images?.length > 0 && (
-                                                        <div className="mb-2 grid gap-1">
-                                                            {msg.images.map((img, i) => (
-                                                                <button
-                                                                    key={i}
-                                                                    onClick={() => setLightboxImage(img)}
-                                                                    className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
-                                                                >
-                                                                    <Image src={img} alt="" fill className="object-cover" />
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    )}
-                                                    {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
-                                                    <div className={`flex items-center justify-end gap-1 mt-1 ${msg.senderRole === "CLIENT" ? "text-white/70" : "text-[#999]"}`}>
-                                                        <span className="text-[10px]">
-                                                            {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                                        return (
+                                            <div key={msg.id} className="flex flex-col gap-3">
+                                                {showDateSeparator && (
+                                                    <div className="flex items-center justify-center my-1">
+                                                        <span className="px-3 py-1 bg-[#F4F0F8] rounded-full text-[10px] font-semibold text-[#999] tracking-wider uppercase">
+                                                            {new Date(msg.createdAt).toLocaleDateString("en-NG", {
+                                                                weekday: "short",
+                                                                day: "numeric",
+                                                                month: "short",
+                                                                year: new Date(msg.createdAt).getFullYear() !== new Date().getFullYear() ? "numeric" : undefined
+                                                            })}
                                                         </span>
-                                                        {msg.senderRole === "CLIENT" && (
-                                                            msg.isRead || msg.readAt
-                                                                ? <CheckCheck size={14} />
-                                                                : <Check size={14} />
+                                                    </div>
+                                                )}
+                                                <div
+                                                    className={`flex ${msg.senderRole === "CLIENT" ? "justify-end" : "justify-start"} ${!msg.isRead && msg.senderRole !== "CLIENT" ? "chat-msg-unread" : ""}`}
+                                                    data-unread={!msg.isRead && msg.senderRole !== "CLIENT" ? "true" : "false"}
+                                                >
+                                                    <div
+                                                        className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm ${msg.senderRole === "CLIENT"
+                                                            ? "bg-[#C2185B] text-white rounded-br-md"
+                                                            : "bg-white text-[#0D0D0D] rounded-bl-md shadow-sm border border-[rgba(0,0,0,0.06)]"
+                                                            }`}
+                                                    >
+                                                        {/* Image attachments — clickable for lightbox */}
+                                                        {msg.attachments?.length > 0 && (
+                                                            <div className="mb-2 grid gap-1">
+                                                                {msg.attachments.map((img, i) => (
+                                                                    <button
+                                                                        key={i}
+                                                                        onClick={() => setLightboxImage(img)}
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
+                                                                    >
+                                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
                                                         )}
+                                                        {/* Legacy images field fallback */}
+                                                        {!msg.attachments?.length && msg.images?.length > 0 && (
+                                                            <div className="mb-2 grid gap-1">
+                                                                {msg.images.map((img, i) => (
+                                                                    <button
+                                                                        key={i}
+                                                                        onClick={() => setLightboxImage(img)}
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
+                                                                    >
+                                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
+                                                        <div className={`flex items-center justify-end gap-1 mt-1 ${msg.senderRole === "CLIENT" ? "text-white/70" : "text-[#999]"}`}>
+                                                            <span className="text-[10px]">
+                                                                {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                                                            </span>
+                                                            {msg.senderRole === "CLIENT" && (
+                                                                msg.isRead || msg.readAt
+                                                                    ? <CheckCheck size={14} />
+                                                                    : <Check size={14} />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
-
-                        {/* Attachment preview */}
-                        {chatAttachmentPreview && (
-                            <div className="px-3 pt-2 bg-white border-t border-[rgba(0,0,0,0.06)]">
-                                <div className="relative inline-block">
-                                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#F4F0F8]">
-                                        <Image src={chatAttachmentPreview} alt="Attachment" fill className="object-cover" />
-                                    </div>
-                                    <button
-                                        onClick={() => { setChatAttachment(null); setChatAttachmentPreview(null); }}
-                                        className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C62828] text-white flex items-center justify-center"
-                                    >
-                                        <X size={10} />
-                                    </button>
-                                </div>
+                                        );
+                                    })
+                                )}
                             </div>
-                        )}
 
-                        {/* Chat input */}
-                        <div className="px-3 py-3 border-t border-[rgba(0,0,0,0.06)] bg-white flex gap-2 items-end">
-                            <input
-                                ref={fileInputRef}
-                                type="file"
-                                accept="image/*"
-                                onChange={handleChatFileSelect}
-                                className="hidden"
-                            />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="h-10 w-10 rounded-full flex items-center justify-center text-[#999] hover:bg-[#F4F0F8] transition-colors shrink-0"
-                            >
-                                <Paperclip size={16} />
-                            </button>
-                            <input
-                                type="text"
-                                value={chatMessage}
-                                onChange={(e) => setChatMessage(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && (chatMessage.trim() || chatAttachment) && handleSendMessage()}
-                                placeholder="Type a message..."
-                                className="flex-1 h-10 px-3.5 text-sm border border-[#E0E0E0] rounded-full focus:border-[#C2185B] outline-none bg-[#FAFAFA]"
-                            />
-                            <button
-                                onClick={handleSendMessage}
-                                disabled={(!chatMessage.trim() && !chatAttachment) || sendMessage.isPending}
-                                className="h-10 w-10 rounded-full bg-[#C2185B] text-white flex items-center justify-center hover:bg-[#A01548] disabled:opacity-50 transition-colors shrink-0"
-                            >
-                                <Send size={16} />
-                            </button>
+                            {/* Attachment preview */}
+                            {chatAttachmentPreview && (
+                                <div className="px-3 pt-2 bg-white border-t border-[rgba(0,0,0,0.06)]">
+                                    <div className="relative inline-block">
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#F4F0F8]">
+                                            <Image src={chatAttachmentPreview} alt="Attachment" fill className="object-cover" />
+                                        </div>
+                                        <button
+                                            onClick={() => { setChatAttachment(null); setChatAttachmentPreview(null); }}
+                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C62828] text-white flex items-center justify-center"
+                                        >
+                                            <X size={10} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Chat input */}
+                            <div className="px-3 py-3 border-t border-[rgba(0,0,0,0.06)] bg-white flex gap-2 items-end">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleChatFileSelect}
+                                    className="hidden"
+                                />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="h-10 w-10 rounded-full flex items-center justify-center text-[#999] hover:bg-[#F4F0F8] transition-colors shrink-0"
+                                >
+                                    <Paperclip size={16} />
+                                </button>
+                                <input
+                                    type="text"
+                                    value={chatMessage}
+                                    onChange={(e) => setChatMessage(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && (chatMessage.trim() || chatAttachment) && handleSendMessage()}
+                                    placeholder="Type a message..."
+                                    className="flex-1 h-10 px-3.5 text-sm border border-[#E0E0E0] rounded-full focus:border-[#C2185B] outline-none bg-[#FAFAFA]"
+                                />
+                                <button
+                                    onClick={handleSendMessage}
+                                    disabled={(!chatMessage.trim() && !chatAttachment) || sendMessage.isPending}
+                                    className="h-10 w-10 rounded-full bg-[#C2185B] text-white flex items-center justify-center hover:bg-[#A01548] disabled:opacity-50 transition-colors shrink-0"
+                                >
+                                    <Send size={16} />
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <PaymentInfoCard orderNumber={order?.orderNumber} grandTotal={outstanding} />
                 </div>
             </div>
+
+
 
             {/* ─── Mobile Sticky Bottom Action Bar ─── */}
             <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-[rgba(0,0,0,0.06)] z-40 lg:hidden flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">

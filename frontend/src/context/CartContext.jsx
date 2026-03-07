@@ -20,7 +20,7 @@ export function CartProvider({ children }) {
         queryKey: ["cart"],
         queryFn: async () => {
             const { data } = await api.get("/cart");
-            return data.data?.cart || data.data;
+            return isAuthenticated ? data.data?.cart || data.data : null;
         },
         enabled: isAuthenticated,
     });

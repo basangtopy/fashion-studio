@@ -15,7 +15,7 @@ export const createAppointment = async (req, res) => {
   const existingOpen = await prisma.measurementAppointment.findFirst({
     where: {
       clientId: req.user.userId,
-      status: "REQUESTED",
+      status: { in: ["REQUESTED", "CONFIRMED"] }
     },
   });
 

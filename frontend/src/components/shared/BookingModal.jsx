@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, Clock, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,34 +27,66 @@ import { useToast } from "@/components/ui/toaster";
 export function BookingModal({ isOpen, onOpenChange }) {
     const { user, isAuthenticated } = useAuth();
     const { success, error, warning } = useToast();
+    const queryClient = useQueryClient();
 
     const [date, setDate] = useState(null);
     const [notes, setNotes] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    // const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const [pendingAppointment, setPendingAppointment] = useState(null);
-    const [isLoadingStatus, setIsLoadingStatus] = useState(false);
+    // const [pendingAppointment, setPendingAppointment] = useState(null);
+    // const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
     // Fetch 'own' appointments to check for a REQUESTED one
-    useEffect(() => {
-        async function checkPending() {
-            if (!isOpen || !isAuthenticated) return;
-
-            setIsLoadingStatus(true);
-            try {
-                const { data } = await api.get("/appointments/own");
-                if (data.success && data.data?.appointments) {
-                    const req = data.data.appointments.find((a) => a.status === "REQUESTED");
-                    setPendingAppointment(req || null);
-                }
-            } catch (err) {
-                console.error("Error checking appointments:", err);
-            } finally {
-                setIsLoadingStatus(false);
-            }
+    const { data: pendingAppointment, isLoading: isLoadingStatus, isError } = useQuery({
+        queryKey: ["pendingAppointment"],
+        queryFn: async () => {
+            const { data } = await api.get("/appointments/own");
+            const appointments = data.data?.appointments || data.data || [];
+            return appointments.find((a) => a.status === "REQUESTED") || null;
         }
-        checkPending();
-    }, [isOpen, isAuthenticated]);
+    });
+
+    if (isError) {
+        error(
+            "Error",
+            "Failed to fetch appointments."
+        );
+    }
+
+    const { mutate: requestAppointment, isPending: isSubmitting } = useMutation({
+        mutationFn: async ({ requestedDate, clientNotes }) => {
+            const { data } = await api.post("/appointments", {
+                requestedDate,
+                clientNotes,
+            });
+            return data.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["pendingAppointment"] });
+        },
+    });
+
+
+
+    // useEffect(() => {
+    //     async function checkPending() {
+    //         if (!isOpen || !isAuthenticated) return;
+
+    //         setIsLoadingStatus(true);
+    //         try {
+    //             const { data } = await api.get("/appointments/own");
+    //             if (data.success && data.data?.appointments) {
+    //                 const req = data.data.appointments.find((a) => a.status === "REQUESTED");
+    //                 setPendingAppointment(req || null);
+    //             }
+    //         } catch (err) {
+    //             console.error("Error checking appointments:", err);
+    //         } finally {
+    //             setIsLoadingStatus(false);
+    //         }
+    //     }
+    //     checkPending();
+    // }, [isOpen, isAuthenticated]);
 
     // Clean form when closing
     useEffect(() => {
@@ -65,38 +98,63 @@ export function BookingModal({ isOpen, onOpenChange }) {
         }
     }, [isOpen]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         if (!date) return;
 
-        setIsSubmitting(true);
-        try {
-            const { data } = await api.post("/appointments", {
-                requestedDate: date.toISOString(),
-                clientNotes: notes,
-            });
-
-            if (data.success) {
+        requestAppointment({
+            requestedDate: date.toISOString(),
+            clientNotes: notes,
+        }, {
+            onSuccess: () => {
                 success(
                     "Request submitted",
                     "Your fitting appointment request has been sent to our studio."
                 );
-                setPendingAppointment(data.data.appointment);
-            }
-        } catch (err) {
-            if (err.response?.status === 409) {
-                warning(
-                    "Already Requested",
-                    "You already have a pending appointment request."
-                );
-            } else {
-                error(
-                    "Error",
-                    err.response?.data?.message || "Failed to request appointment."
-                );
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
+            },
+            onError: (err) => {
+                if (err.response?.status === 409) {
+                    warning(
+                        "Already Requested",
+                        "You already have a pending appointment request."
+                    );
+                } else {
+                    error(
+                        "Error",
+                        err.response?.data?.message || "Failed to request appointment."
+                    );
+                }
+            },
+        });
+
+        // setIsSubmitting(true);
+        // try {
+        //     const { data } = await api.post("/appointments", {
+        //         requestedDate: date.toISOString(),
+        //         clientNotes: notes,
+        //     });
+
+        //     if (data.success) {
+        //         success(
+        //             "Request submitted",
+        //             "Your fitting appointment request has been sent to our studio."
+        //         );
+        //         setPendingAppointment(data.data.appointment);
+        //     }
+        // } catch (err) {
+        //     if (err.response?.status === 409) {
+        //         warning(
+        //             "Already Requested",
+        //             "You already have a pending appointment request."
+        //         );
+        //     } else {
+        //         error(
+        //             "Error",
+        //             err.response?.data?.message || "Failed to request appointment."
+        //         );
+        //     }
+        // } finally {
+        //     setIsSubmitting(false);
+        // }
     };
 
     if (!isAuthenticated) return null;
@@ -316,7 +374,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                             selected={date}
                                             onSelect={setDate}
                                             disabled={(date) =>
-                                                date < new Date() || date < new Date("1900-01-01")
+                                                date < new Date().setHours(0, 0, 0, 0) || date < new Date("1900-01-01")
                                             }
                                             initialFocus
                                         />

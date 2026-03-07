@@ -341,7 +341,7 @@ export const checkout = async (req, res) => {
         orderId: newOrder.id,
         status: "AGREED_AWAITING_PAYMENT",
         changedById: userId,
-        note: `Order placed via Cart checkout (${cart.items.length} items)`,
+        note: `Order placed via Cart checkout (${cart.items.length} ${cart.items.length > 1 ? "items" : "item"})`,
       },
     });
 
