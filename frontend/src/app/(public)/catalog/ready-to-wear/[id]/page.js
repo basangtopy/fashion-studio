@@ -13,6 +13,8 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
+import { RTWDetailSkeleton } from "@/components/shared/Skeleton";
+import { CatalogItemNotFound } from "@/components/shared/EmptyStates";
 
 const STOCK_STATUS = { IN_STOCK: { label: "In Stock", color: "#2E7D32" }, LOW_STOCK: { label: "Low Stock", color: "#E65100" }, OUT_OF_STOCK: { label: "Sold Out", color: "#B71C1C" } };
 
@@ -34,19 +36,11 @@ export default function RTWDetailPage() {
     });
 
     if (isLoading) {
-        return (
-            <div className="pt-[var(--nav-height)] page-container py-12">
-                <div className="skeleton h-[400px] rounded-xl" />
-            </div>
-        );
+        return <RTWDetailSkeleton />;
     }
 
     if (!item) {
-        return (
-            <div className="pt-[var(--nav-height)] page-container py-12 text-center">
-                <p className="text-[#555]">Item not found.</p>
-            </div>
-        );
+        return <CatalogItemNotFound type="ready-to-wear" />;
     }
 
     const images = item.images || [];
@@ -103,9 +97,9 @@ export default function RTWDetailPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
                     {/* Image Gallery */}
                     <div>
-                        <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F0F8] mb-4">
+                        <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F0F8] mb-4 group">
                             {images[selectedImage] ? (
-                                <Image src={images[selectedImage]} alt={item.name} fill className="object-cover" />
+                                <Image src={images[selectedImage]} alt={item.name} fill className="object-cover transition-transform duration-300 group-hover:scale-110" />
                             ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-[#F8E8F0] to-[#F4F0F8]" />
                             )}

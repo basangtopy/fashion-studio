@@ -199,6 +199,16 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Reserve permanent scrollbar gutter so Radix's scroll-lock
+       padding-right injection never shifts the page width */
+    scrollbar-gutter: stable;
+  }
+
+  /* Belt-and-suspenders: override Radix's injected padding-right
+     when a modal/dialog locks the body scroll */
+  body[data-scroll-locked] {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
   }
 
   body {
@@ -453,6 +463,46 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 6px;
+}
+
+/* ============================================
+   MODAL ANIMATIONS (design brief Motion Principles)
+   Duration: 400ms — Medium (modals)
+   Easing: var(--ease-spring) = cubic-bezier(0.16, 1, 0.3, 1) — enter
+         var(--ease-in)     = cubic-bezier(0.55, 0, 1, 0.45)  — exit
+   Scale:  0.97 → 1.0 (brief specifies fade + scale 0.97→1.0)
+   ============================================ */
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes modal-exit {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+}
+
+.modal-animate-in {
+  animation: modal-enter 400ms var(--ease-spring) forwards;
+}
+
+.modal-animate-out {
+  animation: modal-exit 200ms var(--ease-in) forwards;
 }
 
 /* ============================================

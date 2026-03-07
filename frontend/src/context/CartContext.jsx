@@ -20,7 +20,7 @@ export function CartProvider({ children }) {
         queryKey: ["cart"],
         queryFn: async () => {
             const { data } = await api.get("/cart");
-            return data.data;
+            return data.data?.cart || data.data;
         },
         enabled: isAuthenticated,
     });
@@ -76,10 +76,11 @@ export function CartProvider({ children }) {
 
     // Checkout
     const checkout = useMutation({
-        mutationFn: async ({ fulfillmentMethod, deliveryAddress }) => {
+        mutationFn: async ({ fulfillmentMethod, deliveryAddress, clientNotes }) => {
             const { data } = await api.post("/cart/checkout", {
                 fulfillmentMethod,
                 deliveryAddress,
+                clientNotes,
             });
             return data.data;
         },

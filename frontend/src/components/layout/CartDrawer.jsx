@@ -109,7 +109,7 @@ export default function CartDrawer() {
                                                     Size: {item.selectedSize}
                                                 </p>
                                                 <p className="text-sm font-semibold font-mono-data text-[#0D0D0D] mt-1">
-                                                    {formatCurrency(item.readyToWear?.price)}
+                                                    {formatCurrency(item.readyToWear?.price * item.quantity)}
                                                 </p>
 
                                                 {/* Quantity Controls */}

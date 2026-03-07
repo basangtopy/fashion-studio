@@ -9,7 +9,8 @@ import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
-import { SkeletonCard } from "@/components/shared/Skeleton";
+import { StyleDetailSkeleton } from "@/components/shared/Skeleton";
+import { CatalogItemNotFound } from "@/components/shared/EmptyStates";
 import { Button } from "@/components/ui/button";
 
 export default function StyleDetailPage() {
@@ -26,19 +27,11 @@ export default function StyleDetailPage() {
     });
 
     if (isLoading) {
-        return (
-            <div className="pt-[var(--nav-height)] page-container py-12">
-                <SkeletonCard className="max-w-4xl mx-auto" />
-            </div>
-        );
+        return <StyleDetailSkeleton />;
     }
 
     if (!style) {
-        return (
-            <div className="pt-[var(--nav-height)] page-container py-12 text-center">
-                <p className="text-[#555]">Style not found.</p>
-            </div>
-        );
+        return <CatalogItemNotFound type="style" />;
     }
 
     const images = style.images || [];
