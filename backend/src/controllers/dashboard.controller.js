@@ -2,6 +2,7 @@ import prisma from "../config/prisma.js";
 import { successResponse } from "../utils/apiResponse.js";
 import { format as formatCsv } from "fast-csv";
 import PDFDocument from "pdfkit";
+import { getOnlineUserIds } from "../utils/sseManager.js";
 
 // ─── GET /admin/dashboard ─────────────────────────────────────────────────
 // Returns aggregated business metrics. Accepts optional ?from=&to= for
@@ -32,6 +33,7 @@ export const getDashboardStats = async (req, res) => {
     activeOrders,
     pendingPayments,
     pendingTestimonials,
+    appointmentsPending,
     totalRevenue,
     ordersInPeriod,
     revenueInPeriod,
@@ -51,6 +53,7 @@ export const getDashboardStats = async (req, res) => {
     }),
     prisma.payment.count({ where: { status: "PENDING" } }),
     prisma.testimonial.count({ where: { status: "PENDING" } }),
+    prisma.measurementAppointment.count({ where: { status: "REQUESTED" } }),
 
     // All-time revenue
     prisma.payment.aggregate({
@@ -78,9 +81,9 @@ export const getDashboardStats = async (req, res) => {
       where: dateFilter,
     }),
 
-    // Recent orders (last 5)
+    // Recent orders (last 10)
     prisma.order.findMany({
-      take: 5,
+      take: 10,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -145,6 +148,7 @@ export const getDashboardStats = async (req, res) => {
     activeOrders,
     pendingPayments,
     pendingTestimonials,
+    appointmentsPending,
     unreadChats,
 
     // Period-based metrics
@@ -382,5 +386,113 @@ export const exportDashboard = async (req, res) => {
     }
 
     doc.end();
+  }
+};
+
+// ─── GET /admin/dashboard/online-count ────────────────────────────────────────
+// Returns the count of currently online CLIENT-role users (excludes admins).
+// Driven by the in-memory SSE registry — no DB round-trip for the presence
+// check itself, but we do a single DB query to filter out admin connections.
+
+export const getOnlineClientsCount = async (req, res) => {
+  const onlineIds = getOnlineUserIds();
+
+  if (onlineIds.length === 0) {
+    return successResponse(res, 200, "Online clients count", { onlineClients: 0 });
+  }
+
+  // Filter to only CLIENT-role users among the connected IDs
+  const onlineClients = await prisma.user.count({
+    where: {
+      id: { in: onlineIds },
+      role: "CLIENT",
+    },
+  });
+
+  return successResponse(res, 200, "Online clients count", { onlineClients });
+};
+
+// ─── GET /admin/dashboard/search ──────────────────────────────────────────────
+// Global search for the Admin Command Palette
+
+export const globalSearch = async (req, res) => {
+  const { q } = req.query;
+  if (!q || typeof q !== "string" || q.trim().length === 0) {
+    return successResponse(res, 200, "Search results", {
+      orders: [],
+      clients: [],
+      styles: [],
+      rtw: [],
+    });
+  }
+
+  const query = q.trim();
+
+  try {
+    const [orders, clients, styles, rtw] = await Promise.all([
+      // 1. Orders matching order number
+      prisma.order.findMany({
+        where: {
+          orderNumber: { contains: query, mode: "insensitive" },
+        },
+        select: {
+          id: true,
+          orderNumber: true,
+          status: true,
+          client: { select: { fullName: true } }
+        },
+        take: 5,
+      }),
+      // 2. Clients matching name or email
+      prisma.user.findMany({
+        where: {
+          role: "CLIENT",
+          OR: [
+            { fullName: { contains: query, mode: "insensitive" } },
+            { email: { contains: query, mode: "insensitive" } }
+          ],
+        },
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+        },
+        take: 5,
+      }),
+      // 3. Styles matching name
+      prisma.style.findMany({
+        where: {
+          name: { contains: query, mode: "insensitive" },
+        },
+        select: {
+          id: true,
+          name: true,
+          isActive: true,
+        },
+        take: 5,
+      }),
+      // 4. RTW matching name
+      prisma.readyToWear.findMany({
+        where: {
+          name: { contains: query, mode: "insensitive" },
+        },
+        select: {
+          id: true,
+          name: true,
+          isActive: true,
+        },
+        take: 5,
+      })
+    ]);
+
+    return successResponse(res, 200, "Search results", {
+      orders,
+      clients,
+      styles,
+      rtw,
+    });
+  } catch (error) {
+    console.error("Global search error:", error);
+    return res.status(500).json({ status: "error", message: "Failed to perform global search" });
   }
 };

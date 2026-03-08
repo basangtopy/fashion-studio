@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
     ArrowLeft, User, Mail, Phone, MapPin, Calendar, ShoppingBag, CreditCard,
-    Ruler, CheckCircle2, XCircle, Plus, Pencil,
+    Ruler, CheckCircle2, XCircle, Plus, Pencil, MessageSquare,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -15,7 +15,7 @@ import { SkeletonCard } from "@/components/shared/Skeleton";
 import CreateOrderModal from "@/components/admin/CreateOrderModal";
 import MeasurementFormModal from "@/components/admin/MeasurementFormModal";
 
-const TABS = ["overview", "orders", "measurements", "payments"];
+const TABS = ["overview", "orders", "measurements", "payments", "chat"];
 
 // Fields to exclude from measurement display
 const MEASUREMENT_META = ["id", "clientId", "client", "createdAt", "updatedAt", "disclaimerSignedAt", "updatedByRole", "notes", "customParams"];
@@ -164,6 +164,36 @@ export default function AdminClientDetailPage() {
                     {/* Overview Tab */}
                     {activeTab === "overview" && (
                         <div className="space-y-6">
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
+                                    <p className="text-2xl font-bold text-[#0D0D0D]">{client._count?.orders || orders.length}</p>
+                                    <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Total Orders</p>
+                                </div>
+                                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
+                                    <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+                                        {formatCurrency(orders.reduce((sum, o) => sum + (o.totalPaid || 0), 0))}
+                                    </p>
+                                    <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Total Spend</p>
+                                </div>
+                                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
+                                    <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+                                        {orders.length > 0 ? formatCurrency(orders.reduce((sum, o) => sum + (o.totalPaid || 0), 0) / orders.length) : formatCurrency(0)}
+                                    </p>
+                                    <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Avg Order Value</p>
+                                </div>
+                            </div>
+
+                            {/* Contact info */}
+                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Contact Info</h3>
+                                <div className="space-y-3 text-sm">
+                                    <InfoRow icon={Mail} label="Email" value={client.email} />
+                                    <InfoRow icon={Phone} label="Phone" value={client.phone || "—"} />
+                                    <InfoRow icon={MapPin} label="Address" value={client.address || "—"} />
+                                </div>
+                            </div>
+
                             <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
                                 <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Recent Orders</h3>
                                 {orders.length === 0 ? (
@@ -284,6 +314,9 @@ export default function AdminClientDetailPage() {
                     )}
 
                     {activeTab === "payments" && <ClientPaymentsTab clientId={id} orders={orders} />}
+
+                    {/* Chat History Tab */}
+                    {activeTab === "chat" && <ClientChatHistoryTab clientId={id} orders={orders} />}
                 </div>
             </div>
 
@@ -363,6 +396,68 @@ function InfoRow({ icon: Icon, label, value }) {
                 <p className="text-[10px] uppercase text-[#999]">{label}</p>
                 <p className="text-[#0D0D0D] font-medium break-all">{typeof value === "string" || typeof value === "number" ? value : "—"}</p>
             </div>
+        </div>
+    );
+}
+
+function ClientChatHistoryTab({ clientId, orders }) {
+    const { data: chatThreads, isLoading } = useQuery({
+        queryKey: ["admin-client-chats", clientId],
+        queryFn: async () => {
+            if (!orders.length) return [];
+            const threads = await Promise.all(
+                orders.map(async (order) => {
+                    try {
+                        const { data } = await api.get(`/chat/${order.id}`);
+                        const msgs = data.data?.messages || data.data || [];
+                        if (!Array.isArray(msgs) || msgs.length === 0) return null;
+                        return { order, messages: msgs, lastMessage: msgs[msgs.length - 1] };
+                    } catch { return null; }
+                })
+            );
+            return threads.filter(Boolean).sort((a, b) =>
+                new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt)
+            );
+        },
+        enabled: orders?.length > 0,
+    });
+
+    const threads = Array.isArray(chatThreads) ? chatThreads : [];
+
+    if (isLoading) return <SkeletonCard className="h-[200px]" />;
+
+    return (
+        <div className="space-y-3">
+            {threads.length === 0 ? (
+                <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
+                    <MessageSquare size={24} className="text-[#999] mx-auto mb-2" />
+                    <p className="text-sm text-[#555]">No chat history.</p>
+                </div>
+            ) : (
+                threads.map((thread) => (
+                    <Link key={thread.order.id} href={`/admin/orders/${thread.order.id}`}
+                        className="flex items-center justify-between p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
+                        <div className="flex items-start gap-3 min-w-0 flex-1">
+                            <div className="w-9 h-9 rounded-full bg-[#C2185B]/10 flex items-center justify-center shrink-0">
+                                <MessageSquare size={16} className="text-[#C2185B]" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs font-mono-data text-[#999]">{thread.order.orderNumber}</p>
+                                <p className="text-sm text-[#555] truncate mt-0.5">
+                                    {thread.lastMessage.senderRole !== "CLIENT" ? "You: " : ""}
+                                    {thread.lastMessage.message || "[Attachment]"}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="text-right shrink-0 ml-3">
+                            <span className="text-[10px] text-[#999]">
+                                {new Date(thread.lastMessage.createdAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
+                            </span>
+                            <p className="text-[9px] text-[#999] mt-0.5">{thread.messages.length} msgs</p>
+                        </div>
+                    </Link>
+                ))
+            )}
         </div>
     );
 }

@@ -94,6 +94,7 @@ export default function useSSE() {
         es.addEventListener("presence", (e) => {
             try {
                 queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
+                queryClient.invalidateQueries({ queryKey: ["admin-online-count"] });
             } catch { /* ignore */ }
         });
 

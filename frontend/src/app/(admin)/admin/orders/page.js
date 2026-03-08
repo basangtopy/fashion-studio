@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
     Search, Eye, LayoutGrid, List, ChevronRight, ChevronLeft,
-    Plus, Calendar,
+    Plus, Calendar, X, ArrowRight,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -132,6 +132,36 @@ export default function AdminOrdersPage() {
                 </div>
             </div>
 
+            {/* Active filter pills */}
+            {(statusFilter || typeFilter || searchQuery || dateFrom || dateTo) && (
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                    {statusFilter && (
+                        <button onClick={() => { setStatusFilter(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C2185B]/8 text-[#C2185B] text-[11px] font-medium hover:bg-[#C2185B]/15 transition-colors">
+                            Status: {ORDER_STATUS[statusFilter]?.label || statusFilter} <X size={12} />
+                        </button>
+                    )}
+                    {typeFilter && (
+                        <button onClick={() => { setTypeFilter(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#6A1B9A]/8 text-[#6A1B9A] text-[11px] font-medium hover:bg-[#6A1B9A]/15 transition-colors">
+                            Type: {ORDER_TYPES[typeFilter]?.label || ORDER_TYPES[typeFilter]?.short || typeFilter} <X size={12} />
+                        </button>
+                    )}
+                    {searchQuery && (
+                        <button onClick={() => { setSearchQuery(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1565C0]/8 text-[#1565C0] text-[11px] font-medium hover:bg-[#1565C0]/15 transition-colors">
+                            "{searchQuery}" <X size={12} />
+                        </button>
+                    )}
+                    {(dateFrom || dateTo) && (
+                        <button onClick={() => { setDateFrom(""); setDateTo(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2E7D32]/8 text-[#2E7D32] text-[11px] font-medium hover:bg-[#2E7D32]/15 transition-colors">
+                            {dateFrom || "..."} → {dateTo || "..."} <X size={12} />
+                        </button>
+                    )}
+                    <button onClick={() => { setStatusFilter(""); setTypeFilter(""); setSearchQuery(""); setDateFrom(""); setDateTo(""); setPage(1); }}
+                        className="text-[11px] text-[#999] hover:text-[#C2185B] font-medium transition-colors">
+                        Clear all
+                    </button>
+                </div>
+            )}
+
             {/* Table View */}
             {viewMode === "table" && (
                 isLoading ? <SkeletonTable rows={6} cols={6} /> : orders.length === 0 ? (
@@ -163,42 +193,39 @@ export default function AdminOrdersPage() {
                         <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden hidden lg:block">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead>
+                                    <thead className="sticky top-14 z-10">
                                         <tr className="border-b border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
                                             <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Order #</th>
                                             <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Client</th>
-                                            <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Style</th>
                                             <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Type</th>
                                             <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Status</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4">Amount</th>
+                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4">Agreed Fee</th>
+                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4">Total Paid</th>
                                             <th className="text-right text-xs font-medium text-[#999] py-3 px-4">Date</th>
-                                            <th className="py-3 px-4 w-10"></th>
+                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4 w-24">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {orders.map((order) => (
-                                            <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors">
-                                                <td className="py-3 px-4"><Link href={`/admin/orders/${order.id}`} className="font-mono-data text-xs text-[#C2185B] hover:underline">{order.orderNumber}</Link></td>
-                                                <td className="py-3 px-4">{order.client?.fullName || "—"}</td>
-                                                <td className="py-3 px-4 text-[#555]">{order.style?.name || "—"}</td>
-                                                <td className="py-3 px-4 text-xs text-[#555]">{ORDER_TYPES[order.orderType]?.short || "—"}</td>
-                                                <td className="py-3 px-4"><StatusPill status={order.status} size="small" /></td>
-                                                <td className="py-3 px-4 text-right font-mono-data">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                <td className="py-3 px-4 text-right text-xs text-[#999]">{new Date(order.createdAt).toLocaleDateString("en-NG")}</td>
-                                                <td className="py-3 px-4">
-                                                    <TooltipProvider>
-                                                        <Tooltip delayDuration={300}>
-                                                            <TooltipTrigger asChild>
-                                                                <Link href={`/admin/orders/${order.id}`} className="block w-7 h-7 bg-[#F4F0F8] rounded-md hover:bg-[#E0E0E0] text-[#555] flex items-center justify-center transition-colors">
-                                                                    <Eye size={14} />
-                                                                </Link>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent><p>View Order</p></TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {orders.map((order) => {
+                                            const totalPaid = order.payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
+                                            return (
+                                                <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors group">
+                                                    <td className="py-3 px-4"><Link href={`/admin/orders/${order.id}`} className="font-mono-data text-xs text-[#C2185B] hover:underline">{order.orderNumber}</Link></td>
+                                                    <td className="py-3 px-4">{order.client?.fullName || "—"}</td>
+                                                    <td className="py-3 px-4 text-xs text-[#555]">{ORDER_TYPES[order.orderType]?.short || "—"}</td>
+                                                    <td className="py-3 px-4"><StatusPill status={order.status} size="small" /></td>
+                                                    <td className="py-3 px-4 text-right font-mono-data">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
+                                                    <td className="py-3 px-4 text-right font-mono-data text-[#555]">{formatCurrency(totalPaid)}</td>
+                                                    <td className="py-3 px-4 text-right text-xs text-[#999]">{new Date(order.createdAt).toLocaleDateString("en-NG")}</td>
+                                                    <td className="py-3 px-4 text-right">
+                                                        <Link href={`/admin/orders/${order.id}`}
+                                                            className="text-xs text-[#C2185B] font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
+                                                            Manage <ArrowRight size={10} />
+                                                        </Link>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
                                     </tbody>
                                 </table>
                             </div>

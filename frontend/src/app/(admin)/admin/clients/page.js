@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, Users, ChevronRight, ChevronLeft, Plus } from "lucide-react";
+import { Search, Users, ChevronRight, ChevronLeft, Plus, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
+import { formatCurrency } from "@/config/branding";
 import { SkeletonCard } from "@/components/shared/Skeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import CreateClientModal from "@/components/admin/CreateClientModal";
@@ -46,12 +47,12 @@ export default function AdminClientsPage() {
                 </Button>
             </div>
 
-            {/* Search */}
-            <div className="relative mb-6 max-w-sm">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+            {/* Search — prominent, full-width */}
+            <div className="relative mb-6">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#999]" />
                 <Input type="text" placeholder="Search by name, email, phone..." value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    className="pl-8 h-9 bg-white" />
+                    className="pl-10 h-11 bg-white text-sm" />
             </div>
 
             {isLoading ? (
@@ -60,71 +61,72 @@ export default function AdminClientsPage() {
                 <EmptyState icon={Users} title="No clients found" description={search ? "Try adjusting your search." : "No clients yet."} />
             ) : (
                 <>
-                    {/* Mobile: Cards */}
-                    <div className="grid grid-cols-1 gap-3 lg:hidden">
-                        {clients.map((c) => (
-                            <Link key={c.id} href={`/admin/clients/${c.id}`}
-                                className="flex items-center gap-3 p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
-                                <div className="relative shrink-0">
-                                    <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white text-sm font-bold">
-                                        {c.fullName?.charAt(0)}
-                                    </div>
-                                    {c.online && <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#2E7D32] border-2 border-white" />}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-[#0D0D0D] truncate">{c.fullName}</p>
-                                    <p className="text-[10px] text-[#999] truncate">{c.email}</p>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <span className="text-[10px] text-[#555]">{c._count?.orders || 0} orders</span>
-                                        {c.phone && <span className="text-[10px] text-[#999]">{c.phone}</span>}
-                                    </div>
-                                </div>
-                                <ChevronRight size={16} className="text-[#D0D0D0] shrink-0" />
-                            </Link>
-                        ))}
-                    </div>
+                    {/* Client Cards Grid — 2 cols desktop, 1 on mobile per spec */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        {clients.map((c) => {
+                            const initial = c.fullName?.charAt(0) || "?";
+                            // Color-code avatar by first letter
+                            const hue = ((initial.charCodeAt(0) - 65) * 27) % 360;
+                            const avatarColor = `hsl(${hue}, 50%, 40%)`;
+                            const totalPaid = c.totalPaid || c._count?.payments || 0;
 
-                    {/* Desktop: Table */}
-                    <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden hidden lg:block">
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="border-b border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
-                                    <th className="text-left py-3 px-4 text-xs font-medium text-[#999]">Client</th>
-                                    <th className="text-left py-3 px-4 text-xs font-medium text-[#999]">Email</th>
-                                    <th className="text-left py-3 px-4 text-xs font-medium text-[#999]">Phone</th>
-                                    <th className="text-center py-3 px-4 text-xs font-medium text-[#999]">Orders</th>
-                                    <th className="text-center py-3 px-4 text-xs font-medium text-[#999]">Status</th>
-                                    <th className="text-right py-3 px-4 text-xs font-medium text-[#999]">Joined</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {clients.map((c) => (
-                                    <tr key={c.id} onClick={() => router.push(`/admin/clients/${c.id}`)}
-                                        className="border-b border-[rgba(0,0,0,0.04)] hover:bg-[#FAFAFA] transition-colors cursor-pointer">
-                                        <td className="py-3 px-4">
-                                            <div className="flex items-center gap-2.5">
-                                                <div className="relative shrink-0">
-                                                    <div className="w-8 h-8 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs">
-                                                        {c.fullName?.charAt(0)}
-                                                    </div>
-                                                    {c.online && <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#2E7D32] border-2 border-white" />}
-                                                </div>
-                                                <span className="font-medium text-[#0D0D0D]">{c.fullName}</span>
+                            // Relative time for last active
+                            const lastActive = c.lastLoginAt ? (() => {
+                                const d = new Date(c.lastLoginAt);
+                                const now = new Date();
+                                const seconds = Math.floor((now - d) / 1000);
+                                if (seconds < 60) return "just now";
+                                const minutes = Math.floor(seconds / 60);
+                                if (minutes < 60) return `${minutes}m ago`;
+                                const hours = Math.floor(minutes / 60);
+                                if (hours < 24) return `${hours}h ago`;
+                                const days = Math.floor(hours / 24);
+                                if (days < 7) return `${days}d ago`;
+                                return d.toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+                            })() : null;
+
+                            return (
+                                <div key={c.id} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-all group">
+                                    <div className="flex items-start gap-3 mb-3">
+                                        <div className="relative shrink-0">
+                                            <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden"
+                                                style={{ backgroundColor: avatarColor }}>
+                                                {c.profilePicture ? (
+                                                    <img src={c.profilePicture} alt="" className="w-full h-full object-cover" />
+                                                ) : initial}
                                             </div>
-                                        </td>
-                                        <td className="py-3 px-4 text-[#555]">{c.email}</td>
-                                        <td className="py-3 px-4 text-[#555]">{c.phone || "—"}</td>
-                                        <td className="py-3 px-4 text-center font-mono-data">{c._count?.orders || 0}</td>
-                                        <td className="py-3 px-4 text-center">
-                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${c.online ? "bg-[#E8F5E9] text-[#2E7D32]" : "bg-[#F4F0F8] text-[#999]"}`}>
-                                                {c.online ? "Online" : "Offline"}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 px-4 text-right text-xs text-[#999]">{new Date(c.createdAt).toLocaleDateString("en-NG")}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${c.online ? "bg-[#2E7D32]" : "bg-[#E0E0E0]"}`} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-[#0D0D0D] truncate">{c.fullName}</p>
+                                            <p className="text-xs text-[#555] truncate">{c.email}</p>
+                                            {c.phone && <p className="text-xs text-[#999]">{c.phone}</p>}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between gap-2 mb-3">
+                                        <div className="flex items-center gap-4">
+                                            <div>
+                                                <p className="text-lg font-bold font-mono-data text-[#0D0D0D]">{c._count?.orders || 0}</p>
+                                                <p className="text-[9px] text-[#999] uppercase tracking-wider">Orders</p>
+                                            </div>
+                                            {typeof totalPaid === "number" && totalPaid > 0 && (
+                                                <div>
+                                                    <p className="text-lg font-bold font-mono-data text-[#0D0D0D]">{formatCurrency(totalPaid)}</p>
+                                                    <p className="text-[9px] text-[#999] uppercase tracking-wider">Total Paid</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {lastActive && (
+                                            <span className="text-[10px] text-[#999]">Active {lastActive}</span>
+                                        )}
+                                    </div>
+                                    <Link href={`/admin/clients/${c.id}`}
+                                        className="block w-full text-center py-2 rounded-lg bg-[#C2185B]/5 text-[#C2185B] text-xs font-semibold hover:bg-[#C2185B]/10 transition-colors">
+                                        View Profile
+                                    </Link>
+                                </div>
+                            );
+                        })}
                     </div>
 
                     {/* Pagination */}

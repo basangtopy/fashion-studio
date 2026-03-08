@@ -415,12 +415,20 @@ export const declineQuote = async (req, res) => {
 // ─── GET /admin/orders — All orders (admin) ────────────────────────────────
 
 export const getAdminOrders = async (req, res) => {
-  const { status, type, clientId, from, to, page = 1, limit = 20 } = req.query;
+  const { status, type, clientId, from, to, search, page = 1, limit = 20 } = req.query;
 
   const where = {};
   if (status) where.status = status;
   if (type) where.orderType = type;
   if (clientId) where.clientId = clientId;
+
+  // Search by order number or client name
+  if (search) {
+    where.OR = [
+      { orderNumber: { contains: search, mode: "insensitive" } },
+      { client: { fullName: { contains: search, mode: "insensitive" } } },
+    ];
+  }
 
   // Date range filter
   if (from || to) {

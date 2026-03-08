@@ -503,28 +503,20 @@ export const getFinanceSummary = async (req, res) => {
     }),
 
     // Revenue broken down by order type (MODEL_1, MODEL_2, MODEL_3)
-    prisma.payment
-      .groupBy({
-        by: ["orderId"],
-        where: confirmedFilter,
-        _sum: { amount: true },
-      })
-      .then(async () => {
-        // groupBy doesn't support nested relations, so we use a different approach
-        return prisma.order.findMany({
-          where: {
-            payments: { some: { status: "CONFIRMED", ...dateFilter } },
-            ...(type ? { orderType: type } : {}),
-          },
-          select: {
-            orderType: true,
-            payments: {
-              where: { status: "CONFIRMED" },
-              select: { amount: true },
-            },
-          },
-        });
-      }),
+    // groupBy doesn't support nested relations, so we query orders directly
+    prisma.order.findMany({
+      where: {
+        payments: { some: { status: "CONFIRMED", ...dateFilter } },
+        ...(type ? { orderType: type } : {}),
+      },
+      select: {
+        orderType: true,
+        payments: {
+          where: { status: "CONFIRMED" },
+          select: { amount: true },
+        },
+      },
+    }),
 
     // 5 most recent confirmed payments for a "recent activity" widget
     prisma.payment.findMany({

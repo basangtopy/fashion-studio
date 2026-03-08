@@ -614,12 +614,15 @@ Settings
 
 ADMIN PAGE 1 — DASHBOARD OVERVIEW (/admin/dashboard)
 
-Header: Welcome back + Date Range Filter (This Month, Last Month, YTD, custom) + "Export Report" split button (Download CSV / Download PDF).
+Header: Welcome back + Date Range Filter (This Month, Last Month, YTD, custom) + "Export Report" split button (Download CSV / Download PDF ) with icons.
 
 Stat cards row (6 cards, 3+3 on tablet, 2+2+2 on desktop): - Total Active Orders (count) - Orders Pending Review (count, Warning colour if > 0) - Total Revenue (₦ amount) - Outstanding Payments (₦ amount) - Clients This Month (count) - Appointments Pending (count)
 _(Note: These stats dynamically update based on the Date Range filter)._
 
+
 Live indicator: small pulsing green dot + "X clients online now" (SSE-driven, updates live)
+
+Statistics Charts: Different charts for different metrics. Must be interactive and responsive.
 
 Recent Orders table (last 10):
 Columns: Order # | Client | Type | Status | Agreed Fee | Paid | Action
@@ -640,6 +643,7 @@ Timeline-style list for the next 7 days.
 
 ADMIN PAGE 2 — ORDERS (/admin/orders)
 
+There should be a button that opens a modal/panel to create a new order for a client
 Filter bar: Status (multi-select dropdown) | Order Type | Client (search) | Date range picker | Search
 All filters apply simultaneously. Active filters shown as dismissible pills below the bar.
 
@@ -652,7 +656,7 @@ Sticky header on scroll
 Row hover: subtle highlight, "Manage →" button appears on right
 
 KANBAN VIEW (Primary Operational Flow):
-A horizontal drag-and-drop board containing columns representing lifecycle states (PENDING_REVIEW, CUTTING, SEWING, FINISHING).
+A horizontal drag-and-drop board containing columns representing lifecycle states.
 Admins drag order cards between columns to silently update statuses in the background via precise API hits. This acts as the studio's true operation dashboard.
 
 ORDER DETAIL PAGE (/admin/orders/:id)
@@ -660,6 +664,8 @@ ORDER DETAIL PAGE (/admin/orders/:id)
     Two-column layout: same structure as client order detail but with admin controls.
 
     LEFT COLUMN:
+
+    Order Details Card: Same as client order detail but with admin controls.
 
     Status Update Card:
       - Current status (large pill)
@@ -699,6 +705,8 @@ ORDER DETAIL PAGE (/admin/orders/:id)
 
     Chat Panel: identical to client chat panel but from admin's perspective.
       Admin messages right-aligned, client messages left-aligned.
+      Same improved chat features as client view.
+      Same presentation and responsiveness on mobile as client view.
 
     Payment History: same as client view, but with Confirm/Reject actions on each PENDING payment.
 
@@ -706,10 +714,12 @@ ORDER DETAIL PAGE (/admin/orders/:id)
 
 ADMIN PAGE 3 — CLIENTS (/admin/clients)
 
+There should be a button that opens a modal/panel to create a new client
+
 Search bar (prominent, full-width at top) with real-time search.
 
 Client cards grid (2-column desktop, 1 on mobile):
-Each card: - Avatar circle (initials-based, colour-coded by name initial) - Name, email, phone - Online indicator (green dot = online, grey = offline) - Total orders count + total paid amount - Last active: relative time - "View Profile" button
+Each card: - Avatar circle (initials-based if profile photo not available, colour-coded by name initial) - Name, email, phone - Online indicator (green dot = online, grey = offline) - Total orders count + total paid amount - Last active: relative time - "View Profile" button
 
 CLIENT PROFILE PAGE (/admin/clients/:id)
 
@@ -721,6 +731,7 @@ CLIENT PROFILE PAGE (/admin/clients/:id)
       - Stats: total orders, total spend, average order value
 
     Orders tab:
+      - A button to open a modal/panel for admin to create a new order for this client
       - Same order list as admin orders page but pre-filtered to this client
 
     Measurements tab:
@@ -761,7 +772,7 @@ Filter sidebar: category, model availability, active/archived toggle
 Item grid: same card design as public catalog but with edit/archive controls overlaid on hover
 "Add New Style" button: prominent, top-right
 Add/Edit form: opens as a large modal or full-width panel sliding in from right
-Fields: name, description, category (dropdown), model availability (toggle switches),
+Fields: name, description, category (dropdown list of categories + custom option), model availability (toggle switches),
 images (multi-upload with drag-and-drop reorder, individual delete per image — requires confirmation modal),
 isFeatured toggle, isActive toggle
 
@@ -773,9 +784,10 @@ fabricDetails, careInstructions (text areas)
 
 PORTFOLIO PAGE:
 Same structure. Additional fields:
-orderId (search + select from completed orders), title, description, category,
+orderId (search + select from completed orders), title, description, category, images (multi-upload with drag-and-drop reorder, individual delete per image — requires confirmation modal),
 clientConsent toggle (must be ON to publish), isFeatured toggle, isPublished toggle
 Unpublished items shown with a "DRAFT" watermark overlay on the card
+Works done without order on the platform can also be added as portfolio items
 
 TESTIMONIALS MODERATION:
 List view of testimonials submitted by clients.
@@ -790,9 +802,9 @@ ADMIN PAGE 6 — MEASUREMENTS & APPOINTMENTS (/admin/measurements, /admin/appoin
 
 MEASUREMENTS PAGE:
 Search bar: search clients by name or email
-Client list: table with columns: Client | Bust | Waist | Hips | Last Updated | Actions
+Client list: table with columns: Client | measurement fields (as columns) | Last Updated | Actions
 "View/Edit" expands a detailed measurement panel inline (or navigates to client profile)
-Export button (top-right): downloads CSV of all measurements
+Export button (top-right): downloads CSV/PDF of all measurements
 
 APPOINTMENTS PAGE:
 Calendar-style view toggle (list / calendar)
@@ -821,6 +833,8 @@ Chart 2: Orders by Status (Donut/Pie chart) — PENDING, IN_PROGRESS, COMPLETED,
 Chart 3: Orders by Type (Bar chart) — Model 1 / Model 2 / Ready-to-Wear comparison.
 Outstanding Orders section: table of orders where totalPaid < totalAgreedFee
 Charts use Primary colour family: primary for main series, tints for secondary.
+Must be interactive and responsive
+
 
 ═══════════════════════════════════════════════════════════
 SECTION 6 — RESPONSIVE BEHAVIOUR SPECIFICATION

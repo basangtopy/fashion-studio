@@ -12,6 +12,7 @@ import validate from "../middleware/validate.js";
 import {
   rejectPaymentSchema,
   offlinePaymentSchema,
+  financeSummarySchema,
 } from "../validators/payment.validators.js";
 
 const router = Router();
@@ -21,7 +22,7 @@ router.use(authenticate, authorise("SUPER_ADMIN"));
 
 // export and offline must be defined BEFORE /:id routes
 router.get("/export", exportPayments);
-router.get("/summary", getFinanceSummary);
+router.get("/summary", validate(financeSummarySchema, "query"), getFinanceSummary);
 router.post("/offline", validate(offlinePaymentSchema), logOfflinePayment);
 
 router.get("/", getAdminPayments);
