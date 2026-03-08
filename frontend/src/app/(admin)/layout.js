@@ -122,17 +122,10 @@ export default function AdminLayout({ children }) {
     const [moreOpen, setMoreOpen] = useState(false);
     const [cmdOpen, setCmdOpen] = useState(false);
     const [cmdQuery, setCmdQuery] = useState("");
-    // const [debouncedQuery, setDebouncedQuery] = useState("");
     const cmdInputRef = useRef(null);
 
     // Debounce the command query for DB search
     const debouncedQuery = useDebounce(cmdQuery, 300);
-    // useEffect(() => {
-    //     const handler = setTimeout(() => {
-    //         setDebouncedQuery(cmdQuery);
-    //     }, 300);
-    //     return () => clearTimeout(handler);
-    // }, [cmdQuery]);
 
     // DB Search Query
     const { data: searchData, isFetching: isSearching } = useQuery({
@@ -255,6 +248,10 @@ export default function AdminLayout({ children }) {
 
     // "More" sheet items — everything not in the primary bottom 5
     const moreItems = [
+        { href: "/admin/dashboard", icon: LayoutDashboard, label: "Home" },
+        { href: "/admin/orders", icon: ShoppingBag, label: "Orders" },
+        { href: "/admin/chat", icon: MessageSquare, label: "Chat" },
+        { href: "/admin/clients", icon: Users, label: "Clients" },
         { href: "/admin/catalog/styles", label: "Styles", icon: Palette },
         { href: "/admin/catalog/ready-to-wear", label: "Ready-to-Wear", icon: Shirt },
         { href: "/admin/catalog/portfolio", label: "Portfolio", icon: ImageIcon },

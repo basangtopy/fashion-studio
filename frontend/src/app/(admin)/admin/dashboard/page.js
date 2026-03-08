@@ -4,15 +4,17 @@ import { useState, useMemo, useEffect, useRef, Fragment } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-    ShoppingBag, Users, CreditCard, TrendingUp, Calendar, ArrowRight,
+    ShoppingBag, Users, CreditCard, TrendingUp, Calendar as CalendarIcon, ArrowRight,
     CheckCircle2, XCircle, Clock, Download, FileText,
     AlertTriangle, Eye, ChevronDown, ChevronUp, ChevronsUpDown,
+    Mail, Phone, MapPin, Scissors,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar,
 } from "recharts";
+import { format } from "date-fns";
 import { useToast } from "@/components/ui/toaster";
 import api from "@/lib/api";
 import { formatCurrency, ORDER_STATUS } from "@/config/branding";
@@ -22,6 +24,8 @@ import { useScrollReveal, useCountUp } from "@/hooks/useAnimations";
 import CustomSelect from "@/components/shared/CustomSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useAuth } from "@/context/AuthContext";
 
 const PIE_COLORS = ["#F9A825", "#6A1B9A", "#2E7D32", "#1565C0", "#C62828", "#1A1A2E", "#E65100", "#00695C", "#AD1457"];
@@ -159,8 +163,7 @@ export default function AdminDashboard() {
     const presets = useMemo(getDatePresets, []);
 
     const [datePreset, setDatePreset] = useState("all");
-    const [customFrom, setCustomFrom] = useState("");
-    const [customTo, setCustomTo] = useState("");
+    const [dateRange, setDateRange] = useState({ from: undefined, to: undefined });
     const [exporting, setExporting] = useState(null);
     const [rejectModal, setRejectModal] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
@@ -171,11 +174,16 @@ export default function AdminDashboard() {
 
     // Compute from/to based on preset
     const { from, to } = useMemo(() => {
-        if (datePreset === "custom") return { from: customFrom, to: customTo };
+        if (datePreset === "custom") {
+            return {
+                from: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "",
+                to: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : ""
+            };
+        }
         if (datePreset === "all") return { from: "", to: "" };
         const preset = presets.find((p) => p.value === datePreset);
         return { from: preset?.from || "", to: preset?.to || "" };
-    }, [datePreset, customFrom, customTo, presets]);
+    }, [datePreset, dateRange, presets]);
 
     const { data: dashboardData, isLoading } = useQuery({
         queryKey: ["admin-dashboard", from, to],
@@ -354,13 +362,38 @@ export default function AdminDashboard() {
                         className="w-[180px]"
                     />
                     {datePreset === "custom" && (
-                        <div className="flex items-center gap-2">
-                            <Input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)}
-                                className="h-9 bg-white w-auto" />
-                            <span className="text-xs text-[#999]">to</span>
-                            <Input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)}
-                                className="h-9 bg-white w-auto" />
-                        </div>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    className={`h-9 border-[#E0E0E0] bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange.from && "text-muted-foreground"}`}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {dateRange.from ? (
+                                        dateRange.to ? (
+                                            <>
+                                                {format(dateRange.from, "MMM d, yyyy")} -{" "}
+                                                {format(dateRange.to, "MMM d, yyyy")}
+                                            </>
+                                        ) : (
+                                            format(dateRange.from, "MMM d, yyyy")
+                                        )
+                                    ) : (
+                                        "Pick a date range"
+                                    )}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="end">
+                                <Calendar
+                                    initialFocus
+                                    mode="range"
+                                    defaultMonth={dateRange?.from}
+                                    selected={dateRange}
+                                    onSelect={setDateRange}
+                                    numberOfMonths={2}
+                                />
+                            </PopoverContent>
+                        </Popover>
                     )}
                 </div>
             </div>
@@ -380,7 +413,7 @@ export default function AdminDashboard() {
                             subtext={`${payments.length} payment${payments.length !== 1 ? "s" : ""} awaiting`} />
                         <StatCard index={4} label="Clients" value={stats.totalClients || 0} icon={Users} color="#1565C0"
                             subtext={from ? `${stats.newClientsInPeriod || 0} new in period` : null} />
-                        <StatCard index={5} label="Appointments" value={stats.appointmentsPending || 0} icon={Calendar} color="#6A1B9A" warning />
+                        <StatCard index={5} label="Appointments" value={stats.appointmentsPending || 0} icon={CalendarIcon} color="#6A1B9A" warning />
                     </>
                 )}
             </div>
@@ -560,7 +593,7 @@ export default function AdminDashboard() {
                                 ))}
                             </div>
                             {/* Desktop: table with sortable columns + expandable rows */}
-                            <div className="hidden lg:block overflow-x-auto">
+                            <div className="hidden lg:block overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 <table className="w-full text-sm">
                                     <thead>
                                         <tr className="border-b border-[rgba(0,0,0,0.06)]">
@@ -571,7 +604,7 @@ export default function AdminDashboard() {
                                                 return (
                                                     <th key={key}
                                                         onClick={() => handleSort(key)}
-                                                        className={`text-xs font-medium text-[#999] py-3 pr-4 cursor-pointer select-none hover:text-[#C2185B] transition-colors ${isRight ? "text-right" : "text-left"}`}
+                                                        className={`text-xs font-medium text-[#999] py-3 pr-4 cursor-pointer select-none whitespace-nowrap hover:text-[#C2185B] transition-colors ${isRight ? "text-right" : "text-left"}`}
                                                     >
                                                         {label}<SortIcon col={key} />
                                                     </th>
@@ -591,15 +624,15 @@ export default function AdminDashboard() {
                                                         className={`border-b border-[rgba(0,0,0,0.03)] transition-colors group cursor-pointer ${isExpanded ? "bg-[#F4F0F8]/40" : "hover:bg-[#FAFAFA]"
                                                             }`}
                                                     >
-                                                        <td className="py-3 pr-4">
+                                                        <td className="py-3 pr-4 whitespace-nowrap">
                                                             <span className="font-mono-data text-xs text-[#C2185B]">{order.orderNumber}</span>
                                                         </td>
-                                                        <td className="py-3 pr-4 text-[#0D0D0D]">{order.client?.fullName || "—"}</td>
-                                                        <td className="py-3 pr-4 text-[#555] text-xs">{order.orderType?.replace(/_/g, " ") || "—"}</td>
-                                                        <td className="py-3 pr-4"><StatusPill status={order.status} size="small" /></td>
-                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#0D0D0D]">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#555]">{formatCurrency(totalPaid)}</td>
-                                                        <td className="py-3 text-right" onClick={(e) => e.stopPropagation()}>
+                                                        <td className="py-3 pr-4 text-[#0D0D0D] whitespace-nowrap">{order.client?.fullName || "—"}</td>
+                                                        <td className="py-3 pr-4 text-[#555] text-xs whitespace-nowrap">{order.orderType?.replace(/_/g, " ") || "—"}</td>
+                                                        <td className="py-3 pr-4 whitespace-nowrap"><StatusPill status={order.status} size="small" /></td>
+                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#0D0D0D] whitespace-nowrap">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
+                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#555] whitespace-nowrap">{formatCurrency(totalPaid)}</td>
+                                                        <td className="py-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                             <Link href={`/admin/orders/${order.id}`}
                                                                 className="text-xs text-[#C2185B] font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
                                                                 Manage <ArrowRight size={10} />
@@ -618,28 +651,92 @@ export default function AdminDashboard() {
                                                                         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                                                                         className="overflow-hidden"
                                                                     >
-                                                                        <div className="flex items-center gap-6 px-4 py-3 bg-[#F4F0F8]/40 border-b border-[rgba(0,0,0,0.04)]">
-                                                                            <div>
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-0.5">Status</p>
-                                                                                <StatusPill status={order.status} size="small" />
+                                                                        <div className="flex flex-col md:flex-row gap-6 px-4 py-4 bg-[#F4F0F8]/40 border-b border-[rgba(0,0,0,0.04)] items-start">
+                                                                            {/* Column 1: Order Info */}
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Order Details</p>
+                                                                                {order.orderType === "MODEL_3" ? (
+                                                                                    <div className="space-y-1">
+                                                                                        {order.items?.length > 0 ? (
+                                                                                            order.items.map((item, idx) => (
+                                                                                                <p key={idx} className="text-sm font-medium text-[#0D0D0D] truncate">
+                                                                                                    {item.quantity}x {item.readyToWear?.name || "RTW Item"}
+                                                                                                </p>
+                                                                                            ))
+                                                                                        ) : (
+                                                                                            <p className="text-sm text-[#555] italic">No items listed</p>
+                                                                                        )}
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <div>
+                                                                                        {order.style?.name ? (
+                                                                                            <p className="text-sm font-medium text-[#0D0D0D] truncate">Style: {order.style.name}</p>
+                                                                                        ) : order.customStyleDescription ? (
+                                                                                            <p className="text-sm font-medium text-[#0D0D0D] line-clamp-2" title={order.customStyleDescription}>
+                                                                                                Custom: {order.customStyleDescription}
+                                                                                            </p>
+                                                                                        ) : (
+                                                                                            <p className="text-sm text-[#555] italic">No style specified</p>
+                                                                                        )}
+                                                                                        {order.clientProvidesFabric !== undefined && order.clientProvidesFabric !== null && (
+                                                                                            <span className="inline-flex items-center gap-1.5 mt-2 bg-[#F4F0F8] text-[#C2185B] text-[10px] font-medium px-2 py-1 rounded-md border border-[#F4F0F8]">
+                                                                                                <Scissors size={10} className="shrink-0" />
+                                                                                                {order.clientProvidesFabric ? "Client provides fabric" : "Studio provides fabric"}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
-                                                                            <div>
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-0.5">Agreed Fee</p>
-                                                                                <p className="text-sm font-mono-data font-bold text-[#0D0D0D]">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</p>
-                                                                            </div>
-                                                                            <div>
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-0.5">Paid</p>
-                                                                                <p className="text-sm font-mono-data font-bold text-[#2E7D32]">{formatCurrency(totalPaid)}</p>
-                                                                            </div>
-                                                                            {order.totalAgreedFee && (
-                                                                                <div>
-                                                                                    <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-0.5">Outstanding</p>
-                                                                                    <p className="text-sm font-mono-data font-bold text-[#E65100]">{formatCurrency(Math.max(0, order.totalAgreedFee - totalPaid))}</p>
+
+                                                                            {/* Column 2: Client Contact */}
+                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-[rgba(0,0,0,0.06)]">
+                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Client Contact</p>
+                                                                                <div className="space-y-1.5">
+                                                                                    {order.client?.email ? (
+                                                                                        <div className="flex items-center gap-1.5 text-sm text-[#0D0D0D] truncate">
+                                                                                            <Mail size={12} className="text-[#999] shrink-0" />
+                                                                                            <span className="truncate">{order.client.email}</span>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <p className="text-sm text-[#999] italic">No email</p>
+                                                                                    )}
+                                                                                    {order.client?.phone ? (
+                                                                                        <div className="flex items-center gap-1.5 text-sm text-[#0D0D0D] truncate">
+                                                                                            <Phone size={12} className="text-[#999] shrink-0" />
+                                                                                            <span className="truncate">{order.client.phone}</span>
+                                                                                        </div>
+                                                                                    ) : (
+                                                                                        <p className="text-sm text-[#999] italic">No phone</p>
+                                                                                    )}
                                                                                 </div>
-                                                                            )}
-                                                                            <div className="ml-auto">
+                                                                            </div>
+
+                                                                            {/* Column 3: Logistics */}
+                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-[rgba(0,0,0,0.06)]">
+                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Logistics</p>
+                                                                                <div className="space-y-1.5 flex flex-col justify-between h-full">
+                                                                                    <div className="flex items-start gap-1.5 text-sm text-[#0D0D0D]">
+                                                                                        <MapPin size={12} className="text-[#C2185B] shrink-0 mt-0.5" />
+                                                                                        <div className="line-clamp-2">
+                                                                                            {order.fulfillmentMethod === "DELIVERY" && order.deliveryAddress ? (
+                                                                                                <span>Delivery: {order.deliveryAddress}</span>
+                                                                                            ) : order.fulfillmentMethod === "PICKUP" ? (
+                                                                                                <span>Studio Pickup</span>
+                                                                                            ) : (
+                                                                                                <span className="text-[#999] italic">Not specified</span>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <p className="text-[11px] text-[#999] mt-2 font-mono-data">
+                                                                                        Ordered: {format(new Date(order.createdAt), "MMM d, yyyy")}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* Manage Action */}
+                                                                            <div className="md:ml-auto md:pl-6 flex items-center mt-4 md:mt-0 pt-2 shrink-0 self-center">
                                                                                 <Link href={`/admin/orders/${order.id}`}
-                                                                                    className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#C2185B] hover:bg-[#A31545] px-3 py-1.5 rounded-lg transition-colors"
+                                                                                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-[#C2185B] hover:bg-[#A31545] px-4 py-2 rounded-lg transition-colors shadow-sm w-full md:w-auto"
                                                                                     onClick={(e) => e.stopPropagation()}
                                                                                 >
                                                                                     Manage <ArrowRight size={11} />
@@ -669,11 +766,11 @@ export default function AdminDashboard() {
                     </div>
                     {appointments.length === 0 ? (
                         <div className="text-center py-8">
-                            <Calendar size={24} className="text-[#E0E0E0] mx-auto mb-2" />
+                            <CalendarIcon size={24} className="text-[#E0E0E0] mx-auto mb-2" />
                             <p className="text-sm text-[#999]">No upcoming appointments</p>
                         </div>
                     ) : (
-                        <div className="space-y-0">
+                        <div className="space-y-5 mt-10">
                             {appointments.slice(0, 6).map((apt, i) => {
                                 const aptDate = new Date(apt.confirmedDate || apt.requestedDate);
                                 const isToday = aptDate.toDateString() === new Date().toDateString();

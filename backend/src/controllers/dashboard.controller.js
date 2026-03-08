@@ -92,7 +92,17 @@ export const getDashboardStats = async (req, res) => {
         status: true,
         totalAgreedFee: true,
         createdAt: true,
-        client: { select: { fullName: true } },
+        customStyleDescription: true,
+        clientProvidesFabric: true,
+        fulfillmentMethod: true,
+        deliveryAddress: true,
+        client: { select: { fullName: true, email: true, phone: true } },
+        style: { select: { name: true } },
+        items: { select: { readyToWear: { select: { name: true } }, quantity: true } },
+        payments: {
+          select: { amount: true },
+          where: { status: "CONFIRMED" }
+        }
       },
     }),
 
