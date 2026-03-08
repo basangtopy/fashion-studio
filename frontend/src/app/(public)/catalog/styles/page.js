@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +13,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import useDebounce from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/AuthContext";
 
 export default function StylesCatalogPage() {
     const [category, setCategory] = useState("All");
@@ -20,6 +22,19 @@ export default function StylesCatalogPage() {
     const debouncedSearch = useDebounce(searchQuery, 500);
     const [quickViewStyle, setQuickViewStyle] = useState(null);
     const [quickViewImageIdx, setQuickViewImageIdx] = useState(0);
+    const router = useRouter();
+    const { isAuthenticated } = useAuth();
+
+    const handleOrderStyle = (styleId) => {
+        if (!isAuthenticated) {
+            // Redirect to login; on return the style detail page's useEffect
+            // picks up action=orderStyle and auto-navigates to /client/orders/new
+            const redirectURL = `/catalog/styles/${styleId}`;
+            router.push(`/login?redirectURL=${encodeURIComponent(redirectURL)}&action=orderStyle`);
+            return;
+        }
+        router.push(`/client/orders/new?styleId=${styleId}`);
+    };
 
     const {
         data,
@@ -321,13 +336,17 @@ export default function StylesCatalogPage() {
 
                                     <p className="text-sm text-[#555] mb-6">{quickViewStyle.description}</p>
                                 </div>
-                                <Link
-                                    href={`/catalog/styles/${quickViewStyle.id}`}
+                                <button
+                                    onClick={() => {
+                                        setQuickViewStyle(null);
+                                        setQuickViewImageIdx(0);
+                                        handleOrderStyle(quickViewStyle.id);
+                                    }}
                                     className="flex items-center justify-center gap-2 w-full mt-auto py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors shrink-0"
                                 >
                                     Order This Style
                                     <ArrowRight size={16} />
-                                </Link>
+                                </button>
                             </div>
 
                             {/* Close Button */}

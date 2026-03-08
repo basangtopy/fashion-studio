@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
     ShoppingBag,
     CreditCard,
@@ -21,6 +23,7 @@ import OrderListItem from "@/components/shared/OrderListItem";
 import { useScrollReveal, useCountUp } from "@/hooks/useAnimations";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/shared/EmptyState";
+import NewOrderDialog from "@/components/shared/NewOrderDialog";
 const LIFECYCLE_STEPS = [
     { label: "Review", maxStep: 0 },
     { label: "Agreement", maxStep: 1 },
@@ -107,6 +110,8 @@ function ProgressSteps({ status }) {
 /* ─── Main Dashboard ─── */
 export default function ClientDashboard() {
     const { user } = useAuth();
+    const pathname = usePathname();
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     const { data: orders, isLoading: ordersLoading } = useQuery({
         queryKey: ["client-orders"],
@@ -282,28 +287,52 @@ export default function ClientDashboard() {
                     }}
                     className="grid grid-cols-2 lg:grid-cols-4 gap-3"
                 >
-                    {[
-                        { href: "/catalog/styles", icon: ShoppingBag, label: "Place New Order", color: "#C2185B" },
-                        { href: "/client/measurements", icon: Ruler, label: "Update Measurements", color: "#6A1B9A" },
-                        { href: user ? "?action=book_appointment" : `/login?redirectURL=${pathname}&action=book_appointment`, icon: Calendar, label: "Book Appointment", color: "#1565C0" },
-                        { href: "/portfolio", icon: Eye, label: "View Portfolio", color: "#2E7D32" },
-                    ].map((action) => (
-                        <motion.div key={action.label} variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
-                            <Link
-                                href={action.href}
-                                {...action.href.includes("?action=") && { scroll: false }}
-                                className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
-                            >
-                                <div
-                                    className="w-10 h-10 rounded-lg flex items-center justify-center"
-                                    style={{ backgroundColor: `${action.color}15` }}
-                                >
-                                    <action.icon size={18} style={{ color: action.color }} />
-                                </div>
-                                <span className="text-xs font-medium text-[#555]">{action.label}</span>
-                            </Link>
-                        </motion.div>
-                    ))}
+                    {/* Place New Order — opens dialog */}
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
+                        <button
+                            onClick={() => setDialogOpen(true)}
+                            className="w-full h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                        >
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#C2185B15" }}>
+                                <ShoppingBag size={18} style={{ color: "#C2185B" }} />
+                            </div>
+                            <span className="text-xs font-medium text-[#555]">Place New Order</span>
+                        </button>
+                    </motion.div>
+
+                    {/* Update Measurements */}
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
+                        <Link href="/client/measurements" className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#6A1B9A15" }}>
+                                <Ruler size={18} style={{ color: "#6A1B9A" }} />
+                            </div>
+                            <span className="text-xs font-medium text-[#555]">Update Measurements</span>
+                        </Link>
+                    </motion.div>
+
+                    {/* Book Appointment */}
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
+                        <Link
+                            href={user ? `${pathname}?action=book_appointment` : `/login?redirectURL=${encodeURIComponent(pathname)}&action=book_appointment`}
+                            scroll={false}
+                            className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                        >
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1565C015" }}>
+                                <Calendar size={18} style={{ color: "#1565C0" }} />
+                            </div>
+                            <span className="text-xs font-medium text-[#555]">Book Appointment</span>
+                        </Link>
+                    </motion.div>
+
+                    {/* View Portfolio */}
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
+                        <Link href="/portfolio" className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2E7D3215" }}>
+                                <Eye size={18} style={{ color: "#2E7D32" }} />
+                            </div>
+                            <span className="text-xs font-medium text-[#555]">View Portfolio</span>
+                        </Link>
+                    </motion.div>
                 </motion.div>
             </div>
 
@@ -344,6 +373,8 @@ export default function ClientDashboard() {
                     </div>
                 )
             }
-        </div >
+            {/* New Order Dialog */}
+            <NewOrderDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+        </div>
     );
 }

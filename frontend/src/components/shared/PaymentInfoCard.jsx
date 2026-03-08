@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Copy, Building2, Check } from "lucide-react";
+import { Copy, Building2, Check, CreditCard } from "lucide-react";
 import { BRANDING, formatCurrency } from "../../config/branding";
 
 export default function PaymentInfoCard({ orderNumber, grandTotal, compact = false }) {
@@ -28,7 +28,7 @@ export default function PaymentInfoCard({ orderNumber, grandTotal, compact = fal
             <div className="px-5 pt-5 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2.5 mb-1">
                     <div className="w-8 h-8 rounded-lg bg-[#C2185B]/20 flex items-center justify-center shrink-0">
-                        <Building2 size={15} className="text-[#C2185B]" />
+                        <CreditCard size={15} className="text-[#C2185B]" />
                     </div>
                     <h3 className="font-semibold text-sm">Payment Details</h3>
                 </div>

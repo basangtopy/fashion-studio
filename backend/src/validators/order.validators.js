@@ -29,7 +29,7 @@ export const createOrderSchema = z
       .optional(),
 
     // Model 1 specific
-    clientProvidesFabric: z.boolean().optional(),
+    clientProvidesFabric: z.coerce.boolean().optional(),
     fabricNotes: z
       .string()
       .max(1000, "Fabric notes must not exceed 1000 characters")
@@ -37,7 +37,7 @@ export const createOrderSchema = z
       .optional(),
 
     // Use client's saved measurements or not
-    useSavedMeasurements: z.boolean().default(true),
+    useSavedMeasurements: z.coerce.boolean().default(true),
 
     // Fulfillment
     fulfillmentMethod: z.enum(["PICKUP", "DELIVERY"], {

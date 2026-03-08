@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -13,10 +13,23 @@ import { StyleDetailSkeleton } from "@/components/shared/Skeleton";
 import { CatalogItemNotFound } from "@/components/shared/EmptyStates";
 import { Button } from "@/components/ui/button";
 
+// Suspense boundary — required because useSearchParams() is called inside
 export default function StyleDetailPage() {
+    return (
+        <Suspense fallback={<StyleDetailSkeleton />}>
+            <StyleDetailContent />
+        </Suspense>
+    );
+}
+
+function StyleDetailContent() {
     const { id } = useParams();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const { isAuthenticated } = useAuth();
     const [selectedImage, setSelectedImage] = useState(0);
+    // Prevent double-firing the post-login redirect
+    const actionConsumed = useRef(false);
 
     const { data: style, isLoading } = useQuery({
         queryKey: ["style", id],
@@ -26,15 +39,31 @@ export default function StyleDetailPage() {
         },
     });
 
-    if (isLoading) {
-        return <StyleDetailSkeleton />;
-    }
+    // ── Post-login callback: auto-navigate to order creation ─────────────────
+    // When an unauthenticated user clicks "Order This Style", we send them to
+    // /login?redirectURL=/catalog/styles/{id}&action=orderStyle. After login,
+    // they land back here and this effect fires the redirect automatically.
+    useEffect(() => {
+        const action = searchParams.get("action");
+        if (action !== "orderStyle" || !isAuthenticated || !id || actionConsumed.current) return;
+        actionConsumed.current = true;
+        router.push(`/client/orders/new?styleId=${id}`);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isAuthenticated, id, searchParams]);
 
-    if (!style) {
-        return <CatalogItemNotFound type="style" />;
-    }
+    if (isLoading) return <StyleDetailSkeleton />;
+    if (!style) return <CatalogItemNotFound type="style" />;
 
     const images = style.images || [];
+
+    const handleOrderStyle = () => {
+        if (!isAuthenticated) {
+            const currentPath = `/catalog/styles/${id}`;
+            router.push(`/login?redirectURL=${encodeURIComponent(currentPath)}&action=orderStyle`);
+            return;
+        }
+        router.push(`/client/orders/new?styleId=${id}`);
+    };
 
     return (
         <div className="pt-[var(--nav-height)]">
@@ -124,7 +153,7 @@ export default function StyleDetailPage() {
                             )}
                             {style.availableForModel2 && (
                                 <span className="text-xs px-3 py-1 rounded-full bg-[#E3F2FD] text-[#1565C0] font-medium">
-                                    Designer Sources Fabric
+                                    Studio Sources Fabric
                                 </span>
                             )}
                         </div>
@@ -134,13 +163,13 @@ export default function StyleDetailPage() {
                         </p>
 
                         {/* CTA */}
-                        <Link
-                            href={isAuthenticated ? `/client/orders/new?styleId=${style.id}` : "/login"}
+                        <button
+                            onClick={handleOrderStyle}
                             className="inline-flex items-center gap-2 px-8 py-3.5 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors text-base"
                         >
                             Order This Style
                             <ArrowRight size={18} />
-                        </Link>
+                        </button>
 
                         {!isAuthenticated && (
                             <p className="text-xs text-[#999] mt-3">
