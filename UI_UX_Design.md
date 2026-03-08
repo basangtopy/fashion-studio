@@ -614,7 +614,7 @@ Settings
 
 ADMIN PAGE 1 — DASHBOARD OVERVIEW (/admin/dashboard)
 
-Header: Welcome back + Date Range Filter (This Month, Last Month, YTD) + "Export Report" split button (Download CSV / Download PDF).
+Header: Welcome back + Date Range Filter (This Month, Last Month, YTD, custom) + "Export Report" split button (Download CSV / Download PDF).
 
 Stat cards row (6 cards, 3+3 on tablet, 2+2+2 on desktop): - Total Active Orders (count) - Orders Pending Review (count, Warning colour if > 0) - Total Revenue (₦ amount) - Outstanding Payments (₦ amount) - Clients This Month (count) - Appointments Pending (count)
 _(Note: These stats dynamically update based on the Date Range filter)._

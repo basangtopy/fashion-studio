@@ -86,7 +86,7 @@ function LoginContent() {
     };
 
     return (
-        <div className="min-h-screen flex pt-[var(--nav-height)]">
+        <div className="h-screen overflow-hidden flex pt-[var(--nav-height)]">
             {/* Left brand panel — Desktop only */}
             <div className="hidden lg:flex w-[55%] bg-[#1A1A2E] relative overflow-hidden items-center justify-center sticky top-[var(--nav-height)] h-[calc(100vh-var(--nav-height))]">
                 <div className="relative z-10 px-16 max-w-lg">
@@ -124,12 +124,12 @@ function LoginContent() {
             </div>
 
             {/* Right form panel */}
-            <div className="flex-1 flex items-center justify-center px-6 py-12 bg-white">
+            <div className="flex-1 flex items-start justify-center px-6 py-12 bg-white overflow-y-auto">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="w-full max-w-[400px]"
+                    className="w-full max-w-[400px] my-auto"
                 >
                     {/* Mobile brand mark */}
                     <div className="lg:hidden text-center mb-8">

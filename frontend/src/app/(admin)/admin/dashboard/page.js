@@ -12,6 +12,7 @@ import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
     PieChart, Pie, Cell, BarChart, Bar,
 } from "recharts";
+import { useToast } from "@/components/ui/toaster";
 import api from "@/lib/api";
 import { formatCurrency, ORDER_STATUS } from "@/config/branding";
 import StatusPill from "@/components/shared/StatusPill";

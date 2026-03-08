@@ -36,6 +36,8 @@ export function BookingModal({ isOpen, onOpenChange }) {
     // const [pendingAppointment, setPendingAppointment] = useState(null);
     // const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
+    if (!isOpen || !isAuthenticated) return;
+
     // Fetch 'own' appointments to check for a REQUESTED one
     const { data: pendingAppointment, isLoading: isLoadingStatus, isError } = useQuery({
         queryKey: ["pendingAppointment"],

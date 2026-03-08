@@ -65,6 +65,7 @@ export const exportMeasurementsToPDF = (
     size: "A4",
     layout: measurements.length === 1 ? "portrait" : "landscape",
     // Portrait for a single client (more readable), landscape for multiple (fits more columns)
+    bufferPages: true,
   });
 
   doc.pipe(res);
