@@ -415,10 +415,20 @@ export const declineQuote = async (req, res) => {
 // ─── GET /admin/orders — All orders (admin) ────────────────────────────────
 
 export const getAdminOrders = async (req, res) => {
-  const { status, type, clientId, from, to, search, page = 1, limit = 20 } = req.query;
+  const { status, type, clientId, from, to, search, page = 1, limit = 20, sortBy = "createdAt", sortDir = "desc" } = req.query;
 
   const where = {};
-  if (status) where.status = status;
+
+  // Multi-status support: "PENDING_REVIEW,IN_PROGRESS" → array
+  if (status) {
+    const statuses = status.split(",").map(s => s.trim()).filter(Boolean);
+    if (statuses.length === 1) {
+      where.status = statuses[0];
+    } else if (statuses.length > 1) {
+      where.status = { in: statuses };
+    }
+  }
+
   if (type) where.orderType = type;
   if (clientId) where.clientId = clientId;
 
@@ -441,6 +451,11 @@ export const getAdminOrders = async (req, res) => {
   const skip = (parseInt(page) - 1) * parseInt(limit);
   const take = parseInt(limit);
 
+  // Sortable columns whitelist
+  const allowedSortFields = ["createdAt", "totalAgreedFee", "orderNumber", "status", "orderType"];
+  const orderField = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
+  const orderDirection = sortDir === "asc" ? "asc" : "desc";
+
   // Run count and data queries in parallel
   const [total, orders] = await Promise.all([
     prisma.order.count({ where }),
@@ -456,7 +471,7 @@ export const getAdminOrders = async (req, res) => {
         },
         payments: { where: { status: "CONFIRMED" }, select: { amount: true } },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { [orderField]: orderDirection },
       skip,
       take,
     }),

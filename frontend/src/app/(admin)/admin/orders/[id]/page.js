@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     ArrowLeft, MessageSquare, Send, Ruler, CreditCard, CheckCircle2, XCircle, Banknote,
     Save, User, Mail, Phone, FileText, Truck, StickyNote, Clock, AlertTriangle, X, Plus,
+    Check, CheckCheck, Paperclip, ImageIcon, Package, Scissors, ShoppingBag,
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -46,11 +47,15 @@ export default function AdminOrderDetailPage() {
     const toast = useToast();
     const { user, isSuperAdmin } = useAuth();
     const queryClient = useQueryClient();
-    const chatEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
+    const fileInputRef = useRef(null);
 
     const [quoteAmount, setQuoteAmount] = useState("");
     const [adminNote, setAdminNote] = useState("");
     const [chatMessage, setChatMessage] = useState("");
+    const [chatAttachment, setChatAttachment] = useState(null);
+    const [chatAttachmentPreview, setChatAttachmentPreview] = useState(null);
+    const [mobileChatOpen, setMobileChatOpen] = useState(false);
     const [statusModal, setStatusModal] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState(null);
     const [statusNote, setStatusNote] = useState("");
@@ -100,10 +105,36 @@ export default function AdminOrderDetailPage() {
         }
     }, [order, adminNotesLoaded]);
 
-    // Scroll chat to bottom
+    // Scroll chat to bottom (scroll the container, not the page)
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [chatMessages]);
+        if (chatContainerRef.current && (mobileChatOpen || window.innerWidth >= 1024)) {
+            setTimeout(() => {
+                if (chatContainerRef.current) {
+                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                }
+            }, 10);
+        }
+    }, [chatMessages, mobileChatOpen]);
+
+    // Intersection Observer — mark messages as read
+    useEffect(() => {
+        if (!chatMessages || chatMessages.length === 0) return;
+        const hasUnread = chatMessages.some(m => !m.isRead && m.senderRole === "CLIENT");
+        if (!hasUnread) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                let shouldMark = false;
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) { shouldMark = true; observer.unobserve(entry.target); }
+                });
+                if (shouldMark && !markMessagesRead.isPending) markMessagesRead.mutate();
+            },
+            { threshold: 0.5 }
+        );
+        const unreadNodes = document.querySelectorAll('.chat-msg-unread');
+        unreadNodes.forEach((node) => observer.observe(node));
+        return () => observer.disconnect();
+    }, [chatMessages, mobileChatOpen]);
 
     const sendQuote = useMutation({
         mutationFn: async () => {
@@ -147,9 +178,38 @@ export default function AdminOrderDetailPage() {
     });
 
     const sendMsg = useMutation({
-        mutationFn: async (message) => { const { data } = await api.post(`/chat/${id}`, { message }); return data; },
-        onSuccess: () => { setChatMessage(""); queryClient.invalidateQueries({ queryKey: ["chat", id] }); },
+        mutationFn: async ({ message, file }) => {
+            if (file) {
+                const formData = new FormData();
+                if (message) formData.append("message", message);
+                formData.append("attachments", file);
+                const { data } = await api.post(`/chat/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+                return data;
+            }
+            const { data } = await api.post(`/chat/${id}`, { message });
+            return data;
+        },
+        onSuccess: () => { setChatMessage(""); setChatAttachment(null); setChatAttachmentPreview(null); queryClient.invalidateQueries({ queryKey: ["chat", id] }); },
     });
+
+    const markMessagesRead = useMutation({
+        mutationFn: async () => { await api.put(`/chat/${id}/read`); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["chat", id] }); queryClient.invalidateQueries({ queryKey: ["admin-chat"] }); },
+    });
+
+    const handleSendMessage = () => {
+        const msg = chatMessage.trim();
+        if (!msg && !chatAttachment) return;
+        sendMsg.mutate({ message: msg || null, file: chatAttachment });
+    };
+
+    const handleChatFileSelect = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setChatAttachment(file);
+        setChatAttachmentPreview(URL.createObjectURL(file));
+        e.target.value = "";
+    };
 
     const confirmPayment = useMutation({
         mutationFn: async (payId) => { const { data } = await api.put(`/admin/payments/${payId}/confirm`); return data; },
@@ -192,7 +252,7 @@ export default function AdminOrderDetailPage() {
                 <div className="lg:col-span-2 space-y-6">
                     {/* Header + Status */}
                     <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                        <div className="flex items-start justify-between mb-4">
+                        <div className="hidden md:flex items-start justify-between mb-4">
                             <div>
                                 <p className="text-xs font-mono-data text-[#999] mb-1">{order.orderNumber}</p>
                                 <h1 className="text-xl font-bold text-[#0D0D0D]">{order.style?.name || typeConfig.label || "Order"}</h1>
@@ -208,6 +268,22 @@ export default function AdminOrderDetailPage() {
                             </div>
                         </div>
 
+                        <div className="md:hidden mb-4">
+                            <div className="flex items-start justify-between">
+                                <p className="text-xs font-mono-data text-[#999] mb-1">{order.orderNumber}</p>
+                                <div className="flex items-center gap-2">
+                                    <StatusPill status={order.status} />
+                                    {allowedTransitions.length > 0 && (
+                                        <Button onClick={() => setStatusModal(true)} variant="outline" className="h-8 text-xs gap-1">
+                                            Update Status
+                                        </Button>
+                                    )}
+                                </div>
+                            </div>
+                            <h1 className="text-xl font-bold text-[#0D0D0D]">{order.style?.name || typeConfig.label || "Order"}</h1>
+                            <p className="text-sm text-[#555] mt-1">{typeConfig.label} · {order.client?.fullName || "Client"}</p>
+                        </div>
+
                         {/* Visual stepper */}
                         <div className="flex items-center gap-1 overflow-x-auto pb-1.5">
                             {STATUS_STEPS.map((step, i) => {
@@ -215,7 +291,7 @@ export default function AdminOrderDetailPage() {
                                 const isCurrentOrPast = i <= currentStepIndex;
                                 const isCurrent = step === order.status;
                                 return (
-                                    <div key={step} className="flex items-center gap-1 shrink-0">
+                                    <div key={step} className="flex items-center gap-1 shrink-0 mt-1">
                                         <div className={`w-2.5 h-2.5 rounded-full transition-colors ${isCurrent ? "ring-2 ring-offset-1" : ""}`}
                                             style={{
                                                 backgroundColor: isCurrentOrPast ? (stepInfo.text || "#C2185B") : "#E0E0E0",
@@ -315,69 +391,127 @@ export default function AdminOrderDetailPage() {
                         </div>
                     </div>
 
-                    {/* Chat */}
-                    <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden">
-                        <div className="px-5 py-3 border-b border-[rgba(0,0,0,0.06)] flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                    {/* Chat — desktop inline, mobile full-screen overlay */}
+                    <div
+                        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:static lg:bg-transparent lg:backdrop-blur-none lg:block lg:z-auto transition-opacity duration-300 ${mobileChatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none lg:opacity-100 lg:pointer-events-auto'}`}
+                        onClick={(e) => { if (e.target === e.currentTarget) setMobileChatOpen(false); }}
+                    >
+                        <div className={`absolute bottom-0 left-0 right-0 h-[100dvh] lg:static lg:h-[calc(100vh-145px)] flex flex-col rounded-t-2xl lg:rounded-xl border-0 lg:border border-[rgba(0,0,0,0.06)] bg-white lg:overflow-hidden lg:sticky lg:top-[72px] transform transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileChatOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'}`}>
+                            {/* Chat header */}
+                            <div className="px-5 py-3 border-b border-[rgba(0,0,0,0.06)] flex items-center gap-2 bg-white shrink-0">
                                 <MessageSquare size={16} className="text-[#C2185B]" />
                                 <h3 className="text-sm font-semibold text-[#0D0D0D]">Chat with Client</h3>
+                                <span className="text-[10px] text-[#999] ml-auto">{messages.length} messages</span>
+                                <button className="lg:hidden ml-2 p-1.5 rounded-full hover:bg-[#F4F0F8] text-[#555] transition-colors" onClick={() => setMobileChatOpen(false)}>
+                                    <X size={16} />
+                                </button>
                             </div>
-                            <span className="text-[10px] text-[#999]">{messages.length} message{messages.length !== 1 ? "s" : ""}</span>
-                        </div>
-                        <div className="h-[300px] overflow-y-auto custom-scrollbar p-4 space-y-3">
-                            {messages.length === 0 ? (
-                                <p className="text-sm text-[#999] text-center py-8">No messages yet. Start the conversation.</p>
-                            ) : (
-                                messages.map((msg) => (
-                                    <div key={msg.id} className={`flex ${msg.senderRole !== "CLIENT" ? "justify-end" : "justify-start"}`}>
-                                        <div className={`max-w-[75%] px-3.5 py-2.5 rounded-2xl text-sm ${msg.senderRole !== "CLIENT"
-                                            ? "bg-[#1A1A2E] text-white rounded-br-md"
-                                            : "bg-[#F4F0F8] text-[#0D0D0D] rounded-bl-md"
-                                            }`}>
-                                            {/* Image attachments — clickable for lightbox */}
-                                            {msg.attachments?.length > 0 && (
-                                                <div className="mb-2 grid gap-1">
-                                                    {msg.attachments.map((img, i) => (
-                                                        <button
-                                                            key={i}
-                                                            onClick={() => setLightboxImage(typeof img === "string" ? img : img.url)}
-                                                            className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
-                                                        >
-                                                            <Image src={typeof img === "string" ? img : img.url} alt="" fill className="object-cover" />
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            {/* Legacy images field fallback */}
-                                            {!msg.attachments?.length && msg.images?.length > 0 && (
-                                                <div className="mb-2 grid gap-1">
-                                                    {msg.images.map((img, i) => (
-                                                        <button
-                                                            key={i}
-                                                            onClick={() => setLightboxImage(img)}
-                                                            className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
-                                                        >
-                                                            <Image src={img} alt="" fill className="object-cover" />
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                            {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
-                                            <p className={`text-[10px] mt-1 ${msg.senderRole !== "CLIENT" ? "text-white/50" : "text-[#999]"}`}>
-                                                {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
-                                            </p>
-                                        </div>
+
+                            {/* Messages */}
+                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
+                                {messages.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-center">
+                                        <MessageSquare size={24} className="text-[#E0E0E0] mb-2" />
+                                        <p className="text-sm text-[#999]">No messages yet.</p>
+                                        <p className="text-xs text-[#999] mt-1">Send a message to start the conversation.</p>
                                     </div>
-                                ))
+                                ) : (
+                                    messages.map((msg, idx) => {
+                                        const msgDate = new Date(msg.createdAt).setHours(0, 0, 0, 0);
+                                        const prevMsgDate = idx > 0 ? new Date(messages[idx - 1].createdAt).setHours(0, 0, 0, 0) : null;
+                                        const showDateSeparator = msgDate !== prevMsgDate;
+                                        const isAdmin = msg.senderRole !== "CLIENT";
+
+                                        return (
+                                            <div key={msg.id} className="flex flex-col gap-3">
+                                                {showDateSeparator && (
+                                                    <div className="flex items-center justify-center my-1">
+                                                        <span className="px-3 py-1 bg-[#F4F0F8] rounded-full text-[10px] font-semibold text-[#999] tracking-wider uppercase">
+                                                            {new Date(msg.createdAt).toLocaleDateString("en-NG", {
+                                                                weekday: "short", day: "numeric", month: "short",
+                                                                year: new Date(msg.createdAt).getFullYear() !== new Date().getFullYear() ? "numeric" : undefined
+                                                            })}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                                <div
+                                                    className={`flex ${isAdmin ? "justify-end" : "justify-start"} ${!msg.isRead && msg.senderRole === "CLIENT" ? "chat-msg-unread" : ""}`}
+                                                    data-unread={!msg.isRead && msg.senderRole === "CLIENT" ? "true" : "false"}
+                                                >
+                                                    <div className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm ${isAdmin
+                                                        ? "bg-[#1A1A2E] text-white rounded-br-md"
+                                                        : "bg-white text-[#0D0D0D] rounded-bl-md shadow-sm border border-[rgba(0,0,0,0.06)]"
+                                                        }`}>
+                                                        {msg.attachments?.length > 0 && (
+                                                            <div className="mb-2 grid gap-1">
+                                                                {msg.attachments.map((img, i) => (
+                                                                    <button key={i} onClick={() => setLightboxImage(typeof img === "string" ? img : img.url)}
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
+                                                                        <Image src={typeof img === "string" ? img : img.url} alt="" fill className="object-cover" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        {!msg.attachments?.length && msg.images?.length > 0 && (
+                                                            <div className="mb-2 grid gap-1">
+                                                                {msg.images.map((img, i) => (
+                                                                    <button key={i} onClick={() => setLightboxImage(img)}
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
+                                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                        {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
+                                                        <div className={`flex items-center justify-end gap-1 mt-1 ${isAdmin ? "text-white/50" : "text-[#999]"}`}>
+                                                            <span className="text-[10px]">
+                                                                {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                                                            </span>
+                                                            {isAdmin && (
+                                                                msg.isRead || msg.readAt
+                                                                    ? <CheckCheck size={14} />
+                                                                    : <Check size={14} />
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
+                            </div>
+
+                            {/* Attachment preview */}
+                            {chatAttachmentPreview && (
+                                <div className="px-3 pt-2 bg-white border-t border-[rgba(0,0,0,0.06)]">
+                                    <div className="relative inline-block">
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#F4F0F8] relative">
+                                            <Image src={chatAttachmentPreview} alt="Attachment" fill className="object-cover" />
+                                        </div>
+                                        <button onClick={() => { setChatAttachment(null); setChatAttachmentPreview(null); }}
+                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C62828] text-white flex items-center justify-center">
+                                            <X size={10} />
+                                        </button>
+                                    </div>
+                                </div>
                             )}
-                            <div ref={chatEndRef} />
-                        </div>
-                        <div className="px-4 py-3 border-t border-[rgba(0,0,0,0.06)] flex gap-2">
-                            <Input type="text" value={chatMessage} onChange={(e) => setChatMessage(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && chatMessage.trim() && sendMsg.mutate(chatMessage)}
-                                placeholder="Type a message..." className="h-10 bg-white" />
-                            <Button onClick={() => chatMessage.trim() && sendMsg.mutate(chatMessage)} disabled={!chatMessage.trim()}
-                                className="h-10 w-10 p-0 bg-[#1A1A2E] text-white hover:bg-[#2A2A40] shrink-0"><Send size={16} /></Button>
+
+                            {/* Chat input */}
+                            <div className="px-3 py-3 border-t border-[rgba(0,0,0,0.06)] bg-white flex gap-2 items-end shrink-0">
+                                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleChatFileSelect} className="hidden" />
+                                <button onClick={() => fileInputRef.current?.click()}
+                                    className="h-10 w-10 rounded-full flex items-center justify-center text-[#999] hover:bg-[#F4F0F8] transition-colors shrink-0">
+                                    <Paperclip size={16} />
+                                </button>
+                                <input type="text" value={chatMessage} onChange={(e) => setChatMessage(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && (chatMessage.trim() || chatAttachment) && handleSendMessage()}
+                                    placeholder="Type a message..."
+                                    className="flex-1 h-10 px-3.5 text-sm border border-[#E0E0E0] rounded-full focus:border-[#C2185B] outline-none bg-[#FAFAFA]" />
+                                <button onClick={handleSendMessage} disabled={(!chatMessage.trim() && !chatAttachment) || sendMsg.isPending}
+                                    className="h-10 w-10 rounded-full bg-[#1A1A2E] text-white flex items-center justify-center hover:bg-[#2A2A40] disabled:opacity-50 transition-colors shrink-0">
+                                    <Send size={16} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -417,6 +551,22 @@ export default function AdminOrderDetailPage() {
                                 </div>
                             )}
                         </div>
+                        {/* Measurements summary */}
+                        {order.measurement ? (
+                            <div className="mb-4 p-3 rounded-lg bg-[#F4F0F8]">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <Ruler size={12} className="text-[#6A1B9A]" />
+                                    <span className="text-[10px] font-semibold text-[#6A1B9A] uppercase tracking-wider">Measurements</span>
+                                </div>
+                                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs">
+                                    {[["Bust", order.measurement.bust], ["Waist", order.measurement.waist], ["Hips", order.measurement.hips], ["Height", order.measurement.fullHeight]].filter(([, v]) => v).map(([label, val]) => (
+                                        <span key={label} className="text-[#555]">{label}: <span className="font-mono font-semibold text-[#0D0D0D]">{val}cm</span></span>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-[10px] text-[#999] italic mb-4">No measurements on file</p>
+                        )}
                         {order.client?.id && (
                             <Link href={`/admin/clients/${order.client.id}`}
                                 className="block text-center text-xs font-semibold text-[#C2185B] hover:underline py-2 rounded-lg bg-[#C2185B]/5 hover:bg-[#C2185B]/10 transition-colors">
@@ -431,11 +581,12 @@ export default function AdminOrderDetailPage() {
                         <div className="space-y-3 text-sm">
                             {[
                                 { l: "Type", v: typeConfig.label },
-                                { l: "Style", v: order.style?.name || "—" },
+                                { l: "Style", v: order.style?.name || (order.customStyleDescription ? "Custom Style" : "—") },
+                                { l: "Fulfillment", v: order.fulfillmentMethod === "DELIVERY" ? "Home Delivery" : "Studio Pickup" },
                                 { l: "Agreed Fee", v: order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—" },
                                 { l: "Total Paid", v: formatCurrency(totalPaidCalc) },
                                 { l: "Balance", v: order.totalAgreedFee ? formatCurrency(Math.max(0, order.totalAgreedFee - totalPaidCalc)) : "—" },
-                                ...(isDeliveryOrder ? [{ l: "Delivery", v: order.deliveryFee ? formatCurrency(order.deliveryFee) : "Not set" }] : []),
+                                ...(isDeliveryOrder ? [{ l: "Delivery Fee", v: order.deliveryFee ? formatCurrency(order.deliveryFee) : "Not set" }] : []),
                                 { l: "Created", v: new Date(order.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" }) },
                             ].map(({ l, v }) => (
                                 <div key={l} className="flex items-center justify-between">
@@ -444,6 +595,47 @@ export default function AdminOrderDetailPage() {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Custom description */}
+                        {order.customStyleDescription && (
+                            <div className="mt-4 pt-3 border-t border-[rgba(0,0,0,0.06)]">
+                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Custom Description</p>
+                                <p className="text-xs text-[#555] leading-relaxed">{order.customStyleDescription}</p>
+                            </div>
+                        )}
+
+                        {/* Fabric notes */}
+                        {order.fabricNotes && (
+                            <div className="mt-3 pt-3 border-t border-[rgba(0,0,0,0.06)]">
+                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Fabric Notes</p>
+                                <p className="text-xs text-[#555] leading-relaxed">{order.fabricNotes}</p>
+                            </div>
+                        )}
+
+                        {/* Model 3 order items */}
+                        {order.orderType === "MODEL_3" && order.items?.length > 0 && (
+                            <div className="mt-4 pt-3 border-t border-[rgba(0,0,0,0.06)]">
+                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-2">Order Items</p>
+                                <div className="space-y-2 max-h-[200px] overflow-y-auto custom-scrollbar">
+                                    {order.items.map((item, idx) => (
+                                        <div key={idx} className="flex items-center gap-3 p-2 rounded-lg bg-[#FAFAFA]">
+                                            <div className="w-10 h-10 rounded-lg bg-[#F4F0F8] overflow-hidden shrink-0 relative">
+                                                {item.readyToWear?.images?.[0] ? (
+                                                    <Image src={item.readyToWear.images[0]} alt="" fill className="object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center"><ShoppingBag size={14} className="text-[#BDBDBD]" /></div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs font-medium text-[#0D0D0D] truncate">{item.readyToWear?.name || "Item"}</p>
+                                                <p className="text-[10px] text-[#999]">Size: {item.selectedSize} · Qty: {item.quantity}</p>
+                                            </div>
+                                            <span className="text-xs font-mono font-semibold text-[#0D0D0D] shrink-0">{formatCurrency(item.price || item.readyToWear?.price || 0)}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Created By / Assigned To */}
@@ -466,10 +658,22 @@ export default function AdminOrderDetailPage() {
                         </div>
                     )}
 
-                    {/* Style image */}
+                    {/* Associated images */}
                     {order.style?.images?.[0] && (
                         <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F0F8]">
                             <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover" />
+                        </div>
+                    )}
+                    {order.customStyleImages?.length > 0 && (
+                        <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                            <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-2">Custom Style Images</p>
+                            <div className="grid grid-cols-3 gap-2">
+                                {order.customStyleImages.map((img, i) => (
+                                    <button key={i} onClick={() => setLightboxImage(img)} className="relative aspect-square rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
+                                        <Image src={img} alt="" fill className="object-cover" />
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     )}
 
@@ -480,6 +684,8 @@ export default function AdminOrderDetailPage() {
                             <p className="text-sm text-[#555] leading-relaxed">{order.clientNotes}</p>
                         </div>
                     )}
+
+
 
                     {/* Payment History */}
                     <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
@@ -503,6 +709,17 @@ export default function AdminOrderDetailPage() {
                                         <p className="text-[10px] text-[#999]">
                                             {pay.paymentType?.replace(/_/g, " ")} · {new Date(pay.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                         </p>
+                                        {/* Payment proof thumbnail */}
+                                        {(pay.proofImage || pay.proofImages?.length > 0) && (
+                                            <div className="flex gap-1.5 mt-2">
+                                                {(pay.proofImages || [pay.proofImage]).filter(Boolean).map((img, i) => (
+                                                    <button key={i} onClick={() => setLightboxImage(img)}
+                                                        className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
+                                                        <Image src={img} alt="Proof" fill className="object-cover" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                         {pay.status === "PENDING" && (
                                             <div className="flex gap-1.5 mt-2">
                                                 <Button size="sm" onClick={() => confirmPayment.mutate(pay.id)} disabled={confirmPayment.isPending}
@@ -524,6 +741,19 @@ export default function AdminOrderDetailPage() {
                         )}
                     </div>
                 </div>
+            </div>
+
+            {/* ─── Mobile Sticky Bottom Bar ─── */}
+            <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-[rgba(0,0,0,0.06)] z-40 lg:hidden flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                <button
+                    onClick={() => setMobileChatOpen(true)}
+                    className="flex flex-1 items-center justify-center gap-2 py-3 rounded-xl border border-[rgba(0,0,0,0.12)] bg-[#F4F0F8] text-[#0D0D0D] font-semibold hover:bg-[#E8E4EC] transition-colors text-sm relative"
+                >
+                    <MessageSquare size={16} /> Chat
+                    {messages.filter(m => !m.isRead && m.senderRole === "CLIENT").length > 0 && (
+                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C2185B]"></span>
+                    )}
+                </button>
             </div>
 
             {/* ─── Status Update Modal ─── */}
@@ -658,8 +888,8 @@ export default function AdminOrderDetailPage() {
                                         {["INSTALLMENT", "FULL"].map(t => (
                                             <button key={t} onClick={() => setOfflineType(t)}
                                                 className={`flex-1 py-2.5 rounded-lg text-xs font-semibold border-2 transition-colors ${offlineType === t
-                                                        ? "border-[#2E7D32] bg-[#2E7D32]/5 text-[#2E7D32]"
-                                                        : "border-[#E0E0E0] text-[#555] hover:border-[#2E7D32]/30"
+                                                    ? "border-[#2E7D32] bg-[#2E7D32]/5 text-[#2E7D32]"
+                                                    : "border-[#E0E0E0] text-[#555] hover:border-[#2E7D32]/30"
                                                     }`}>
                                                 {t === "FULL" ? "Full Payment" : "Installment"}
                                             </button>

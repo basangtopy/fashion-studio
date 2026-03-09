@@ -643,7 +643,7 @@ Timeline-style list for the next 7 days.
 
 ADMIN PAGE 2 — ORDERS (/admin/orders)
 
-There should be a button that opens a modal/panel to create a new order for a client
+There should be a button that opens a modal/panel to create a new order for a client. The order creation flow should take all the necessary details and information to create any of the types of orders for the client.
 Filter bar: Status (multi-select dropdown) | Order Type | Client (search) | Date range picker | Search
 All filters apply simultaneously. Active filters shown as dismissible pills below the bar.
 
@@ -658,6 +658,7 @@ Row hover: subtle highlight, "Manage →" button appears on right
 KANBAN VIEW (Primary Operational Flow):
 A horizontal drag-and-drop board containing columns representing lifecycle states.
 Admins drag order cards between columns to silently update statuses in the background via precise API hits. This acts as the studio's true operation dashboard.
+Kanban view should be contained in a scrollable container, so that it can be scrolled horizontally to view all columns, and not be cut off.
 
 ORDER DETAIL PAGE (/admin/orders/:id)
 
@@ -707,6 +708,7 @@ ORDER DETAIL PAGE (/admin/orders/:id)
       Admin messages right-aligned, client messages left-aligned.
       Same improved chat features as client view.
       Same presentation and responsiveness on mobile as client view.
+      On mobile, there should be a button to open the chat panel and the chat panel should be full-screen, just like the implementation in the client view.
 
     Payment History: same as client view, but with Confirm/Reject actions on each PENDING payment.
 

@@ -415,7 +415,7 @@ export default function AdminLayout({ children }) {
 
             {/* ─── Main area ─── */}
             <div
-                className="flex-1 flex flex-col min-h-screen lg:ml-[var(--admin-sw)]"
+                className="flex-1 min-w-0 flex flex-col min-h-screen lg:ml-[var(--admin-sw)]"
                 style={{
                     "--admin-sw": `${collapsed ? COLLAPSED_W : EXPANDED_W}px`,
                     transition: "margin-left 300ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -451,8 +451,8 @@ export default function AdminLayout({ children }) {
                     </div>
                 </header>
 
-                <main className="flex-1">
-                    <div className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">{children}</div>
+                <main className="flex-1 min-w-0">
+                    <div className="p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8 max-w-full">{children}</div>
                 </main>
             </div>
 

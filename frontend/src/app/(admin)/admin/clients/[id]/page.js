@@ -12,7 +12,6 @@ import api from "@/lib/api";
 import { formatCurrency, ORDER_STATUS, ORDER_TYPES } from "@/config/branding";
 import StatusPill from "@/components/shared/StatusPill";
 import { SkeletonCard } from "@/components/shared/Skeleton";
-import CreateOrderModal from "@/components/admin/CreateOrderModal";
 import MeasurementFormModal from "@/components/admin/MeasurementFormModal";
 
 const TABS = ["overview", "orders", "measurements", "payments", "chat"];
@@ -45,7 +44,6 @@ function groupMeasurements(measurement) {
 export default function AdminClientDetailPage() {
     const { id } = useParams();
     const [activeTab, setActiveTab] = useState("overview");
-    const [createOrderOpen, setCreateOrderOpen] = useState(false);
     const [measurementFormOpen, setMeasurementFormOpen] = useState(false);
 
     const { data: client, isLoading } = useQuery({
@@ -227,10 +225,10 @@ export default function AdminClientDetailPage() {
                     {activeTab === "orders" && (
                         <div className="space-y-3">
                             <div className="flex justify-end mb-2">
-                                <button onClick={() => setCreateOrderOpen(true)}
+                                <Link href={`/admin/orders/new?client=${id}`}
                                     className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#C2185B] text-white text-xs font-semibold hover:bg-[#A01548] transition-colors">
                                     <Plus size={14} /> Create Order
-                                </button>
+                                </Link>
                             </div>
                             {orders.length === 0 ? (
                                 <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
@@ -321,7 +319,6 @@ export default function AdminClientDetailPage() {
             </div>
 
             {/* Modals */}
-            <CreateOrderModal open={createOrderOpen} onClose={() => setCreateOrderOpen(false)} preselectedClientId={id} />
             <MeasurementFormModal open={measurementFormOpen} onClose={() => setMeasurementFormOpen(false)} clientId={id} existingMeasurement={clientMeasurements} />
         </div>
     );

@@ -3,110 +3,136 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/context/AuthContext";
-
+import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { getAccessToken } from "@/lib/api";
 /**
  * useSSE — Establishes a Server-Sent Events connection to the backend.
+ * Uses @microsoft/fetch-event-source to send the auth token via Authorization header
+ * (secure — unlike native EventSource which only supports URL query params).
  * Automatically invalidates relevant React Query caches on incoming events.
  * Auto-reconnects on disconnect with exponential backoff.
  */
 export default function useSSE() {
     const { isAuthenticated } = useAuth();
     const queryClient = useQueryClient();
-    const eventSourceRef = useRef(null);
-    const reconnectTimeoutRef = useRef(null);
+    const controllerRef = useRef(null);
     const retryCountRef = useRef(0);
 
     const connect = useCallback(() => {
-        // Get stored token
-        const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
+        const token = getAccessToken();
         if (!token) return;
 
         const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
         const url = `${apiBase}/sse`;
 
-        // Create EventSource with auth via query param (SSE doesn't support headers)
-        // We'll use a custom fetch-based approach instead
-        const es = new EventSource(`${url}?token=${token}`, { withCredentials: false });
+        // Abort any previous connection
+        if (controllerRef.current) controllerRef.current.abort();
+        const controller = new AbortController();
+        controllerRef.current = controller;
 
-        es.onopen = () => {
-            retryCountRef.current = 0; // Reset retry count on success
-        };
+        fetchEventSource(url, {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
+            openWhenHidden: true, // Keep connection alive when tab is hidden
 
-        // Handle named events
-        es.addEventListener("connected", () => {
-            // Connection established
-        });
-
-        es.addEventListener("notification", (e) => {
-            try {
-                queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
-            } catch { /* ignore */ }
-        });
-
-        es.addEventListener("chat", (e) => {
-            try {
-                queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
-            } catch { /* ignore */ }
-        });
-
-        // Backend sends "chat_message" SSE events for real-time chat
-        es.addEventListener("chat_message", (e) => {
-            try {
-                const payload = JSON.parse(e.data);
-                // Invalidate specific order's chat query for client-side real-time
-                if (payload?.orderId) {
-                    queryClient.invalidateQueries({ queryKey: ["chat", payload.orderId] });
+            onopen(response) {
+                if (response.ok) {
+                    retryCountRef.current = 0;
+                } else if (response.status === 401 || response.status === 403) {
+                    // Auth failed — don't retry
+                    throw new Error("Unauthorized");
                 }
-                // Also invalidate admin queries
-                queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
-            } catch { /* ignore */ }
+            },
+
+            onmessage(event) {
+                try {
+                    const payload = event.data ? JSON.parse(event.data) : {};
+
+                    switch (event.event || event.type) {
+                        case "connected":
+                            break;
+
+                        case "notification":
+                            queryClient.invalidateQueries({ queryKey: ["admin-notifications"] });
+                            queryClient.invalidateQueries({ queryKey: ["client-notifications"] });
+                            break;
+
+                        case "chat":
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat-inbox"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+                            break;
+
+                        case "chat_message":
+                            if (payload?.orderId) {
+                                queryClient.invalidateQueries({ queryKey: ["chat", payload.orderId] });
+                            }
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat-inbox"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+                            queryClient.invalidateQueries({ queryKey: ["client-orders"] });
+                            break;
+
+                        case "chat_read":
+                            if (payload?.orderId) {
+                                queryClient.invalidateQueries({ queryKey: ["chat", payload.orderId] });
+                            }
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-chat-inbox"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+                            break;
+
+                        case "order":
+                            queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-recent-orders"] });
+                            queryClient.invalidateQueries({ queryKey: ["client-orders"] });
+                            if (payload?.orderId) {
+                                queryClient.invalidateQueries({ queryKey: ["admin-order", payload.orderId] });
+                                queryClient.invalidateQueries({ queryKey: ["order", payload.orderId] });
+                            }
+                            break;
+
+                        case "payment":
+                            queryClient.invalidateQueries({ queryKey: ["admin-payments"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-pending-payments"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
+                            queryClient.invalidateQueries({ queryKey: ["client-orders"] });
+                            if (payload?.orderId) {
+                                queryClient.invalidateQueries({ queryKey: ["order-payments", payload.orderId] });
+                            }
+                            break;
+
+                        case "presence":
+                            queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
+                            queryClient.invalidateQueries({ queryKey: ["admin-online-count"] });
+                            break;
+
+                        default:
+                            break;
+                    }
+                } catch { /* ignore parse errors for heartbeat/keep-alive */ }
+            },
+
+            onerror(err) {
+                // Don't retry on auth errors
+                if (err?.message === "Unauthorized") throw err;
+                // Exponential backoff: 1s, 2s, 4s, 8s... max 30s
+                const delay = Math.min(1000 * Math.pow(2, retryCountRef.current), 30000);
+                retryCountRef.current += 1;
+                return delay;
+            },
+
+            onclose() {
+                // Server closed connection — reconnect
+                const delay = Math.min(1000 * Math.pow(2, retryCountRef.current), 30000);
+                retryCountRef.current += 1;
+                return delay;
+            },
+        }).catch(() => {
+            // Silently handle abort and auth errors
         });
-
-        es.addEventListener("chat_read", (e) => {
-            try {
-                const payload = JSON.parse(e.data);
-                if (payload?.orderId) {
-                    queryClient.invalidateQueries({ queryKey: ["chat", payload.orderId] });
-                }
-                queryClient.invalidateQueries({ queryKey: ["admin-chat"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
-            } catch { /* ignore */ }
-        });
-
-        es.addEventListener("order", (e) => {
-            try {
-                queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-recent-orders"] });
-            } catch { /* ignore */ }
-        });
-
-        es.addEventListener("payment", (e) => {
-            try {
-                queryClient.invalidateQueries({ queryKey: ["admin-payments"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-pending-payments"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-dashboard"] });
-            } catch { /* ignore */ }
-        });
-
-        es.addEventListener("presence", (e) => {
-            try {
-                queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
-                queryClient.invalidateQueries({ queryKey: ["admin-online-count"] });
-            } catch { /* ignore */ }
-        });
-
-        es.onerror = () => {
-            es.close();
-            // Exponential backoff: 1s, 2s, 4s, 8s... max 30s
-            const delay = Math.min(1000 * Math.pow(2, retryCountRef.current), 30000);
-            retryCountRef.current += 1;
-            reconnectTimeoutRef.current = setTimeout(connect, delay);
-        };
-
-        eventSourceRef.current = es;
     }, [queryClient]);
 
     useEffect(() => {
@@ -115,12 +141,9 @@ export default function useSSE() {
         connect();
 
         return () => {
-            if (eventSourceRef.current) {
-                eventSourceRef.current.close();
-                eventSourceRef.current = null;
-            }
-            if (reconnectTimeoutRef.current) {
-                clearTimeout(reconnectTimeoutRef.current);
+            if (controllerRef.current) {
+                controllerRef.current.abort();
+                controllerRef.current = null;
             }
         };
     }, [isAuthenticated, connect]);

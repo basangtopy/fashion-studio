@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, ArrowLeft, MessageSquare, ExternalLink, X } from "lucide-react";
+import { Send, ArrowLeft, MessageSquare, ExternalLink, X, Paperclip, Check, CheckCheck } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -14,7 +14,10 @@ export default function AdminChatInboxPage() {
     const queryClient = useQueryClient();
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [message, setMessage] = useState("");
-    const messagesEndRef = useRef(null);
+    const [chatAttachment, setChatAttachment] = useState(null);
+    const [chatAttachmentPreview, setChatAttachmentPreview] = useState(null);
+    const chatContainerRef = useRef(null);
+    const fileInputRef = useRef(null);
     const [lightboxImage, setLightboxImage] = useState(null);
 
     // Get all chat threads (admin inbox)
@@ -63,20 +66,49 @@ export default function AdminChatInboxPage() {
 
     // Scroll to bottom on new messages
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [chatMsgs]);
+        if (chatContainerRef.current) {
+            setTimeout(() => {
+                if (chatContainerRef.current) {
+                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+                }
+            }, 10);
+        }
+    }, [chatMsgs, selectedOrderId]);
 
     const sendMsg = useMutation({
-        mutationFn: async (msg) => {
+        mutationFn: async ({ msg, file }) => {
+            if (file) {
+                const formData = new FormData();
+                if (msg) formData.append("message", msg);
+                formData.append("attachments", file);
+                const { data } = await api.post(`/chat/${selectedOrderId}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+                return data;
+            }
             const { data } = await api.post(`/chat/${selectedOrderId}`, { message: msg });
             return data;
         },
         onSuccess: () => {
             setMessage("");
+            setChatAttachment(null);
+            setChatAttachmentPreview(null);
             queryClient.invalidateQueries({ queryKey: ["admin-chat", selectedOrderId] });
             queryClient.invalidateQueries({ queryKey: ["admin-chat-inbox"] });
         },
     });
+
+    const handleSendMessage = () => {
+        const msg = message.trim();
+        if (!msg && !chatAttachment) return;
+        sendMsg.mutate({ msg: msg || null, file: chatAttachment });
+    };
+
+    const handleChatFileSelect = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setChatAttachment(file);
+        setChatAttachmentPreview(URL.createObjectURL(file));
+        e.target.value = "";
+    };
 
     // Relative time helper
     const relativeTime = (dateStr) => {
@@ -204,7 +236,7 @@ export default function AdminChatInboxPage() {
                             </div>
 
                             {/* Messages */}
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
+                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
                                 {chatMessages.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-center">
                                         <MessageSquare size={24} className="text-[#E0E0E0] mb-2" />
@@ -255,31 +287,57 @@ export default function AdminChatInboxPage() {
                                                             </div>
                                                         )}
                                                         {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
-                                                        <p className={`text-[10px] mt-1 ${isAdmin ? "text-white/50" : "text-[#999]"}`}>
-                                                            {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
-                                                        </p>
+                                                        <div className={`flex items-center justify-end gap-1 mt-1 ${isAdmin ? "text-white/50" : "text-[#999]"}`}>
+                                                            <span className="text-[10px]">
+                                                                {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
+                                                            </span>
+                                                            {isAdmin && (
+                                                                msg.isRead || msg.readAt
+                                                                    ? <CheckCheck size={14} />
+                                                                    : <Check size={14} />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         );
                                     })
                                 )}
-                                <div ref={messagesEndRef} />
                             </div>
+
+                            {/* Attachment preview */}
+                            {chatAttachmentPreview && (
+                                <div className="px-3 pt-2 bg-white border-t border-[rgba(0,0,0,0.06)]">
+                                    <div className="relative inline-block">
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#F4F0F8] relative">
+                                            <Image src={chatAttachmentPreview} alt="Attachment" fill className="object-cover" />
+                                        </div>
+                                        <button onClick={() => { setChatAttachment(null); setChatAttachmentPreview(null); }}
+                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C62828] text-white flex items-center justify-center">
+                                            <X size={10} />
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Input */}
                             <div className="px-4 py-3 border-t border-[rgba(0,0,0,0.06)] bg-white flex gap-2 items-end">
+                                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleChatFileSelect} className="hidden" />
+                                <button onClick={() => fileInputRef.current?.click()}
+                                    className="h-10 w-10 rounded-full flex items-center justify-center text-[#999] hover:bg-[#F4F0F8] transition-colors shrink-0">
+                                    <Paperclip size={16} />
+                                </button>
                                 <input
                                     type="text"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    onKeyDown={(e) => e.key === "Enter" && message.trim() && sendMsg.mutate(message)}
+                                    onKeyDown={(e) => e.key === "Enter" && (message.trim() || chatAttachment) && handleSendMessage()}
                                     placeholder="Type a message..."
                                     className="flex-1 h-10 px-3.5 text-sm border border-[#E0E0E0] rounded-full focus:border-[#C2185B] outline-none bg-[#FAFAFA]"
                                 />
                                 <button
-                                    onClick={() => message.trim() && sendMsg.mutate(message)}
-                                    disabled={!message.trim() || sendMsg.isPending}
+                                    onClick={handleSendMessage}
+                                    disabled={(!message.trim() && !chatAttachment) || sendMsg.isPending}
                                     className="h-10 w-10 rounded-full bg-[#C2185B] text-white flex items-center justify-center hover:bg-[#A01548] disabled:opacity-50 transition-colors shrink-0"
                                 >
                                     <Send size={16} />
