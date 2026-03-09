@@ -12,6 +12,7 @@ import EmptyState from "@/components/shared/EmptyState";
 import CreateClientModal from "@/components/admin/CreateClientModal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import useDebounce from "@/hooks/useDebounce";
 
 export default function AdminClientsPage() {
     const router = useRouter();
@@ -20,11 +21,13 @@ export default function AdminClientsPage() {
     const [createOpen, setCreateOpen] = useState(false);
     const limit = 20;
 
+    const debouncedSearch = useDebounce(search, 500);
+
     const { data, isLoading } = useQuery({
-        queryKey: ["admin-clients", search, page],
+        queryKey: ["admin-clients", debouncedSearch, page],
         queryFn: async () => {
             const params = { page, limit };
-            if (search) params.search = search;
+            if (debouncedSearch) params.search = debouncedSearch;
             const { data } = await api.get("/users/admin/clients", { params });
             return data.data || {};
         },
@@ -71,8 +74,8 @@ export default function AdminClientsPage() {
                             const totalPaid = c.totalPaid || c._count?.payments || 0;
 
                             // Relative time for last active
-                            const lastActive = c.lastLoginAt ? (() => {
-                                const d = new Date(c.lastLoginAt);
+                            const lastActive = c.updatedAt ? (() => {
+                                const d = new Date(c.updatedAt);
                                 const now = new Date();
                                 const seconds = Math.floor((now - d) / 1000);
                                 if (seconds < 60) return "just now";
@@ -116,9 +119,11 @@ export default function AdminClientsPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        {lastActive && (
+                                        {c.online ? (
+                                            <span className="text-[10px] text-[#2E7D32] font-medium">Online now</span>
+                                        ) : lastActive ? (
                                             <span className="text-[10px] text-[#999]">Active {lastActive}</span>
-                                        )}
+                                        ) : null}
                                     </div>
                                     <Link href={`/admin/clients/${c.id}`}
                                         className="block w-full text-center py-2 rounded-lg bg-[#C2185B]/5 text-[#C2185B] text-xs font-semibold hover:bg-[#C2185B]/10 transition-colors">

@@ -262,11 +262,40 @@ export const createClientAccount = async (req, res) => {
       isEmailVerified: true, // admin-created accounts are pre-verified
       createdById: req.user.userId,
       // No password — client sets their own via password reset email
-      // (password reset email will be implemented in Phase 6 with email service)
     },
   });
 
   return successResponse(res, 201, "Client account created successfully", {
     client: sanitizeUser(client),
+  });
+};
+
+// ─── Admin: PUT /admin/clients/:id ──────────────────────────────────────────────
+export const updateClientAccount = async (req, res) => {
+  const { id } = req.params;
+  const { fullName, phone, sex, dateOfBirth, address } = req.validatedBody;
+
+  const existing = await prisma.user.findUnique({
+    where: { id, role: "CLIENT" },
+  });
+
+  if (!existing) {
+    throw new AppError("Client not found", 404);
+  }
+
+  const updateData = {};
+  if (fullName !== undefined) updateData.fullName = fullName;
+  if (phone !== undefined) updateData.phone = phone;
+  if (sex !== undefined) updateData.sex = sex;
+  if (address !== undefined) updateData.address = address;
+  if (dateOfBirth !== undefined) updateData.dateOfBirth = new Date(dateOfBirth);
+
+  const updated = await prisma.user.update({
+    where: { id },
+    data: updateData,
+  });
+
+  return successResponse(res, 200, "Client account updated successfully", {
+    client: sanitizeUser(updated),
   });
 };

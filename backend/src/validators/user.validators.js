@@ -18,8 +18,8 @@ export const updateProfileSchema = z
     sex: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
 
     dateOfBirth: z
-      .string()
-      .datetime({ message: "Please provide a valid date" })
+      .iso
+      .date({ message: "Please provide a valid date" })
       .optional(),
 
     address: z
@@ -70,7 +70,6 @@ export const createClientSchema = z.object({
     .trim(),
 
   email: z
-    .string({ required_error: "Email is required" })
     .email("Please provide a valid email address")
     .toLowerCase()
     .trim(),
@@ -83,6 +82,6 @@ export const createClientSchema = z.object({
     required_error: "Sex is required",
   }),
 
-  dateOfBirth: z.string().datetime().optional(),
+  dateOfBirth: z.iso.date().optional(),
   address: z.string().min(5).max(300).trim().optional(),
 });

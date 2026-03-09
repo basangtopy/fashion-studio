@@ -7,6 +7,7 @@ import {
   getClientById,
   getClientOnlineStatus,
   createClientAccount,
+  updateClientAccount,
 } from "../controllers/user.controller.js";
 import { authenticate, authorise } from "../middleware/auth.middleware.js";
 import { uploadSingle } from "../middleware/upload.middleware.js";
@@ -54,6 +55,13 @@ router.post(
   authorise("STAFF_ADMIN", "SUPER_ADMIN"),
   validate(createClientSchema),
   createClientAccount,
+);
+
+router.put(
+  "/admin/clients/:id",
+  authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  validate(updateProfileSchema),
+  updateClientAccount,
 );
 
 export default router;

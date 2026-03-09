@@ -655,7 +655,7 @@ Bulk actions checkbox: select multiple, bulk status update or export
 Sticky header on scroll
 Row hover: subtle highlight, "Manage →" button appears on right
 
-KANBAN VIEW (Primary Operational Flow):
+KANBAN VIEW (Primary Operational Flow):7
 A horizontal drag-and-drop board containing columns representing lifecycle states.
 Admins drag order cards between columns to silently update statuses in the background via precise API hits. This acts as the studio's true operation dashboard.
 Kanban view should be contained in a scrollable container, so that it can be scrolled horizontally to view all columns, and not be cut off.

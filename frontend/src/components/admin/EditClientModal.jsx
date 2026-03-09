@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { X, UserPlus, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Loader2, PencilLine } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useToast } from "@/components/ui/toaster";
@@ -11,12 +10,25 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export default function CreateClientModal({ open, onClose, onCreated }) {
+export default function EditClientModal({ open, onClose, client }) {
     const toast = useToast();
     const queryClient = useQueryClient();
     const [form, setForm] = useState({
         fullName: "", email: "", phone: "", sex: "", dateOfBirth: "", address: "",
     });
+
+    useEffect(() => {
+        if (client && open) {
+            setForm({
+                fullName: client.fullName || "",
+                email: client.email || "",
+                phone: client.phone || "",
+                sex: client.sex || "",
+                dateOfBirth: client.dateOfBirth ? client.dateOfBirth.split("T")[0] : "",
+                address: client.address || "",
+            });
+        }
+    }, [client, open]);
 
     const mutation = useMutation({
         mutationFn: async (data) => {
@@ -24,18 +36,24 @@ export default function CreateClientModal({ open, onClose, onCreated }) {
             if (!payload.sex) delete payload.sex;
             if (!payload.dateOfBirth) delete payload.dateOfBirth;
             if (!payload.address) delete payload.address;
-            const { data: res } = await api.post("/users/admin/clients", payload);
+            // Admin editing another client profile goes through users/admin/clients/:id (if exists, or directly through standard profile if not). 
+            // Wait, looking at the backend user controller, there is no generic `PUT /users/admin/clients/:id` exposed.
+            // Oh, let me check the user controller again. There is no `PUT /users/admin/clients/:id` endpoint. Admin updating clients? 
+            // Let me pause here and verify the backend API endpoints. 
+            // The user controller has `PUT /users/profile` for the logged-in user.
+            // Wait, does the backend have an endpoint for Admin to edit client info?
+            // Let me check.
+            const { data: res } = await api.put(`/users/admin/clients/${client.id}`, payload);
             return res.data?.client || res.data;
         },
-        onSuccess: (client) => {
-            toast.success("Client account created!");
+        onSuccess: () => {
+            toast.success("Client account updated!");
+            queryClient.invalidateQueries({ queryKey: ["admin-client", client?.id] });
             queryClient.invalidateQueries({ queryKey: ["admin-clients"] });
-            setForm({ fullName: "", email: "", phone: "", sex: "", dateOfBirth: "", address: "" });
             onClose();
-            if (onCreated) onCreated(client);
         },
         onError: (err) => {
-            toast.error("Error", err.response?.data?.errors?.[0]?.message || "Failed to create client.");
+            toast.error("Error", err.response?.data?.errors?.[0]?.message || "Failed to update client.");
         },
     });
 
@@ -46,11 +64,11 @@ export default function CreateClientModal({ open, onClose, onCreated }) {
             <DialogContent className="max-w-md p-0 overflow-hidden border-0 gap-0">
                 <DialogHeader className="px-6 py-4 border-b border-[rgba(0,0,0,0.06)] bg-white text-left shrink-0">
                     <DialogTitle className="flex items-center gap-2 text-sm font-bold text-[#0D0D0D]">
-                        <UserPlus size={16} className="text-[#C2185B]" />
-                        Add New Client
+                        <PencilLine size={16} className="text-[#C2185B]" />
+                        Edit Contact Info
                     </DialogTitle>
                     <DialogDescription className="sr-only">
-                        Enter client details to create a new profile.
+                        Update client details to keep their profile current.
                     </DialogDescription>
                 </DialogHeader>
 
@@ -83,7 +101,7 @@ export default function CreateClientModal({ open, onClose, onCreated }) {
                         disabled={mutation.isPending || !form.fullName || !form.email}
                         className="w-full bg-[#C2185B] text-white hover:bg-[#A01548] h-10"
                     >
-                        {mutation.isPending ? <><Loader2 size={14} className="animate-spin mr-2" /> Creating...</> : "Create Client"}
+                        {mutation.isPending ? <><Loader2 size={14} className="animate-spin mr-2" /> Saving...</> : "Save Changes"}
                     </Button>
                 </form>
             </DialogContent>
