@@ -154,12 +154,14 @@ export default function AdminClientDetailPage() {
                 <ArrowLeft size={14} /> All Clients
             </Link>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 {/* Client Profile Card */}
-                <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                <div className="md:max-xl:flex items-center justify-around p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
                     <div className="flex flex-col items-center text-center mb-6">
                         <div className="w-16 h-16 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-xl mb-3">
-                            {client.fullName?.charAt(0) || "?"}
+                            {client.profilePicture ? (
+                                <img src={client.profilePicture} alt="" className="w-full h-full rounded-full object-cover" />
+                            ) : client.fullName?.charAt(0) || "?"}
                         </div>
                         <h2 className="text-lg font-bold text-[#0D0D0D]">{client.fullName}</h2>
                         <div className="flex items-center gap-1.5 mt-1">
@@ -170,29 +172,31 @@ export default function AdminClientDetailPage() {
                         </div>
                     </div>
 
-                    <div className="space-y-3 text-sm">
-                        <InfoRow icon={Mail} label="Email" value={client.email} />
-                        <InfoRow icon={Phone} label="Phone" value={client.phone || "—"} />
-                        <InfoRow icon={User} label="Sex" value={client.sex || "—"} />
-                        <InfoRow icon={MapPin} label="Address" value={client.address || "—"} />
-                        <InfoRow icon={Calendar} label="Joined" value={new Date(client.createdAt).toLocaleDateString("en-NG")} />
-                        <InfoRow icon={client.isEmailVerified ? CheckCircle2 : XCircle} label="Verified" value={client.isEmailVerified ? "Yes" : "No"} />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 mt-6">
-                        <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
-                            <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.orders || 0}</p>
-                            <p className="text-[10px] text-[#999] uppercase">Orders</p>
+                    <div>
+                        <div className="space-y-3 text-sm">
+                            <InfoRow icon={Mail} label="Email" value={client.email} />
+                            <InfoRow icon={Phone} label="Phone" value={client.phone || "—"} />
+                            <InfoRow icon={User} label="Sex" value={client.sex || "—"} />
+                            <InfoRow icon={MapPin} label="Address" value={client.address || "—"} />
+                            <InfoRow icon={Calendar} label="Joined" value={new Date(client.createdAt).toLocaleDateString("en-NG")} />
+                            <InfoRow icon={client.isEmailVerified ? CheckCircle2 : XCircle} label="Verified" value={client.isEmailVerified ? "Yes" : "No"} />
                         </div>
-                        <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
-                            <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.payments || 0}</p>
-                            <p className="text-[10px] text-[#999] uppercase">Payments</p>
+
+                        <div className="grid grid-cols-2 gap-3 mt-6">
+                            <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
+                                <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.orders || 0}</p>
+                                <p className="text-[10px] text-[#999] uppercase">Orders</p>
+                            </div>
+                            <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
+                                <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.payments || 0}</p>
+                                <p className="text-[10px] text-[#999] uppercase">Payments</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Main content with tabs */}
-                <div className="lg:col-span-3">
+                <div className="xl:col-span-3">
                     <div className="flex gap-1 mb-6 bg-[#F4F0F8] rounded-lg p-1 overflow-x-auto">
                         {TABS.map((tab) => (
                             <button
@@ -213,7 +217,7 @@ export default function AdminClientDetailPage() {
                         {activeTab === "overview" && (
                             <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
                                 {/* Stats Cards */}
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
                                         <p className="text-2xl font-bold text-[#0D0D0D]">{client._count?.orders || orders.length}</p>
                                         <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Total Orders</p>

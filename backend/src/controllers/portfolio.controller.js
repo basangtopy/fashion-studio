@@ -6,7 +6,7 @@ import { uploadMultipleImages } from "../services/cloudinary.service.js";
 // ─── GET /portfolio ────────────────────────────────────────────────────────
 // Public — only published entries
 export const getPortfolioEntries = async (req, res) => {
-  const { category, featured, page, limit } = req.query;
+  const { category, featured, page, limit, search } = req.query;
 
   const where = { isPublished: true, clientConsent: true };
 
@@ -15,6 +15,8 @@ export const getPortfolioEntries = async (req, res) => {
   }
 
   if (featured === "true") where.isFeatured = true;
+
+  if (search) where = { OR: [{ title: { contains: search, mode: "insensitive" } }, { description: { contains: search, mode: "insensitive" } }] };
 
   const parsedPage = Math.max(parseInt(page) || 1, 1);
   const parsedLimit = Math.max(parseInt(limit) || 12, 1);
