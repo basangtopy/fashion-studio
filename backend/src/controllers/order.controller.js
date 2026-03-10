@@ -471,7 +471,7 @@ export const getAdminOrders = async (req, res) => {
         },
         payments: { where: { status: "CONFIRMED" }, select: { amount: true } },
       },
-      orderBy: { [orderField]: orderDirection },
+      orderBy: [{ [orderField]: orderDirection }, { id: "asc" }],
       skip,
       take,
     }),

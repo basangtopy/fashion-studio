@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Archive, Eye, Search, X, Save, Star, Filter, Loader2 } from "lucide-react";
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import useDebounce from "@/hooks/useDebounce";
 import { SkeletonCard } from "@/components/shared/Skeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
@@ -41,6 +42,8 @@ export default function AdminCatalogStylesPage() {
     const [newImageFiles, setNewImageFiles] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
 
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
     // Fetch styles
     const {
         data,
@@ -49,10 +52,10 @@ export default function AdminCatalogStylesPage() {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery({
-        queryKey: ["admin-styles", searchQuery],
+        queryKey: ["admin-styles", debouncedSearchQuery],
         queryFn: async ({ pageParam = 1 }) => {
             const params = { page: pageParam, limit: 12 };
-            if (searchQuery) params.search = searchQuery;
+            if (debouncedSearchQuery) params.search = debouncedSearchQuery;
             const { data } = await api.get("/styles", { params });
             return data.data || {};
         },
@@ -64,7 +67,8 @@ export default function AdminCatalogStylesPage() {
         },
     });
 
-    const uniqueStyles = data?.pages.flatMap((page) => page?.styles || []) || [];
+    const allStyles = data?.pages.flatMap((page) => page?.styles || []) || [];
+    const uniqueStyles = Array.from(new Map(allStyles.map(s => [s.id, s])).values());
 
     const handleSearchChange = (val) => setSearchQuery(val);
 
@@ -245,8 +249,8 @@ export default function AdminCatalogStylesPage() {
                         <CustomSelect
                             label="Model"
                             options={[
-                                { value: "model1", label: "Model 1 (Custom)" },
-                                { value: "model2", label: "Model 2 (Bring Fabric)" },
+                                { value: "model1", label: "Model 1 (Client Brings Fabric)" },
+                                { value: "model2", label: "Model 2 (Studio Source Fabric)" },
                             ]}
                             value={filterModel}
                             onChange={setFilterModel}
@@ -447,8 +451,8 @@ export default function AdminCatalogStylesPage() {
                                     <div className="space-y-3">
                                         <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA] transition-colors">
                                             <div>
-                                                <p className="text-sm font-medium text-[#0D0D0D]">Model 1 — Custom</p>
-                                                <p className="text-[10px] text-[#999]">We source fabric and make</p>
+                                                <p className="text-sm font-medium text-[#0D0D0D]">Model 1 — Client Brings Fabric</p>
+                                                <p className="text-[10px] text-[#999]">Client provides fabric</p>
                                             </div>
                                             <Switch
                                                 checked={formData.availableForModel1}
@@ -457,8 +461,8 @@ export default function AdminCatalogStylesPage() {
                                         </label>
                                         <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA] transition-colors">
                                             <div>
-                                                <p className="text-sm font-medium text-[#0D0D0D]">Model 2 — Bring Fabric</p>
-                                                <p className="text-[10px] text-[#999]">Client provides fabric</p>
+                                                <p className="text-sm font-medium text-[#0D0D0D]">Model 2 — Studio Source Fabric</p>
+                                                <p className="text-[10px] text-[#999]">We source fabric and make</p>
                                             </div>
                                             <Switch
                                                 checked={formData.availableForModel2}

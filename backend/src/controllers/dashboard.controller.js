@@ -84,7 +84,7 @@ export const getDashboardStats = async (req, res) => {
     // Recent orders (last 10)
     prisma.order.findMany({
       take: 10,
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       select: {
         id: true,
         orderNumber: true,

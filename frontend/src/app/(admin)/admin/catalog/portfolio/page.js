@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Trash2, Eye, Search, X, Save, Star, Filter, Loader2, ImageIcon } from "lucide-react";
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import useDebounce from "@/hooks/useDebounce";
 import { SkeletonCard } from "@/components/shared/Skeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
@@ -39,11 +40,14 @@ export default function AdminCatalogPortfolioPage() {
 
     // Order search for order linking
     const [orderSearch, setOrderSearch] = useState("");
+
+    const debouncedOrderSearch = useDebounce(orderSearch, 500)
+
     const { data: ordersData } = useQuery({
-        queryKey: ["admin-orders-search", orderSearch],
+        queryKey: ["admin-orders-search", debouncedOrderSearch],
         queryFn: async () => {
             const { data } = await api.get("/admin/orders", {
-                params: { status: "COMPLETED", search: orderSearch, limit: 20 },
+                params: { status: "COMPLETED", search: debouncedOrderSearch, limit: 20 },
             });
             return data.data?.orders || [];
         },
@@ -52,8 +56,10 @@ export default function AdminCatalogPortfolioPage() {
 
     const orderOptions = (ordersData || []).map(o => ({
         value: o.id,
-        label: `#${o.id.slice(-6).toUpperCase()} — ${o.user?.fullName || o.clientName || "Client"}`,
+        label: `${o.orderNumber} — ${o.client?.fullName || o.clientName || "Client"}`,
     }));
+
+    const debouncedPortfolioSearch = useDebounce(searchQuery, 500);
 
     // Fetch portfolio entries
     const {
@@ -63,11 +69,11 @@ export default function AdminCatalogPortfolioPage() {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery({
-        queryKey: ["admin-portfolio", searchQuery],
+        queryKey: ["admin-portfolio", debouncedPortfolioSearch],
         queryFn: async ({ pageParam = 1 }) => {
-            const params = { page: pageParam, limit: 12, admin: true };
-            if (searchQuery) params.search = searchQuery;
-            const { data } = await api.get("/portfolio", { params });
+            const params = { page: pageParam, limit: 12 };
+            if (debouncedPortfolioSearch) params.search = debouncedPortfolioSearch;
+            const { data } = await api.get("/portfolio/admin", { params });
             return data.data || {};
         },
         getNextPageParam: (lastPage) => {
@@ -78,7 +84,11 @@ export default function AdminCatalogPortfolioPage() {
         },
     });
 
-    const uniqueEntries = data?.pages.flatMap((page) => page?.entries || []) || [];
+
+
+
+    const allEntries = data?.pages.flatMap((page) => page?.entries || []) || [];
+    const uniqueEntries = Array.from(new Map(allEntries.map(e => [e.id, e])).values());
 
     const handleSearchChange = (val) => setSearchQuery(val);
 
@@ -355,6 +365,7 @@ export default function AdminCatalogPortfolioPage() {
                                         onChange={(val) => setFormData({ ...formData, orderId: val })}
                                         placeholder="Search completed orders…"
                                         searchable
+                                        onSearchChange={setOrderSearch}
                                     />
                                     <p className="text-[10px] text-[#999] mt-1">Standalone works can leave this blank. Only completed orders are shown.</p>
                                 </div>

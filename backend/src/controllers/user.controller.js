@@ -167,7 +167,7 @@ export const getAllClients = async (req, res) => {
           select: { orders: true },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       skip,
       take: Number(limit),
     }),

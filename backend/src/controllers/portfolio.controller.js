@@ -16,7 +16,12 @@ export const getPortfolioEntries = async (req, res) => {
 
   if (featured === "true") where.isFeatured = true;
 
-  if (search) where = { OR: [{ title: { contains: search, mode: "insensitive" } }, { description: { contains: search, mode: "insensitive" } }] };
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
   const parsedPage = Math.max(parseInt(page) || 1, 1);
   const parsedLimit = Math.max(parseInt(limit) || 12, 1);
@@ -37,7 +42,7 @@ export const getPortfolioEntries = async (req, res) => {
         // Intentionally NOT including orderId or client details
         // Portfolio entries are anonymous — we don't expose which client it belongs to
       },
-      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }, { id: "asc" }],
       skip,
       take: parsedLimit,
     }),
@@ -142,6 +147,51 @@ export const createPortfolioEntry = async (req, res) => {
 
   return successResponse(res, 201, "Portfolio entry created successfully", {
     entry,
+  });
+};
+
+// ─── GET /portfolio/admin ────────────────────────────────────────────────────────
+// Admin — all entries
+export const getPortfolioEntriesAdmin = async (req, res) => {
+  const { category, featured, page, limit, search } = req.query;
+
+  const where = {};
+
+  if (category) {
+    where.category = { contains: category, mode: "insensitive" };
+  }
+
+  if (featured === "true") where.isFeatured = true;
+
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  const parsedPage = Math.max(parseInt(page) || 1, 1);
+  const parsedLimit = Math.max(parseInt(limit) || 12, 1);
+  const skip = (parsedPage - 1) * parsedLimit;
+
+  const [totalCount, entries] = await prisma.$transaction([
+    prisma.portfolio.count({ where }),
+    prisma.portfolio.findMany({
+      where,
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }, { id: "asc" }],
+      skip,
+      take: parsedLimit,
+    }),
+  ]);
+
+  return successResponse(res, 200, "Portfolio retrieved", {
+    count: entries.length,
+    entries,
+    pagination: {
+      currentPage: parsedPage,
+      totalPages: Math.ceil(totalCount / parsedLimit),
+      totalItems: totalCount,
+    },
   });
 };
 

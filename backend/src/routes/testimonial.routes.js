@@ -18,6 +18,7 @@ import {
   updateTestimonialSchema,
 } from "../validators/testimonial.validators.js";
 import { generalActionLimiter } from "../middleware/rateLimiter.js";
+import { uploadSingle } from "../middleware/upload.middleware.js";
 
 const router = Router();
 
@@ -30,6 +31,7 @@ router.post(
   authenticate,
   requireEmailVerified,
   generalActionLimiter,
+  uploadSingle("reviews"),
   validate(submitTestimonialSchema),
   submitTestimonial,
 );
@@ -46,6 +48,7 @@ router.post(
   "/admin",
   authenticate,
   authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  uploadSingle("reviews"),
   validate(adminCreateTestimonialSchema),
   adminCreateTestimonial,
 );

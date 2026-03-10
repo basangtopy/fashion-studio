@@ -40,7 +40,7 @@ export const getReadyToWearItems = async (req, res) => {
     prisma.readyToWear.count({ where }),
     prisma.readyToWear.findMany({
       where,
-      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }, { id: "asc" }],
       skip,
       take: parsedLimit,
     }),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Star, CheckCircle, XCircle, MessageSquare, Plus, X, Save, Loader2, User } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "@/lib/api";
 import { useToast } from "@/components/ui/toaster";
@@ -10,10 +10,12 @@ import StatusPill from "@/components/shared/StatusPill";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import StarRatingInput from "@/components/shared/StarRatingInput";
 import { SkeletonCard } from "@/components/shared/Skeleton";
+import ImageUpload from "@/components/shared/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import Image from "next/image";
 
 const TABS = ["PENDING", "APPROVED", "REJECTED"];
 
@@ -26,16 +28,31 @@ export default function AdminTestimonialsPage() {
 
     // Create form state
     const [formData, setFormData] = useState({
-        clientName: "", rating: 0, review: "", photoUrl: "", isFeatured: false,
+        clientName: "", rating: 0, review: "", isFeatured: false,
     });
+    const [newImageFiles, setNewImageFiles] = useState([]);
 
     // Fetch testimonials
-    const { data, isLoading } = useQuery({
+    const { 
+        data, 
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage
+    } = useInfiniteQuery({
         queryKey: ["admin-testimonials", activeTab],
-        queryFn: async () => {
-            const { data } = await api.get("/testimonials/admin", { params: { status: activeTab } });
-            return data.data?.testimonials || data.data || [];
+        queryFn: async ({ pageParam = 1 }) => {
+            const { data } = await api.get("/testimonials/admin", { 
+                params: { status: activeTab, page: pageParam, limit: 12 } 
+            });
+            return data.data || {};
         },
+        getNextPageParam: (lastPage) => {
+            if (lastPage?.pagination?.page < lastPage?.pagination?.pages) {
+                return lastPage.pagination.page + 1;
+            }
+            return undefined;
+        }
     });
 
     // Update status mutation
@@ -60,26 +77,31 @@ export default function AdminTestimonialsPage() {
     // Create testimonial mutation
     const createMutation = useMutation({
         mutationFn: async () => {
-            const body = {
-                clientName: formData.clientName,
-                rating: formData.rating,
-                review: formData.review,
-                isFeatured: formData.isFeatured,
-            };
-            if (formData.photoUrl) body.photoUrl = formData.photoUrl;
-            const { data } = await api.post("/testimonials/admin", body);
+            const fd = new FormData();
+            fd.append("clientName", formData.clientName);
+            fd.append("rating", formData.rating);
+            fd.append("review", formData.review);
+            fd.append("isFeatured", String(formData.isFeatured));
+            if (newImageFiles[0]) {
+                fd.append("reviews", newImageFiles[0]);
+            }
+            
+            const { data } = await api.post("/testimonials/admin", fd, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             return data;
         },
         onSuccess: () => {
             toast.success("Testimonial created!");
             setShowCreateForm(false);
-            setFormData({ clientName: "", rating: 0, review: "", photoUrl: "", isFeatured: false });
+            setFormData({ clientName: "", rating: 0, review: "", isFeatured: false });
+            setNewImageFiles([]);
             queryClient.invalidateQueries({ queryKey: ["admin-testimonials"] });
         },
         onError: (err) => toast.error("Error", err.response?.data?.message || "Failed."),
     });
 
-    const testimonials = Array.isArray(data) ? data : [];
+    const testimonials = data?.pages.flatMap((page) => page?.testimonials || []) || [];
 
     const handleConfirmAction = () => {
         if (!confirmAction) return;
@@ -165,6 +187,19 @@ export default function AdminTestimonialsPage() {
 
                             <p className="text-sm text-[#555] leading-relaxed mb-4">{t.review || t.content}</p>
 
+                            {/* Optional Garment Image */}
+                            {t.photoUrl && (
+                                <div className="relative w-full h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                    <Image
+                                        src={t.photoUrl}
+                                        alt={`Attached photo from ${t.clientName || 'Anonymous'}`}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    />
+                                </div>
+                            )}
+
                             {/* Actions — different per tab */}
                             <div className="flex items-center gap-2 flex-wrap">
                                 {activeTab === "PENDING" && (
@@ -202,6 +237,32 @@ export default function AdminTestimonialsPage() {
                             </div>
                         </div>
                     ))}
+                    
+                    {/* Inline Skeleton Loaders when fetching next page */}
+                    {isFetchingNextPage && (
+                        <>
+                            <SkeletonCard className="h-[140px]" />
+                            <SkeletonCard className="h-[140px]" />
+                        </>
+                    )}
+                </div>
+            )}
+
+            {/* Load More Button */}
+            {hasNextPage && (
+                <div className="flex justify-center mt-8">
+                    <Button
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
+                        variant="outline"
+                        className="border-[#C2185B] text-[#C2185B] hover:bg-[#C2185B]/5 gap-2 h-11 px-6 rounded-md"
+                    >
+                        {isFetchingNextPage ? (
+                            <><Loader2 size={14} className="animate-spin" /> Loading…</>
+                        ) : (
+                            "Load More"
+                        )}
+                    </Button>
                 </div>
             )}
 
@@ -245,8 +306,15 @@ export default function AdminTestimonialsPage() {
 
                                 {/* Photo URL */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Photo URL (optional)</label>
-                                    <Input type="url" value={formData.photoUrl} onChange={(e) => setFormData({ ...formData, photoUrl: e.target.value })} className="h-11 bg-white" placeholder="https://..." />
+                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Photo (optional)</label>
+                                    <ImageUpload
+                                        existingImages={[]}
+                                        newFiles={newImageFiles}
+                                        onNewFilesChange={setNewImageFiles}
+                                        onExistingImagesReorder={() => {}}
+                                        onExistingImageDelete={() => {}}
+                                        maxFiles={1}
+                                    />
                                 </div>
 
                                 {/* Featured toggle */}

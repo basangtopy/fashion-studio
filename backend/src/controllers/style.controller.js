@@ -41,6 +41,7 @@ export const getStyles = async (req, res) => {
       orderBy: [
         { isFeatured: "desc" },
         { createdAt: "desc" },
+        { id: "asc" },
       ],
       skip,
       take: parsedLimit,

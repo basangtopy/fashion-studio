@@ -204,7 +204,7 @@ export const getAdminPayments = async (req, res) => {
       where,
       include: fullPaymentInclude,
       // PENDING first so admin sees what needs action immediately
-      orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+      orderBy: [{ status: "asc" }, { createdAt: "desc" }, { id: "asc" }],
       skip,
       take,
     }),

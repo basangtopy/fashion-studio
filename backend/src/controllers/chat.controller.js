@@ -186,7 +186,7 @@ export const getAdminInbox = async (req, res) => {
         status: true,
         client: { select: { id: true, fullName: true } },
         chatMessages: {
-          orderBy: { createdAt: "desc" },
+          orderBy: [{ createdAt: "desc" }, { id: "asc" }],
           take: 1, // only the most recent message per order
           select: {
             id: true,
@@ -204,12 +204,11 @@ export const getAdminInbox = async (req, res) => {
           },
         },
       },
-      orderBy: {
+      orderBy: [
         // Orders with recent messages appear first
         // Prisma doesn't support ordering by a relation field directly,
         // so we sort in JS after fetching
-        updatedAt: "desc",
-      },
+        { updatedAt: "desc" }, { id: "asc" }],
       skip,
       take,
     }),

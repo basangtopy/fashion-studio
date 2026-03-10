@@ -14,6 +14,7 @@ import { ChevronDown, Check, X } from "lucide-react";
  *  - placeholder: string
  *  - multiple: bool
  *  - searchable: bool
+ *  - onSearchChange: (value) => void
  *  - className: string
  *  - label: string
  */
@@ -24,6 +25,7 @@ export default function CustomSelect({
     placeholder = "Select...",
     multiple = false,
     searchable = false,
+    onSearchChange,
     className = "",
     label,
     disabled = false,
@@ -125,7 +127,10 @@ export default function CustomSelect({
                                     ref={inputRef}
                                     type="text"
                                     value={search}
-                                    onChange={(e) => setSearch(e.target.value)}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        if (onSearchChange) onSearchChange(e.target.value);
+                                    }}
                                     placeholder="Search..."
                                     className="w-full h-7 px-2 text-xs border border-[#E0E0E0] rounded-md focus:border-[#C2185B] outline-none"
                                 />

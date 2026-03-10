@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Pencil, Archive, Eye, Search, X, Save, Star, Filter, Loader2, Package } from "lucide-react";
 import { useQuery, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
+import useDebounce from "@/hooks/useDebounce";
 import { SkeletonCard } from "@/components/shared/Skeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
@@ -41,6 +42,8 @@ export default function AdminCatalogReadyToWearPage() {
     const [newImageFiles, setNewImageFiles] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
 
+    const debouncedSearchQuery = useDebounce(searchQuery, 500);
+
     // Fetch items
     const {
         data,
@@ -49,10 +52,10 @@ export default function AdminCatalogReadyToWearPage() {
         hasNextPage,
         isFetchingNextPage,
     } = useInfiniteQuery({
-        queryKey: ["admin-rtw", searchQuery],
+        queryKey: ["admin-rtw", debouncedSearchQuery],
         queryFn: async ({ pageParam = 1 }) => {
             const params = { page: pageParam, limit: 12 };
-            if (searchQuery) params.search = searchQuery;
+            if (debouncedSearchQuery) params.search = debouncedSearchQuery;
             const { data } = await api.get("/ready-to-wear", { params });
             return data.data || {};
         },
@@ -64,7 +67,8 @@ export default function AdminCatalogReadyToWearPage() {
         },
     });
 
-    const uniqueItems = data?.pages.flatMap((page) => page?.items || []) || [];
+    const allItems = data?.pages.flatMap((page) => page?.items || []) || [];
+    const uniqueItems = Array.from(new Map(allItems.map(i => [i.id, i])).values());
 
     const handleSearchChange = (val) => setSearchQuery(val);
 

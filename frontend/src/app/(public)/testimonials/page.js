@@ -10,8 +10,10 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/toaster";
 import { useScrollReveal } from "@/hooks/useAnimations";
 import { SkeletonCard } from "@/components/shared/Skeleton";
+import ImageUpload from "@/components/shared/ImageUpload";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";  
+import Image from "next/image";
 
 export default function TestimonialsPage() {
     const { isAuthenticated } = useAuth();
@@ -20,6 +22,7 @@ export default function TestimonialsPage() {
     const [ratingFilter, setRatingFilter] = useState(0);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({ rating: 5, review: "" });
+    const [newImageFiles, setNewImageFiles] = useState([]);
     const { ref, isVisible } = useScrollReveal();
 
     const {
@@ -47,13 +50,23 @@ export default function TestimonialsPage() {
 
     const submitMutation = useMutation({
         mutationFn: async (payload) => {
-            const { data } = await api.post("/testimonials", payload);
+            const formData = new FormData();
+            formData.append("rating", payload.rating);
+            formData.append("review", payload.review);
+            if (newImageFiles[0]) {
+                formData.append("reviews", newImageFiles[0]);
+            }
+            
+            const { data } = await api.post("/testimonials", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
             return data;
         },
         onSuccess: () => {
             toast.success("Thank you!", "Your review has been submitted and is pending approval.");
             setShowForm(false);
             setFormData({ rating: 5, review: "" });
+            setNewImageFiles([]);
             queryClient.invalidateQueries({ queryKey: ["testimonials"] });
         },
         onError: (err) => {
@@ -177,6 +190,19 @@ export default function TestimonialsPage() {
                                 <p className={`text-[#555] leading-relaxed mb-5 ${testimonial.isFeatured ? "text-base" : "text-sm"}`}>
                                     {testimonial.review}
                                 </p>
+
+                                {/* Optional Attached Garment Photo */}
+                                {testimonial.photoUrl && (
+                                    <div className="relative w-full h-48 sm:h-56 mb-5 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                        <Image
+                                            src={testimonial.photoUrl}
+                                            alt={`Attached photo from ${testimonial.clientName}`}
+                                            fill
+                                            className="object-cover"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -347,6 +373,19 @@ export default function TestimonialsPage() {
                                     placeholder="Tell us about your experience..."
                                     rows={4}
                                     className="resize-none"
+                                />
+                            </div>
+
+                            {/* Image Upload */}
+                            <div className="mb-6">
+                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Add a Photo (Optional)</label>
+                                <ImageUpload
+                                    existingImages={[]}
+                                    newFiles={newImageFiles}
+                                    onNewFilesChange={setNewImageFiles}
+                                    onExistingImagesReorder={() => {}}
+                                    onExistingImageDelete={() => {}}
+                                    maxFiles={1}
                                 />
                             </div>
 

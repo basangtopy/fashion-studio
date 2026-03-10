@@ -5,6 +5,7 @@ import {
   getPortfolioEntry,
   createPortfolioEntry,
   updatePortfolioEntry,
+  getPortfolioEntriesAdmin,
 } from "../controllers/portfolio.controller.js";
 import { authenticate, authorise } from "../middleware/auth.middleware.js";
 import { uploadMultiple } from "../middleware/upload.middleware.js";
@@ -19,6 +20,13 @@ const router = Router();
 
 router.get("/", getPortfolioEntries);
 router.get("/categories", getPortfolioCategories);
+
+router.get("/admin",
+  authenticate,
+  authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  getPortfolioEntriesAdmin
+);
+
 router.get("/:id", getPortfolioEntry);
 
 router.post(

@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/apiResponse.js";
+import { uploadImage } from "../services/cloudinary.service.js";
 
 // ─── Public: GET /testimonials ───────────────────────────────────────────────
 // Returns only APPROVED testimonials, featured first, paginated
@@ -13,7 +14,7 @@ export const getPublicTestimonials = async (req, res) => {
   const [testimonials, total, ratingAgg] = await Promise.all([
     prisma.testimonial.findMany({
       where: { status: "APPROVED" },
-      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ isFeatured: "desc" }, { createdAt: "desc" }, { id: "asc" }],
       skip,
       take: limit,
       select: {
@@ -48,7 +49,7 @@ export const getPublicTestimonials = async (req, res) => {
 // Authenticated client submits their own testimonial (starts as PENDING)
 
 export const submitTestimonial = async (req, res) => {
-  const { rating, review, photoUrl } = req.validatedBody;
+  const { rating, review } = req.validatedBody;
   const userId = req.user.userId;
 
   // Fetch client name for the testimonial display
@@ -59,6 +60,12 @@ export const submitTestimonial = async (req, res) => {
 
   if (!user) {
     throw new AppError("User not found", 404);
+  }
+
+  // Handle optional photo upload
+  let photoUrl = null;
+  if (req.file) {
+    photoUrl = await uploadImage(req.file.buffer, "testimonials");
   }
 
   const testimonial = await prisma.testimonial.create({
@@ -97,7 +104,7 @@ export const getAdminTestimonials = async (req, res) => {
   const [testimonials, total] = await Promise.all([
     prisma.testimonial.findMany({
       where,
-      orderBy: [{ createdAt: "desc" }],
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       skip,
       take: limit,
       include: {
@@ -117,8 +124,13 @@ export const getAdminTestimonials = async (req, res) => {
 // Admin creates a testimonial on behalf of a client (goes straight to APPROVED)
 
 export const adminCreateTestimonial = async (req, res) => {
-  const { clientName, rating, review, photoUrl, isFeatured } =
-    req.validatedBody;
+  const { clientName, rating, review, isFeatured } = req.validatedBody;
+
+  // Handle optional photo upload
+  let photoUrl = null;
+  if (req.file) {
+    photoUrl = await uploadImage(req.file.buffer, "testimonials");
+  }
 
   const testimonial = await prisma.testimonial.create({
     data: {
