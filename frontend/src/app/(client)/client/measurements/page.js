@@ -24,9 +24,9 @@ const STANDARD_FIELDS = [
 
 // Groupings that strictly match the blueprint
 const MEASUREMENT_GROUPS = {
-    "Upper Body": ["bust", "waist", "hips", "shoulderWidth", "sleeveLength", "armLength"],
-    "Lower Body": ["inseam", "thigh", "knee", "calf", "ankleCircumference"],
-    "Length": ["fullHeight", "dressLength", "skirtLength"],
+    "Upper Body": ["bust", "waist", "hips", "shoulderWidth", "sleeveLength", "armLength", "armCircumference", "wristCircumference", "neck"],
+    "Lower Body": ["thigh", "inseam", "ankleCircumference"],
+    "Length": ["dressLength", "frontLength", "backLength"],
 };
 
 // Labels for all standard AND custom fields

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllMeasurements,
   getMeasurements,
   createMeasurements,
   updateMeasurements,
@@ -17,6 +18,13 @@ const router = Router();
 
 // All measurement routes require authentication
 router.use(authenticate);
+
+// Admin-only route to get all measurements with pagination and search
+router.get(
+  "/",
+  authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  getAllMeasurements,
+);
 
 // Export — must be defined BEFORE /:clientId routes
 router.get(

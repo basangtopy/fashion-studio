@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Clock, Loader2, Sparkles, CheckCircle2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Loader2, Sparkles, CheckCircle2, CheckCircle, XCircle, MessageSquare, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -23,6 +23,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
 import { useToast } from "@/components/ui/toaster";
+import Link from "next/link";
+
+const STATUS_DISPLAY = {
+    REQUESTED: { icon: Clock, color: "#E65100", bg: "rgba(230, 81, 0, 0.08)", title: "Pending Studio Review", desc: "is being reviewed. We'll contact you shortly to confirm." },
+    CONFIRMED: { icon: CheckCircle, color: "#2E7D32", bg: "rgba(46, 125, 50, 0.08)", title: "Appointment Confirmed", desc: "has been confirmed. See you at the studio!" },
+    COMPLETED: { icon: CheckCircle2, color: "#555", bg: "rgba(0, 0, 0, 0.06)", title: "Appointment Completed", desc: "has been completed. You can book a new one." },
+    CANCELLED: { icon: XCircle, color: "#C62828", bg: "rgba(198, 40, 40, 0.08)", title: "Appointment Cancelled", desc: "was cancelled." },
+};
 
 export function BookingModal({ isOpen, onOpenChange }) {
     const { user, isAuthenticated } = useAuth();
@@ -31,28 +39,27 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
     const [date, setDate] = useState(null);
     const [notes, setNotes] = useState("");
-    // const [isSubmitting, setIsSubmitting] = useState(false);
-
-    // const [pendingAppointment, setPendingAppointment] = useState(null);
-    // const [isLoadingStatus, setIsLoadingStatus] = useState(false);
 
     if (!isOpen || !isAuthenticated) return;
 
-    // Fetch 'own' appointments to check for a REQUESTED one
-    const { data: pendingAppointment, isLoading: isLoadingStatus, isError } = useQuery({
-        queryKey: ["pendingAppointment"],
+    // Fetch latest active appointment (not just REQUESTED — show all active statuses)
+    const { data: activeAppointment, isLoading: isLoadingStatus, isError } = useQuery({
+        queryKey: ["activeAppointment"],
         queryFn: async () => {
             const { data } = await api.get("/appointments/own");
             const appointments = data.data?.appointments || data.data || [];
-            return appointments.find((a) => a.status === "REQUESTED") || null;
+            // Priority: REQUESTED > CONFIRMED > most recent COMPLETED/CANCELLED
+            const requested = appointments.find((a) => a.status === "REQUESTED");
+            if (requested) return requested;
+            const confirmed = appointments.find((a) => a.status === "CONFIRMED");
+            if (confirmed) return confirmed;
+            // Return most recent overall
+            return appointments[0] || null;
         }
     });
 
     if (isError) {
-        error(
-            "Error",
-            "Failed to fetch appointments."
-        );
+        error("Error", "Failed to fetch appointments.");
     }
 
     const { mutate: requestAppointment, isPending: isSubmitting } = useMutation({
@@ -64,31 +71,11 @@ export function BookingModal({ isOpen, onOpenChange }) {
             return data.data;
         },
         onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["activeAppointment"] });
             queryClient.invalidateQueries({ queryKey: ["pendingAppointment"] });
+            queryClient.invalidateQueries({ queryKey: ["client-appointments"] });
         },
     });
-
-
-
-    // useEffect(() => {
-    //     async function checkPending() {
-    //         if (!isOpen || !isAuthenticated) return;
-
-    //         setIsLoadingStatus(true);
-    //         try {
-    //             const { data } = await api.get("/appointments/own");
-    //             if (data.success && data.data?.appointments) {
-    //                 const req = data.data.appointments.find((a) => a.status === "REQUESTED");
-    //                 setPendingAppointment(req || null);
-    //             }
-    //         } catch (err) {
-    //             console.error("Error checking appointments:", err);
-    //         } finally {
-    //             setIsLoadingStatus(false);
-    //         }
-    //     }
-    //     checkPending();
-    // }, [isOpen, isAuthenticated]);
 
     // Clean form when closing
     useEffect(() => {
@@ -127,39 +114,17 @@ export function BookingModal({ isOpen, onOpenChange }) {
                 }
             },
         });
-
-        // setIsSubmitting(true);
-        // try {
-        //     const { data } = await api.post("/appointments", {
-        //         requestedDate: date.toISOString(),
-        //         clientNotes: notes,
-        //     });
-
-        //     if (data.success) {
-        //         success(
-        //             "Request submitted",
-        //             "Your fitting appointment request has been sent to our studio."
-        //         );
-        //         setPendingAppointment(data.data.appointment);
-        //     }
-        // } catch (err) {
-        //     if (err.response?.status === 409) {
-        //         warning(
-        //             "Already Requested",
-        //             "You already have a pending appointment request."
-        //         );
-        //     } else {
-        //         error(
-        //             "Error",
-        //             err.response?.data?.message || "Failed to request appointment."
-        //         );
-        //     }
-        // } finally {
-        //     setIsSubmitting(false);
-        // }
     };
 
     if (!isAuthenticated) return null;
+
+    // Determine if user can book a new appointment (only if no active REQUESTED)
+    const canBookNew = !activeAppointment || activeAppointment.status === "COMPLETED" || activeAppointment.status === "CANCELLED";
+    const showStatus = activeAppointment && (activeAppointment.status === "REQUESTED" || activeAppointment.status === "CONFIRMED");
+    const showPastStatus = activeAppointment && (activeAppointment.status === "COMPLETED" || activeAppointment.status === "CANCELLED");
+
+    const statusConfig = activeAppointment ? STATUS_DISPLAY[activeAppointment.status] : null;
+    const StatusIcon = statusConfig?.icon || Clock;
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -167,169 +132,154 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
                 {/* — Premium Modal Header — */}
                 <div className="relative px-7 pt-7 pb-5">
-                    {/* Decorative brand accent strip */}
                     <div
                         className="absolute top-0 left-0 right-0 h-[3px]"
                         style={{
                             background: "linear-gradient(90deg, #C2185B 0%, #F8E8F0 60%, transparent 100%)",
                         }}
                     />
-
                     <DialogHeader className="gap-1">
                         <div className="flex items-center gap-2.5 mb-0.5">
                             <div
                                 className="flex h-7 w-7 items-center justify-center rounded-lg flex-shrink-0"
                                 style={{ background: "rgba(194, 24, 91, 0.08)" }}
                             >
-                                <Sparkles
-                                    className="h-3.5 w-3.5"
-                                    style={{ color: "#C2185B" }}
-                                />
+                                <Sparkles className="h-3.5 w-3.5" style={{ color: "#C2185B" }} />
                             </div>
                             <DialogTitle
                                 className="text-[17px] leading-snug font-display font-700"
                                 style={{ fontWeight: 700, color: "#0D0D0D", letterSpacing: "-0.01em" }}
                             >
-                                {pendingAppointment ? "Appointment Status" : "Book a Fitting"}
+                                {showStatus ? statusConfig.title : canBookNew ? "Book a Fitting" : "Appointment Status"}
                             </DialogTitle>
                         </div>
                         <DialogDescription
                             className="text-[13px] leading-relaxed pl-[36px]"
                             style={{ color: "#999999" }}
                         >
-                            {pendingAppointment
-                                ? "Your current appointment request is being reviewed."
-                                : "Choose a preferred date and we'll confirm your studio session."}
+                            {showStatus
+                                ? "Your appointment details at a glance."
+                                : canBookNew
+                                    ? "Choose a preferred date and we'll confirm your studio session."
+                                    : "Review your appointment details below."}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
-                {/* — Divider — */}
-                <div
-                    className="mx-7"
-                    style={{ height: "1px", background: "rgba(0,0,0,0.06)" }}
-                />
+                <div className="mx-7" style={{ height: "1px", background: "rgba(0,0,0,0.06)" }} />
 
-                {/* — Modal Body — fixed min-height, flex-centered across all states — */}
+                {/* — Modal Body — */}
                 <div className="px-7 py-6 min-h-[360px] flex flex-col justify-center">
                     {isLoadingStatus ? (
-
-                        /* Loading State */
                         <div className="flex flex-col items-center justify-center gap-4">
-                            <div
-                                className="relative flex h-14 w-14 items-center justify-center rounded-full"
-                                style={{ background: "rgba(194, 24, 91, 0.06)" }}
-                            >
-                                <Loader2
-                                    className="h-6 w-6 animate-spin"
-                                    style={{ color: "#C2185B" }}
-                                />
+                            <div className="relative flex h-14 w-14 items-center justify-center rounded-full" style={{ background: "rgba(194, 24, 91, 0.06)" }}>
+                                <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#C2185B" }} />
                             </div>
                             <div className="text-center">
-                                <p
-                                    className="text-[13px] font-medium"
-                                    style={{ color: "#555555" }}
-                                >
-                                    Checking studio availability
-                                </p>
-                                <p
-                                    className="text-[12px] mt-0.5"
-                                    style={{ color: "#999999" }}
-                                >
-                                    Just a moment…
-                                </p>
+                                <p className="text-[13px] font-medium" style={{ color: "#555555" }}>Checking studio availability</p>
+                                <p className="text-[12px] mt-0.5" style={{ color: "#999999" }}>Just a moment…</p>
                             </div>
                         </div>
 
-                    ) : pendingAppointment ? (
-
-                        /* Pending State */
+                    ) : showStatus ? (
+                        /* Active Appointment State (REQUESTED or CONFIRMED) */
                         <div className="flex flex-col items-center text-center gap-5">
-                            {/* Layered ring icon treatment */}
                             <div className="relative flex items-center justify-center">
-                                <div
-                                    className="absolute h-20 w-20 rounded-full"
-                                    style={{ background: "rgba(194, 24, 91, 0.06)" }}
-                                />
-                                <div
-                                    className="absolute h-14 w-14 rounded-full"
-                                    style={{ background: "rgba(194, 24, 91, 0.10)" }}
-                                />
-                                <div
-                                    className="relative h-10 w-10 rounded-full flex items-center justify-center"
-                                    style={{ background: "rgba(194, 24, 91, 0.15)" }}
-                                >
-                                    <Clock
-                                        className="h-5 w-5"
-                                        style={{ color: "#C2185B" }}
-                                    />
+                                <div className="absolute h-20 w-20 rounded-full" style={{ background: statusConfig.bg }} />
+                                <div className="absolute h-14 w-14 rounded-full" style={{ background: statusConfig.bg, opacity: 0.7 }} />
+                                <div className="relative h-10 w-10 rounded-full flex items-center justify-center" style={{ background: statusConfig.bg }}>
+                                    <StatusIcon className="h-5 w-5" style={{ color: statusConfig.color }} />
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <h3
-                                    className="text-[15px] font-semibold"
-                                    style={{ color: "#0D0D0D", letterSpacing: "-0.01em" }}
-                                >
-                                    Pending Studio Review
+                                <h3 className="text-[15px] font-semibold" style={{ color: "#0D0D0D", letterSpacing: "-0.01em" }}>
+                                    {statusConfig.title}
                                 </h3>
-                                <p
-                                    className="text-[13px] leading-relaxed max-w-[260px]"
-                                    style={{ color: "#555555" }}
-                                >
+                                <p className="text-[13px] leading-relaxed max-w-[280px]" style={{ color: "#555555" }}>
                                     Your request for{" "}
-                                    <span
-                                        className="font-semibold"
-                                        style={{ color: "#0D0D0D" }}
-                                    >
-                                        {pendingAppointment.requestedDate
-                                            ? format(new Date(pendingAppointment.requestedDate), "MMMM d, yyyy")
-                                            : "a fitting"}
+                                    <span className="font-semibold" style={{ color: "#0D0D0D" }}>
+                                        {activeAppointment.confirmedDate
+                                            ? format(new Date(activeAppointment.confirmedDate), "MMMM d, yyyy")
+                                            : activeAppointment.requestedDate
+                                                ? format(new Date(activeAppointment.requestedDate), "MMMM d, yyyy")
+                                                : "a fitting"}
                                     </span>{" "}
-                                    is being reviewed. We'll contact you shortly to confirm.
+                                    {statusConfig.desc}
                                 </p>
                             </div>
 
-                            {/* Status pill */}
+                            {/* Status pill with pulse */}
                             <div
                                 className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold tracking-wide uppercase"
                                 style={{
-                                    background: "rgba(194, 24, 91, 0.08)",
-                                    color: "#C2185B",
+                                    background: statusConfig.bg,
+                                    color: statusConfig.color,
                                     letterSpacing: "0.06em",
                                 }}
                             >
-                                <div
-                                    className="h-1.5 w-1.5 rounded-full animate-pulse"
-                                    style={{ background: "#C2185B" }}
-                                />
-                                Awaiting Confirmation
+                                <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: statusConfig.color }} />
+                                {activeAppointment.status === "REQUESTED" ? "Awaiting Confirmation" : "Confirmed"}
                             </div>
+
+                            {/* Client notes */}
+                            {activeAppointment.clientNotes && (
+                                <div className="w-full text-left p-3 rounded-lg text-[12px]" style={{ background: "rgba(0,0,0,0.03)", color: "#555" }}>
+                                    <p className="font-medium text-[#0D0D0D] mb-0.5 text-[11px] uppercase tracking-wider">Your notes</p>
+                                    <p>{activeAppointment.clientNotes}</p>
+                                </div>
+                            )}
+
+                            {/* Admin notes */}
+                            {activeAppointment.adminNotes && (
+                                <div className="w-full text-left p-3 rounded-lg text-[12px] flex items-start gap-2" style={{ background: "rgba(194, 24, 91, 0.05)" }}>
+                                    <MessageSquare size={12} className="text-[#C2185B] shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="font-medium text-[#0D0D0D] mb-0.5 text-[11px] uppercase tracking-wider">Studio note</p>
+                                        <p style={{ color: "#555" }}>{activeAppointment.adminNotes}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* View all link */}
+                            <Link
+                                href="/client/appointments"
+                                onClick={() => onOpenChange(false)}
+                                className="flex items-center gap-1 text-[12px] font-medium text-[#C2185B] hover:underline"
+                            >
+                                View all appointments <ArrowRight size={12} />
+                            </Link>
 
                             <Button
                                 variant="outline"
                                 className="w-full mt-1 border-[1.5px] text-[13px] font-medium transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-                                style={{
-                                    borderColor: "rgba(0,0,0,0.12)",
-                                    color: "#555555",
-                                    height: "42px",
-                                }}
+                                style={{ borderColor: "rgba(0,0,0,0.12)", color: "#555555", height: "42px" }}
                                 onClick={() => onOpenChange(false)}
                             >
                                 Close
                             </Button>
                         </div>
 
-                    ) : (
-
-                        /* Booking Form State */
+                    ) : canBookNew ? (
+                        /* Booking Form State (no active, or past appointment — can book new) */
                         <div className="space-y-5">
+                            {/* Show past appointment info if exists */}
+                            {showPastStatus && (
+                                <div className="p-3 rounded-lg text-[12px] mb-2" style={{ background: statusConfig.bg, color: statusConfig.color }}>
+                                    <div className="flex items-center gap-1.5 mb-1">
+                                        <StatusIcon size={12} />
+                                        <span className="font-semibold">{statusConfig.title}</span>
+                                    </div>
+                                    {activeAppointment.cancelReason && (
+                                        <p className="text-[11px] mt-0.5" style={{ color: "#555" }}>Reason: {activeAppointment.cancelReason}</p>
+                                    )}
+                                    <p className="text-[11px] mt-1" style={{ color: "#555" }}>You can book a new appointment below.</p>
+                                </div>
+                            )}
+
                             {/* Date Picker */}
                             <div className="space-y-1.5">
-                                <label
-                                    className="text-[13px] font-medium block"
-                                    style={{ color: "#0D0D0D" }}
-                                >
+                                <label className="text-[13px] font-medium block" style={{ color: "#0D0D0D" }}>
                                     Preferred Date
                                 </label>
                                 <Popover>
@@ -342,9 +292,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                             )}
                                             style={{
                                                 height: "44px",
-                                                borderColor: date
-                                                    ? "#C2185B"
-                                                    : "#E0E0E0",
+                                                borderColor: date ? "#C2185B" : "#E0E0E0",
                                                 borderRadius: "6px",
                                             }}
                                         >
@@ -352,23 +300,14 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                                 className="mr-2.5 h-4 w-4 flex-shrink-0"
                                                 style={{ color: date ? "#C2185B" : "#999999" }}
                                             />
-                                            <span
-                                                style={{
-                                                    color: date ? "#0D0D0D" : "#999999",
-                                                    fontSize: "14px",
-                                                }}
-                                            >
+                                            <span style={{ color: date ? "#0D0D0D" : "#999999", fontSize: "14px" }}>
                                                 {date ? format(date, "PPP") : "Pick a date"}
                                             </span>
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent
                                         className="w-auto p-0"
-                                        style={{
-                                            borderColor: "rgba(0,0,0,0.08)",
-                                            borderRadius: "10px",
-                                            boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-                                        }}
+                                        style={{ borderColor: "rgba(0,0,0,0.08)", borderRadius: "10px", boxShadow: "0 10px 30px rgba(0,0,0,0.12)" }}
                                         align="start"
                                     >
                                         <Calendar
@@ -386,17 +325,9 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
                             {/* Notes */}
                             <div className="space-y-1.5">
-                                <label
-                                    className="text-[13px] font-medium block"
-                                    style={{ color: "#0D0D0D" }}
-                                >
+                                <label className="text-[13px] font-medium block" style={{ color: "#0D0D0D" }}>
                                     Additional Notes{" "}
-                                    <span
-                                        className="font-normal"
-                                        style={{ color: "#999999" }}
-                                    >
-                                        (Optional)
-                                    </span>
+                                    <span className="font-normal" style={{ color: "#999999" }}>(Optional)</span>
                                 </label>
                                 <Textarea
                                     placeholder="Share any specific requirements, garment ideas, or questions for your fitting…"
@@ -440,15 +371,22 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                 )}
                             </Button>
 
-                            {/* Reassurance footnote */}
-                            <p
-                                className="text-center text-[11px] leading-relaxed"
-                                style={{ color: "#999999" }}
-                            >
-                                This is a request — we'll contact you to confirm the exact time.
-                            </p>
+                            {/* Links */}
+                            <div className="flex items-center justify-between">
+                                <p className="text-[11px] leading-relaxed" style={{ color: "#999999" }}>
+                                    This is a request — we'll contact you to confirm.
+                                </p>
+                                <Link
+                                    href="/client/appointments"
+                                    onClick={() => onOpenChange(false)}
+                                    className="text-[11px] font-medium text-[#C2185B] hover:underline whitespace-nowrap"
+                                >
+                                    View all →
+                                </Link>
+                            </div>
                         </div>
-                    )}
+
+                    ) : null}
                 </div>
             </DialogContent>
         </Dialog>

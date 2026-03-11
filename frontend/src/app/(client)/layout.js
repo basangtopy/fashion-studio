@@ -11,6 +11,7 @@ import {
     LayoutDashboard,
     ShoppingBag,
     Ruler,
+    CalendarDays,
     CreditCard,
     User,
     LogOut,
@@ -30,6 +31,7 @@ const SIDEBAR_LINKS = [
     { href: "/client/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/client/orders", label: "My Orders", icon: ShoppingBag },
     { href: "/client/measurements", label: "Measurements", icon: Ruler },
+    { href: "/client/appointments", label: "Appointments", icon: CalendarDays },
     { href: "/client/payments", label: "Payments", icon: CreditCard },
     { href: "/client/profile", label: "Profile", icon: User },
 ];
@@ -38,8 +40,8 @@ const SIDEBAR_LINKS = [
 const MOBILE_NAV = [
     { href: "/client/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/client/orders", label: "Orders", icon: ShoppingBag },
-    { href: "/client/measurements", label: "Measurements", icon: Ruler },
-    { href: "/client/payments", label: "Payments", icon: CreditCard },
+    { href: "/client/measurements", label: "Measures", icon: Ruler },
+    { href: "/client/appointments", label: "Appts", icon: CalendarDays },
 ];
 
 /* ─── "More" bottom sheet — full sidebar menu ─── */
@@ -47,6 +49,7 @@ const MORE_ITEMS = [
     { href: "/client/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/client/orders", label: "My Orders", icon: ShoppingBag },
     { href: "/client/measurements", label: "Measurements", icon: Ruler },
+    { href: "/client/appointments", label: "Appointments", icon: CalendarDays },
     { href: "/client/payments", label: "Payments", icon: CreditCard },
     { href: "/client/profile", label: "Profile", icon: User },
 ];
@@ -56,6 +59,7 @@ const PAGE_TITLES = {
     "/client/dashboard": "Dashboard",
     "/client/orders": "My Orders",
     "/client/measurements": "Measurements",
+    "/client/appointments": "Appointments",
     "/client/payments": "Payments",
     "/client/profile": "Profile",
     "/client/checkout": "Checkout",

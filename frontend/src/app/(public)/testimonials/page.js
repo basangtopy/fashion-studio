@@ -12,7 +12,7 @@ import { useScrollReveal } from "@/hooks/useAnimations";
 import { SkeletonCard } from "@/components/shared/Skeleton";
 import ImageUpload from "@/components/shared/ImageUpload";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";  
+import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 
 export default function TestimonialsPage() {
@@ -56,7 +56,7 @@ export default function TestimonialsPage() {
             if (newImageFiles[0]) {
                 formData.append("reviews", newImageFiles[0]);
             }
-            
+
             const { data } = await api.post("/testimonials", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -383,8 +383,8 @@ export default function TestimonialsPage() {
                                     existingImages={[]}
                                     newFiles={newImageFiles}
                                     onNewFilesChange={setNewImageFiles}
-                                    onExistingImagesReorder={() => {}}
-                                    onExistingImageDelete={() => {}}
+                                    onExistingImagesReorder={() => { }}
+                                    onExistingImageDelete={() => { }}
                                     maxFiles={1}
                                 />
                             </div>

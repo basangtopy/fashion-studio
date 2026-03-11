@@ -68,4 +68,5 @@ export const updateAppointmentSchema = z.object({
   }),
   confirmedDate: z.string().datetime().optional(),
   adminNotes: z.string().max(500).optional(),
+  cancelReason: z.string().max(500).optional(),
 });

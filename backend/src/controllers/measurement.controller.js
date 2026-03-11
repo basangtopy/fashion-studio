@@ -16,6 +16,47 @@ const checkMeasurementAccess = (requestingUser, clientId) => {
   }
 };
 
+// ─── GET /measurements ──────────────────────────────────────────────────
+// Only for admin
+export const getAllMeasurements = async (req, res) => {
+  const { search, limit = 12, page = 1 } = req.query;
+
+  const where = {};
+
+  if (search) {
+    where.OR = [
+      { client: { fullName: { contains: search, mode: "insensitive" } } },
+      { client: { email: { contains: search, mode: "insensitive" } } },
+    ];
+  }
+
+  // Pagination logic
+  const parsedPage = Math.max(parseInt(page) || 1, 1);
+  const parsedLimit = Math.max(parseInt(limit) || 12, 1);
+  const skip = (parsedPage - 1) * parsedLimit;
+
+  const [measurements, total] = await Promise.all([
+    prisma.measurement.findMany({
+      where,
+      include: {
+        client: { select: { id: true, fullName: true, email: true, profilePicture: true } },
+      },
+      take: parsedLimit,
+      skip: skip,
+    }),
+    prisma.measurement.count({ where }),
+  ]);
+  return successResponse(res, 200, "Measurements retrieved", {
+    measurements,
+    pagination: {
+      page: parsedPage,
+      limit: parsedLimit,
+      total,
+      pages: Math.ceil(total / parsedLimit)
+    },
+  });
+};
+
 // ─── GET /measurements/:clientId ──────────────────────────────────────────
 export const getMeasurements = async (req, res) => {
   const { clientId } = req.params;
@@ -25,7 +66,7 @@ export const getMeasurements = async (req, res) => {
   // Confirm the client exists
   const client = await prisma.user.findUnique({
     where: { id: clientId, role: "CLIENT" },
-    select: { id: true, fullName: true, email: true },
+    select: { id: true, fullName: true, email: true, profilePicture: true },
   });
 
   if (!client) {

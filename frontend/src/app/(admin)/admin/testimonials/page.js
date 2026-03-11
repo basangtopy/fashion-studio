@@ -33,8 +33,8 @@ export default function AdminTestimonialsPage() {
     const [newImageFiles, setNewImageFiles] = useState([]);
 
     // Fetch testimonials
-    const { 
-        data, 
+    const {
+        data,
         isLoading,
         fetchNextPage,
         hasNextPage,
@@ -42,8 +42,8 @@ export default function AdminTestimonialsPage() {
     } = useInfiniteQuery({
         queryKey: ["admin-testimonials", activeTab],
         queryFn: async ({ pageParam = 1 }) => {
-            const { data } = await api.get("/testimonials/admin", { 
-                params: { status: activeTab, page: pageParam, limit: 12 } 
+            const { data } = await api.get("/testimonials/admin", {
+                params: { status: activeTab, page: pageParam, limit: 12 }
             });
             return data.data || {};
         },
@@ -85,7 +85,7 @@ export default function AdminTestimonialsPage() {
             if (newImageFiles[0]) {
                 fd.append("reviews", newImageFiles[0]);
             }
-            
+
             const { data } = await api.post("/testimonials/admin", fd, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
@@ -128,8 +128,8 @@ export default function AdminTestimonialsPage() {
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`flex-1 py-2.5 px-3 rounded-md text-sm font-medium capitalize transition-all duration-200 ${activeTab === tab
-                                ? "bg-white text-[#0D0D0D] shadow-sm"
-                                : "text-[#999] hover:text-[#555]"
+                            ? "bg-white text-[#0D0D0D] shadow-sm"
+                            : "text-[#999] hover:text-[#555]"
                             }`}
                     >
                         {tab.toLowerCase()}
@@ -189,7 +189,7 @@ export default function AdminTestimonialsPage() {
 
                             {/* Optional Garment Image */}
                             {t.photoUrl && (
-                                <div className="relative w-full h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                <div className="relative w-48 h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
                                     <Image
                                         src={t.photoUrl}
                                         alt={`Attached photo from ${t.clientName || 'Anonymous'}`}
@@ -237,7 +237,7 @@ export default function AdminTestimonialsPage() {
                             </div>
                         </div>
                     ))}
-                    
+
                     {/* Inline Skeleton Loaders when fetching next page */}
                     {isFetchingNextPage && (
                         <>
@@ -311,8 +311,8 @@ export default function AdminTestimonialsPage() {
                                         existingImages={[]}
                                         newFiles={newImageFiles}
                                         onNewFilesChange={setNewImageFiles}
-                                        onExistingImagesReorder={() => {}}
-                                        onExistingImageDelete={() => {}}
+                                        onExistingImagesReorder={() => { }}
+                                        onExistingImageDelete={() => { }}
                                         maxFiles={1}
                                     />
                                 </div>

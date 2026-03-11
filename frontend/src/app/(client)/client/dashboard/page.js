@@ -205,19 +205,41 @@ export default function ClientDashboard() {
                             isCurrency
                             contextLine={outstandingBalance > 0 ? "Across all orders" : "All clear!"}
                         />
-                        <StatCard
-                            label="Upcoming Appointment"
-                            value={pendingAppointmentDate ? new Date(pendingAppointmentDate).toLocaleDateString("en-NG", {
-                                weekday: "long",
-                                year: "numeric",
-                                month: "long",
-                                day: "numeric",
-                            }) : "None booked"}
-                            icon={Calendar}
-                            color="#1565C0"
-                            delay={0.18}
-                            contextLine={pendingAppointmentStatus ? pendingAppointmentStatus === "REQUESTED" ? "Pending confirmation" : pendingAppointmentStatus === "CONFIRMED" ? "Fitting appointment confirmed" : "" : ""}
-                        />
+                        <Link href="/client/appointments" className="block">
+                            <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.4, delay: 0.18 }}
+                                className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] hover:-translate-y-0.5 transition-all duration-200"
+                            >
+                                <div className="flex items-center justify-between mb-3">
+                                    <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Appointment</span>
+                                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1565C015" }}>
+                                        <Calendar size={18} style={{ color: "#1565C0" }} />
+                                    </div>
+                                </div>
+                                {pendingAppointment ? (
+                                    <>
+                                        <p className="text-sm font-bold text-[#0D0D0D] mb-1">
+                                            {new Date(pendingAppointment.confirmedDate || pendingAppointment.requestedDate).toLocaleDateString("en-NG", {
+                                                weekday: "short", month: "short", day: "numeric",
+                                            })}
+                                        </p>
+                                        <div className="flex items-center gap-1.5 mb-1">
+                                            <StatusPill status={pendingAppointment.status} size="small" />
+                                        </div>
+                                        {pendingAppointment.adminNotes && (
+                                            <p className="text-[10px] text-[#999] mt-1 truncate">💬 {pendingAppointment.adminNotes}</p>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="text-lg font-bold text-[#0D0D0D]">None booked</p>
+                                        <p className="text-[11px] text-[#C2185B] font-medium mt-1">Book an appointment →</p>
+                                    </>
+                                )}
+                            </motion.div>
+                        </Link>
                     </>
                 )}
             </div>

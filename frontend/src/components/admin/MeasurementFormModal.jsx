@@ -13,30 +13,23 @@ import { Button } from "@/components/ui/button";
 
 const UPPER_FIELDS = [
     { key: "bust", label: "Bust" },
-    { key: "underBust", label: "Under Bust" },
-    { key: "shoulder", label: "Shoulder" },
+    { key: "waist", label: "Waist" },
+    { key: "hips", label: "Hips" },
+    { key: "shoulderWidth", label: "Shoulder Width" },
     { key: "sleeveLength", label: "Sleeve Length" },
-    { key: "armhole", label: "Armhole" },
-    { key: "bicep", label: "Bicep" },
-    { key: "wrist", label: "Wrist" },
-    { key: "frontLength", label: "Front Length" },
+    { key: "armLength", label: "Arm Length" },
+    { key: "armCircumference", label: "Arm Circumference" },
+    { key: "wristCircumference", label: "Wrist Circumference" },
+    { key: "neck", label: "Neck" },
     { key: "backLength", label: "Back Length" },
-    { key: "neckToWaist", label: "Neck to Waist" },
-    { key: "acrossFront", label: "Across Front" },
-    { key: "acrossBack", label: "Across Back" },
+    { key: "frontLength", label: "Front Length" },
 ];
 
 const LOWER_FIELDS = [
-    { key: "waist", label: "Waist" },
-    { key: "hips", label: "Hips" },
-    { key: "fullLength", label: "Full Length" },
-    { key: "kneeLength", label: "Knee Length" },
+    { key: "dressLength", label: "Dress Length" },
     { key: "thigh", label: "Thigh" },
-    { key: "calf", label: "Calf" },
-    { key: "ankle", label: "Ankle" },
     { key: "inseam", label: "Inseam" },
-    { key: "outseam", label: "Outseam" },
-    { key: "crotchDepth", label: "Crotch Depth" },
+    { key: "ankleCircumference", label: "Ankle Circumference" },
 ];
 
 export default function MeasurementFormModal({ open, onClose, clientId, existingMeasurement = null }) {

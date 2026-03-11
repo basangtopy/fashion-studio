@@ -107,7 +107,7 @@ export const getAppointments = async (req, res) => {
 // Admin confirms, completes, or cancels an appointment
 export const updateAppointment = async (req, res) => {
   const { id } = req.params;
-  const { status, confirmedDate, adminNotes } = req.validatedBody;
+  const { status, confirmedDate, adminNotes, cancelReason } = req.validatedBody;
 
   const appointment = await prisma.measurementAppointment.findUnique({
     where: { id },
@@ -143,6 +143,7 @@ export const updateAppointment = async (req, res) => {
         ? new Date(confirmedDate)
         : appointment.confirmedDate,
       adminNotes: adminNotes || appointment.adminNotes,
+      cancelReason: cancelReason || appointment.cancelReason,
     },
     include: {
       client: { select: { fullName: true, email: true } },
