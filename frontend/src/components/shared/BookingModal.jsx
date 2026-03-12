@@ -40,7 +40,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
     const [date, setDate] = useState(null);
     const [notes, setNotes] = useState("");
 
-    if (!isOpen || !isAuthenticated) return;
+
 
     // Fetch latest active appointment (not just REQUESTED — show all active statuses)
     const { data: activeAppointment, isLoading: isLoadingStatus, isError } = useQuery({
@@ -55,7 +55,9 @@ export function BookingModal({ isOpen, onOpenChange }) {
             if (confirmed) return confirmed;
             // Return most recent overall
             return appointments[0] || null;
-        }
+        },
+
+        enabled: !!isOpen && !!isAuthenticated,
     });
 
     if (isError) {
@@ -86,6 +88,8 @@ export function BookingModal({ isOpen, onOpenChange }) {
             }, 300);
         }
     }, [isOpen]);
+
+    if (!isOpen || !isAuthenticated) return;
 
     const handleSubmit = () => {
         if (!date) return;

@@ -283,14 +283,29 @@ export default function AdminMeasurementDetailPage() {
                                                     </div>
                                                     {entry.changedFields && typeof entry.changedFields === "object" && (
                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                            {Object.entries(entry.changedFields).map(([field, change]) => (
-                                                                <div key={field} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-[#F4F0F8]">
-                                                                    <span className="text-[#999] capitalize">{field.replace(/([A-Z])/g, " $1").trim()}:</span>
-                                                                    <span className="text-[#C62828] line-through">{change.from ?? "—"}</span>
-                                                                    <span className="text-[#0D0D0D]">→</span>
-                                                                    <span className="text-[#2E7D32] font-medium">{change.to ?? "—"}</span>
-                                                                </div>
-                                                            ))}
+                                                            {Object.entries(entry.changedFields).flatMap(([field, change]) => {
+                                                                // customParams is a nested dict: { rise: { from, to }, calf: { from, to } }
+                                                                if (field === "customParams" && typeof change === "object" && !("from" in change)) {
+                                                                    return Object.entries(change).map(([cpKey, cpChange]) => (
+                                                                        <div key={`cp-${cpKey}`} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-[#F4F0F8]">
+                                                                            <span className="text-[#999] capitalize">{cpKey} (custom):</span>
+                                                                            <span className="text-[#C62828] line-through">{cpChange.from ?? "—"}</span>
+                                                                            <span className="text-[#0D0D0D]">→</span>
+                                                                            <span className="text-[#2E7D32] font-medium">{cpChange.to ?? "—"}</span>
+                                                                        </div>
+                                                                    ));
+                                                                }
+                                                                // Standard field: { from, to }
+                                                                if (typeof change !== "object" || !("from" in change)) return [];
+                                                                return [
+                                                                    <div key={field} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-[#F4F0F8]">
+                                                                        <span className="text-[#999] capitalize">{field.replace(/([A-Z])/g, " $1").trim()}:</span>
+                                                                        <span className="text-[#C62828] line-through">{change.from ?? "—"}</span>
+                                                                        <span className="text-[#0D0D0D]">→</span>
+                                                                        <span className="text-[#2E7D32] font-medium">{change.to ?? "—"}</span>
+                                                                    </div>
+                                                                ];
+                                                            })}
                                                         </div>
                                                     )}
                                                     {entry.notes && (

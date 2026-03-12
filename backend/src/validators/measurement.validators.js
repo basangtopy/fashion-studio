@@ -24,7 +24,7 @@ const measurementFields = {
     .optional(),
   backLength: z.number().positive("Must be a positive number").optional(),
   frontLength: z.number().positive("Must be a positive number").optional(),
-  customParams: z.record(z.number()).optional(),
+  customParams: z.record(z.string(), z.number()).optional(),
   notes: z.string().max(500).optional(),
 };
 
