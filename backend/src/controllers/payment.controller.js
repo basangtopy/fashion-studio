@@ -479,6 +479,8 @@ export const getFinanceSummary = async (req, res) => {
     revenueByOrderType,
     recentPayments,
     outstandingOrders,
+    confirmedPaymentsRaw,
+    orderStatusCounts,
   ] = await Promise.all([
     // Total confirmed revenue
     prisma.payment.aggregate({
@@ -557,6 +559,31 @@ export const getFinanceSummary = async (req, res) => {
         // Filter in JS since Prisma can't compare two columns directly
         orders.filter((o) => Number(o.totalPaid) < Number(o.totalAgreedFee)),
       ),
+
+    // Revenue time-series: fetch all confirmed payments with their dates
+    // for building daily revenue breakdown
+    prisma.payment.findMany({
+      where: confirmedFilter,
+      select: { amount: true, confirmedAt: true, createdAt: true },
+      orderBy: { confirmedAt: "asc" },
+    }),
+
+    // Orders by status: count orders grouped by status (within date range if specified)
+    prisma.order.groupBy({
+      by: ["status"],
+      where: {
+        ...(from || to
+          ? {
+              createdAt: {
+                ...(from ? { gte: new Date(from) } : {}),
+                ...(to ? { lte: new Date(to) } : {}),
+              },
+            }
+          : {}),
+        ...(type ? { orderType: type } : {}),
+      },
+      _count: { id: true },
+    }),
   ]);
 
   // Process revenue by order type
@@ -579,15 +606,42 @@ export const getFinanceSummary = async (req, res) => {
     };
   }
 
+  // Build revenue time-series (grouped by day)
+  const revenueMap = {};
+  for (const p of confirmedPaymentsRaw) {
+    const dateKey = (p.confirmedAt || p.createdAt)
+      .toISOString()
+      .split("T")[0];
+    revenueMap[dateKey] = (revenueMap[dateKey] || 0) + Number(p.amount);
+  }
+  const revenueTimeSeries = Object.entries(revenueMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, totalRevenue]) => ({ date, totalRevenue }));
+
+  // Build orders-by-status array for pie/donut chart
+  const ordersByStatus = orderStatusCounts.map((row) => ({
+    name: row.status,
+    value: row._count.id,
+  }));
+
+  // Compute outstanding balance (sum of what's owed across all outstanding orders)
+  const outstandingBalance = outstandingOrders.reduce(
+    (sum, o) => sum + (Number(o.totalAgreedFee) - Number(o.totalPaid)),
+    0,
+  );
+
   return successResponse(res, 200, "Finance summary retrieved", {
     summary: {
       totalRevenue: totalRevenue._sum.amount ?? 0,
       totalConfirmed: totalRevenue._count.id,
       totalPending: pendingAmount._sum.amount ?? 0,
       pendingCount: pendingAmount._count.id,
+      outstandingBalance,
     },
     byPaymentType,
     byOrderType: revenueByType,
+    revenueTimeSeries,
+    ordersByStatus,
     recentPayments,
     outstandingOrders: {
       count: outstandingOrders.length,

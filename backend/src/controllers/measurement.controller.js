@@ -43,6 +43,7 @@ export const getAllMeasurements = async (req, res) => {
       },
       take: parsedLimit,
       skip: skip,
+      orderBy: [{ createdAt: "desc" }, { id: "asc" }],
     }),
     prisma.measurement.count({ where }),
   ]);

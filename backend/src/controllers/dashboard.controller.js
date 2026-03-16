@@ -42,8 +42,6 @@ export const getDashboardStats = async (req, res) => {
     ordersByType,
     recentOrders,
     unreadChats,
-    revenueTimeSeries,
-    ordersTimeSeries,
   ] = await Promise.all([
     // Snapshot counts (always current)
     prisma.user.count({ where: { role: "CLIENT" } }),
@@ -110,29 +108,80 @@ export const getDashboardStats = async (req, res) => {
     prisma.chatMessage.count({
       where: { senderRole: "CLIENT", isRead: false },
     }),
+  ]);
 
-    // Revenue time-series (last 12 months)
-    prisma.$queryRaw`
+  // ── Determine chart time-series grouping ────────────────────────────────
+  // Dynamic granularity: daily (≤31d), weekly (≤90d), monthly (default)
+  let granularity = "month";
+  let sqlFormat = "YYYY-MM";
+  if (from && to) {
+    const diffMs = new Date(to) - new Date(from);
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    if (diffDays <= 31) {
+      granularity = "day";
+      sqlFormat = "YYYY-MM-DD";
+    } else if (diffDays <= 90) {
+      granularity = "week";
+      sqlFormat = "IYYY-IW"; // ISO year-week
+    }
+  }
+
+  const revenueWhereClause = from && to
+    ? `AND "confirmedAt" >= '${new Date(from).toISOString()}'::timestamp AND "confirmedAt" <= '${new Date(to).toISOString()}'::timestamp`
+    : `AND "confirmedAt" >= NOW() - INTERVAL '12 months'`;
+
+  const ordersWhereClause = from && to
+    ? `AND "createdAt" >= '${new Date(from).toISOString()}'::timestamp AND "createdAt" <= '${new Date(to).toISOString()}'::timestamp`
+    : `AND "createdAt" >= NOW() - INTERVAL '12 months'`;
+
+  // ── Run chart + outstanding queries in parallel ──────────────────────────
+  const [
+    revenueTimeSeries,
+    ordersTimeSeries,
+    outstandingOrders,
+  ] = await Promise.all([
+    // Revenue time-series (respects date filter)
+    prisma.$queryRawUnsafe(`
       SELECT
-        TO_CHAR("confirmedAt", 'YYYY-MM') AS month,
+        TO_CHAR("confirmedAt", '${sqlFormat}') AS period,
         COALESCE(SUM(amount), 0) AS revenue
       FROM payments
       WHERE status = 'CONFIRMED'
-        AND "confirmedAt" >= NOW() - INTERVAL '12 months'
-      GROUP BY month
-      ORDER BY month ASC
-    `,
+        ${revenueWhereClause}
+      GROUP BY period
+      ORDER BY period ASC
+    `),
 
-    // Orders time-series (last 12 months)
-    prisma.$queryRaw`
+    // Orders time-series (respects date filter)
+    prisma.$queryRawUnsafe(`
       SELECT
-        TO_CHAR("createdAt", 'YYYY-MM') AS month,
+        TO_CHAR("createdAt", '${sqlFormat}') AS period,
         COUNT(*)::int AS count
       FROM orders
-      WHERE "createdAt" >= NOW() - INTERVAL '12 months'
-      GROUP BY month
-      ORDER BY month ASC
-    `,
+      WHERE 1=1
+        ${ordersWhereClause}
+      GROUP BY period
+      ORDER BY period ASC
+    `),
+
+    // Outstanding Orders
+    prisma.order.findMany({
+      where: {
+        status: {
+          notIn: [
+            "CANCELLED",
+            "COMPLETED",
+            "PENDING_REVIEW",
+            "AWAITING_CLIENT_RESPONSE",
+          ],
+        },
+        totalAgreedFee: { not: null },
+      },
+      select: {
+        totalAgreedFee: true,
+        totalPaid: true,
+      },
+    }),
   ]);
 
   // ── Format response ────────────────────────────────────────────────────
@@ -160,6 +209,10 @@ export const getDashboardStats = async (req, res) => {
     pendingTestimonials,
     appointmentsPending,
     unreadChats,
+    outstandingBalance: outstandingOrders.reduce((sum, o) => {
+      const remaining = Number(o.totalAgreedFee) - Number(o.totalPaid || 0);
+      return remaining > 0 ? sum + remaining : sum;
+    }, 0),
 
     // Period-based metrics
     periodLabel,
@@ -176,12 +229,13 @@ export const getDashboardStats = async (req, res) => {
     ordersByType: typeBreakdown,
 
     // Time-series (chart-ready)
+    chartGranularity: granularity,
     revenueTimeSeries: revenueTimeSeries.map((r) => ({
-      month: r.month,
+      period: r.period,
       revenue: Number(r.revenue),
     })),
     ordersTimeSeries: ordersTimeSeries.map((r) => ({
-      month: r.month,
+      period: r.period,
       count: Number(r.count),
     })),
 

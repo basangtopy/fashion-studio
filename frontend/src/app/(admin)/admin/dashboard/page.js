@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, Fragment } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ShoppingBag, Users, CreditCard, TrendingUp, Calendar as CalendarIcon, ArrowRight,
-    CheckCircle2, XCircle, Clock, Download, FileText,
+    CheckCircle2, XCircle, Clock, Download, FileText, X,
     AlertTriangle, Eye, ChevronDown, ChevronUp, ChevronsUpDown,
     Mail, Phone, MapPin, Scissors,
 } from "lucide-react";
@@ -168,6 +169,7 @@ export default function AdminDashboard() {
     const [rejectModal, setRejectModal] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [confirmPopover, setConfirmPopover] = useState(null);
+    const [proofPreview, setProofPreview] = useState(null);
     const [expandedRow, setExpandedRow] = useState(null);
     const [sortKey, setSortKey] = useState(null);
     const [sortDir, setSortDir] = useState("asc");
@@ -176,8 +178,8 @@ export default function AdminDashboard() {
     const { from, to } = useMemo(() => {
         if (datePreset === "custom") {
             return {
-                from: dateRange.from ? format(dateRange.from, "yyyy-MM-dd") : "",
-                to: dateRange.to ? format(dateRange.to, "yyyy-MM-dd") : ""
+                from: dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : "",
+                to: dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : ""
             };
         }
         if (datePreset === "all") return { from: "", to: "" };
@@ -318,8 +320,23 @@ export default function AdminDashboard() {
         return fallback;
     };
 
-    const revenueData = Array.isArray(stats.revenueTimeSeries) && stats.revenueTimeSeries.length > 0 ? stats.revenueTimeSeries : [];
-    const ordersData = Array.isArray(stats.ordersTimeSeries) && stats.ordersTimeSeries.length > 0 ? stats.ordersTimeSeries : [];
+    const chartGranularity = stats.chartGranularity || "month";
+    const formatPeriodLabel = (period) => {
+        if (!period) return "";
+        if (chartGranularity === "day") {
+            const d = new Date(period);
+            return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        }
+        if (chartGranularity === "week") {
+            return `W${period.split("-")[1]}`;
+        }
+        // month: "2026-03" -> "Mar 2026"
+        const [y, m] = period.split("-");
+        const d = new Date(Number(y), Number(m) - 1);
+        return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    };
+    const revenueData = (Array.isArray(stats.revenueTimeSeries) ? stats.revenueTimeSeries : []).map(r => ({ ...r, label: formatPeriodLabel(r.period) }));
+    const ordersData = (Array.isArray(stats.ordersTimeSeries) ? stats.ordersTimeSeries : []).map(r => ({ ...r, label: formatPeriodLabel(r.period) }));
     const ordersByStatus = toChartArray(stats.ordersByStatus, ORDER_STATUS, []);
     const ordersByType = toChartArray(stats.ordersByType, { MODEL_1: { label: "Model 1" }, MODEL_2: { label: "Model 2" }, MODEL_3: { label: "Ready-to-Wear" } }, []);
 
@@ -389,7 +406,7 @@ export default function AdminDashboard() {
                                     mode="range"
                                     defaultMonth={dateRange?.from}
                                     selected={dateRange}
-                                    onSelect={setDateRange}
+                                    onSelect={(range) => setDateRange(range || { from: undefined, to: undefined })}
                                     numberOfMonths={2}
                                 />
                             </PopoverContent>
@@ -409,8 +426,8 @@ export default function AdminDashboard() {
                             subtext={from ? `${stats.ordersInPeriod || 0} total in period` : null} />
                         <StatCard index={2} label="Total Revenue" value={stats.totalRevenue || 0} icon={TrendingUp} color="#2E7D32" isCurrency
                             subtext={from ? `${formatCurrency(stats.revenueInPeriod || 0)} in period` : null} />
-                        <StatCard index={3} label="Outstanding" value={stats.pendingPayments || payments.length} icon={CreditCard} color="#E65100"
-                            subtext={`${payments.length} payment${payments.length !== 1 ? "s" : ""} awaiting`} />
+                        <StatCard index={3} label="Outstanding" value={stats.outstandingBalance || 0} icon={CreditCard} color="#E65100" isCurrency
+                            subtext={`${stats.pendingPayments || payments.length} payment${(stats.pendingPayments || payments.length) !== 1 ? "s" : ""} awaiting`} />
                         <StatCard index={4} label="Clients" value={stats.totalClients || 0} icon={Users} color="#1565C0"
                             subtext={from ? `${stats.newClientsInPeriod || 0} new in period` : null} />
                         <StatCard index={5} label="Appointments" value={stats.appointmentsPending || 0} icon={CalendarIcon} color="#6A1B9A" warning />
@@ -435,7 +452,7 @@ export default function AdminDashboard() {
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#F4F0F8" />
-                                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#999" }} />
+                                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#999" }} />
                                 <YAxis tick={{ fontSize: 11, fill: "#999" }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
                                 <Tooltip formatter={(v) => formatCurrency(v)} />
                                 <Area type="monotone" dataKey="revenue" stroke="#C2185B" fill="url(#revenueGradient)" strokeWidth={2} />
@@ -520,9 +537,9 @@ export default function AdminDashboard() {
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0 ml-3">
                                         {pay.proofUrl && (
-                                            <a href={pay.proofUrl} target="_blank" rel="noopener" className="w-7 h-7 rounded-md bg-[#F4F0F8] flex items-center justify-center text-[#555] hover:text-[#C2185B] transition-colors">
+                                            <button onClick={() => setProofPreview(pay.proofUrl)} className="w-7 h-7 rounded-md bg-[#F4F0F8] flex items-center justify-center text-[#555] hover:text-[#C2185B] transition-colors">
                                                 <Eye size={13} />
-                                            </a>
+                                            </button>
                                         )}
                                         {/* Confirm with popover */}
                                         <div className="relative">
@@ -804,6 +821,24 @@ export default function AdminDashboard() {
                     )}
                 </div>
             </div>
+
+            {/* Proof preview lightbox */}
+            <AnimatePresence>
+                {proofPreview && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[80] bg-black/70 flex items-center justify-center p-4" onClick={() => setProofPreview(null)}>
+                        <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
+                            className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
+                            <button onClick={() => setProofPreview(null)} className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center">
+                                <X size={16} className="text-[#0D0D0D]" />
+                            </button>
+                            <div className="relative aspect-square rounded-xl overflow-hidden bg-white">
+                                <Image src={proofPreview} alt="Payment proof" fill className="object-contain" />
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Rejection reason modal */}
             <AnimatePresence>

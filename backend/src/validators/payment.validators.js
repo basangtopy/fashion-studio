@@ -53,8 +53,8 @@ export const offlinePaymentSchema = z.object({
 // ─── Finance summary query params ──────────────────────────────────────────
 
 export const financeSummarySchema = z.object({
-  from: z.string().datetime({ message: "Invalid from date" }).optional(),
-  to: z.string().datetime({ message: "Invalid to date" }).optional(),
+  from: z.string().refine((v) => !isNaN(Date.parse(v)), { message: "Invalid from date" }).optional(),
+  to: z.string().refine((v) => !isNaN(Date.parse(v)), { message: "Invalid to date" }).optional(),
   type: z.enum(["MODEL_1", "MODEL_2", "MODEL_3"]).optional(),
 });
 
