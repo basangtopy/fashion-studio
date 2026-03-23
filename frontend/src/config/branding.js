@@ -49,6 +49,105 @@ export const BRANDING = {
         locale: "en-NG",
     },
 
+    // ── About Page Content ─────────────────────────────────────────────────────
+    founderName: "The Founder",
+    mission:
+        "To craft garments that honour individuality — where every stitch carries intention, every silhouette tells a story, and every client leaves feeling seen.",
+    vision:
+        "To become West Africa's most trusted name in bespoke fashion, setting the standard for precision, creativity, and client care.",
+
+    aboutHeroQuote:
+        "We don't just make clothes. We craft confidence, one stitch at a time.",
+
+    values: [
+        {
+            title: "Precision",
+            description:
+                "Every measurement is taken twice. Every seam is inspected. We believe that true luxury lives in the details — the ones you see, and the ones you feel.",
+        },
+        {
+            title: "Identity",
+            description:
+                "Your clothes should speak before you do. We design garments that amplify who you are — your culture, your confidence, your individuality — never someone else's template.",
+        },
+        {
+            title: "Collaboration",
+            description:
+                "A great garment is a conversation, not a monologue. We listen, sketch, refine, and iterate — together with you — until every detail is exactly right.",
+        },
+    ],
+
+    businessModels: [
+        {
+            title: "You Bring the Fabric",
+            shortDescription:
+                "Have a special fabric? Bring it to us and choose from our curated styles or describe your dream outfit. We'll bring your vision to life.",
+            detailedDescription:
+                "Perhaps you've found the perfect Ankara print at the market, inherited a cherished fabric from a loved one, or brought back a unique textile from your travels. This is where your story begins. You bring the fabric that means something to you, and we transform it into a garment that honours its origin. Browse our curated style catalog for inspiration, or describe your dream design from scratch — either way, we handle everything from precise measurements and pattern drafting to expert cutting, sewing, and finishing. You stay in the loop at every stage, with photo updates and fittings until the final piece is exactly what you envisioned.",
+            link: "/catalog/styles",
+        },
+        {
+            title: "We Source It for You",
+            shortDescription:
+                "Don't have fabric? No problem. Tell us what you want, and we'll source the perfect fabric and create your garment from start to finish.",
+            detailedDescription:
+                "Not everyone has the time — or the desire — to hunt for the right fabric. Tell us the occasion, your style preferences, and your budget, and we'll curate a selection of premium fabrics for your approval. Once you pick your favourite, we take it from there: design consultation, measurements, tailoring, and quality checks — a complete end-to-end experience. This model is ideal for busy professionals, event-driven orders, or anyone who wants the luxury of a fully managed process. You make the decisions; we handle the legwork.",
+            link: "/catalog/styles",
+        },
+        {
+            title: "Ready to Wear",
+            shortDescription:
+                "Browse our collection of beautifully crafted, ready-made garments. Find your size, purchase, and step out in style — no wait required.",
+            detailedDescription:
+                "For those moments when you need something stunning and you need it now. Our Ready-to-Wear collection features handcrafted pieces designed in-house and produced in limited runs — so you get the quality of bespoke without the wait. Each item is available in multiple sizes, and because they're made with the same care as our custom orders, the fit and finish are anything but off-the-rack. Browse online, add to cart, and have your piece delivered — or pick it up at the studio. Perfect for gifting or treating yourself on short notice.",
+            link: "/catalog/ready-to-wear",
+        },
+    ],
+
+    processSteps: [
+        {
+            title: "Consultation",
+            description:
+                "We sit down — in person or virtually — to understand your vision, occasion, style preferences, and budget.",
+        },
+        {
+            title: "Measurement",
+            description:
+                "Our team takes precise body measurements, stored securely in your profile for future orders.",
+        },
+        {
+            title: "Design & Approval",
+            description:
+                "We draft the design, select materials, and present options for your review before a single cut is made.",
+        },
+        {
+            title: "Crafting",
+            description:
+                "Your garment moves through cutting, sewing, and finishing — with quality checks at every stage.",
+        },
+        {
+            title: "Fitting & Delivery",
+            description:
+                "A final fitting ensures perfection. We make any last adjustments, then deliver your finished piece.",
+        },
+    ],
+
+    stats: [
+        { value: 500, suffix: "+", label: "Garments Crafted" },
+        { value: 300, suffix: "+", label: "Happy Clients" },
+        { value: 50, suffix: "+", label: "Styles in Catalog" },
+        { value: 2, suffix: "", label: "Years of Craft" },
+    ],
+
+    manifestoLines: [
+        "For the woman who demands precision.",
+        "For the man who wears intention.",
+        "For the celebration that deserves more than ordinary.",
+        "For the culture that runs through every thread.",
+        "For you — because you deserve clothes that feel like they were made just for you.",
+        "Because they were.",
+    ],
+
     // ── Payment Information (manual bank transfer) ────────────────────────────
     // Replace these with actual details when branding is finalised.
     paymentInfo: {

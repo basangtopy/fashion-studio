@@ -37,6 +37,7 @@ export default function Footer() {
                                 { href: "/catalog/ready-to-wear", label: "Ready-to-Wear" },
                                 { href: "/portfolio", label: "Portfolio" },
                                 { href: "/testimonials", label: "Testimonials" },
+                                { href: "/about", label: "About Us" },
                             ].map((link) => (
                                 <Link
                                     key={link.href}
@@ -115,6 +116,9 @@ export default function Footer() {
                         © {new Date().getFullYear()} {BRANDING.businessName}. All rights reserved.
                     </p>
                     <div className="flex items-center gap-4">
+                        <Link href="/about" className="text-xs text-white/40 hover:text-white/60 transition-colors">
+                            About
+                        </Link>
                         <Link href="/privacy" className="text-xs text-white/40 hover:text-white/60 transition-colors">
                             Privacy Policy
                         </Link>

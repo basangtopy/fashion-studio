@@ -39,6 +39,7 @@ const NAV_LINKS = [
     },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/testimonials", label: "Testimonials" },
+    { href: "/about", label: "About" },
 ];
 
 export default function Navbar() {

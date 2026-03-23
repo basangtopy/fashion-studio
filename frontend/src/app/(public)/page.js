@@ -190,29 +190,13 @@ function HeroSection() {
 function ProcessSection() {
     const { ref, isVisible } = useScrollReveal();
 
-    const models = [
-        {
-            icon: Scissors,
-            title: "You Bring the Fabric",
-            description:
-                "Have a special fabric? Bring it to us and choose from our curated styles or describe your dream outfit. We'll bring your vision to life.",
-            link: "/catalog/styles",
-        },
-        {
-            icon: Package,
-            title: "We Source It for You",
-            description:
-                "Don't have fabric? No problem. Tell us what you want, and we'll source the perfect fabric and create your garment from start to finish.",
-            link: "/catalog/styles",
-        },
-        {
-            icon: ShoppingBag,
-            title: "Ready to Wear Now",
-            description:
-                "Browse our collection of beautifully crafted, ready-made garments. Find your size, purchase, and step out in style — no wait required.",
-            link: "/catalog/ready-to-wear",
-        },
-    ];
+    const MODEL_ICONS = [Scissors, Package, ShoppingBag];
+    const models = BRANDING.businessModels.map((m, i) => ({
+        icon: MODEL_ICONS[i],
+        title: m.title,
+        description: m.shortDescription,
+        link: m.link,
+    }));
 
     return (
         <section ref={ref} className="section-gap bg-white">
