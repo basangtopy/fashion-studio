@@ -65,7 +65,8 @@ export const submitTestimonial = async (req, res) => {
   // Handle optional photo upload
   let photoUrl = null;
   if (req.file) {
-    photoUrl = await uploadImage(req.file.buffer, "testimonials");
+    const result = await uploadImage(req.file.buffer, "testimonials");
+    photoUrl = result.secure_url;
   }
 
   const testimonial = await prisma.testimonial.create({
@@ -129,7 +130,8 @@ export const adminCreateTestimonial = async (req, res) => {
   // Handle optional photo upload
   let photoUrl = null;
   if (req.file) {
-    photoUrl = await uploadImage(req.file.buffer, "testimonials");
+    const result = await uploadImage(req.file.buffer, "testimonials");
+    photoUrl = result.secure_url;
   }
 
   const testimonial = await prisma.testimonial.create({

@@ -194,11 +194,13 @@ export default function TestimonialsPage() {
                                 {/* Optional Attached Garment Photo */}
                                 {testimonial.photoUrl && (
                                     <div className="relative w-full h-48 sm:h-56 mb-5 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                        {/* blurred background */}
+                                        <Image src={testimonial.photoUrl} alt={`Attached photo from ${testimonial.clientName}`} fill className="object-cover blur-xl scale-110 opacity-100" />
                                         <Image
                                             src={testimonial.photoUrl}
                                             alt={`Attached photo from ${testimonial.clientName}`}
                                             fill
-                                            className="object-cover"
+                                            className="object-contain"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                         />
                                     </div>

@@ -267,7 +267,11 @@ export default function AdminCatalogReadyToWearPage() {
                                         onClick={(e) => handleCardTap(e, item.id)}>
                                         <div className="relative h-52 bg-gradient-to-br from-[#C2185B]/10 to-[#F4F0F8]">
                                             {item.images?.[0] ? (
-                                                <Image src={item.images[0]} alt={item.name} fill className="object-cover" />
+                                                <>
+                                                    {/* blurred background */}
+                                                    <Image src={item.images[0]} alt={item.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                                    <Image src={item.images[0]} alt={item.name} fill className="object-contain" />
+                                                </>
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center"><Package size={28} className="text-[#999]" /></div>
                                             )}

@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { Prisma } from "../../prisma/generated/prisma/client.ts";
 import { successResponse } from "../utils/apiResponse.js";
 import { format as formatCsv } from "fast-csv";
 import PDFDocument from "pdfkit";
@@ -113,26 +114,83 @@ export const getDashboardStats = async (req, res) => {
   // ── Determine chart time-series grouping ────────────────────────────────
   // Dynamic granularity: daily (≤31d), weekly (≤90d), monthly (default)
   let granularity = "month";
-  let sqlFormat = "YYYY-MM";
   if (from && to) {
     const diffMs = new Date(to) - new Date(from);
     const diffDays = diffMs / (1000 * 60 * 60 * 24);
     if (diffDays <= 31) {
       granularity = "day";
-      sqlFormat = "YYYY-MM-DD";
     } else if (diffDays <= 90) {
       granularity = "week";
-      sqlFormat = "IYYY-IW"; // ISO year-week
     }
   }
 
-  const revenueWhereClause = from && to
-    ? `AND "confirmedAt" >= '${new Date(from).toISOString()}'::timestamp AND "confirmedAt" <= '${new Date(to).toISOString()}'::timestamp`
-    : `AND "confirmedAt" >= NOW() - INTERVAL '12 months'`;
+  // ── Build parameterized time-series queries ──────────────────────────────
+  // Uses Prisma.sql tagged templates for safe parameterization.
+  // sqlFormat is safe (hardcoded from our own logic, not user input).
 
-  const ordersWhereClause = from && to
-    ? `AND "createdAt" >= '${new Date(from).toISOString()}'::timestamp AND "createdAt" <= '${new Date(to).toISOString()}'::timestamp`
-    : `AND "createdAt" >= NOW() - INTERVAL '12 months'`;
+  const formatMap = {
+    day: "YYYY-MM-DD",
+    week: "IYYY-IW",
+    month: "YYYY-MM",
+  };
+  const sqlFormat = formatMap[granularity];
+
+  let revenueQuery;
+  let ordersQuery;
+
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+
+    if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+      return res.status(400).json({ success: false, message: "Invalid date format for 'from' or 'to'" });
+    }
+
+    revenueQuery = Prisma.sql`
+      SELECT
+        TO_CHAR("confirmedAt", ${sqlFormat}) AS period,
+        COALESCE(SUM(amount), 0) AS revenue
+      FROM payments
+      WHERE status = 'CONFIRMED'
+        AND "confirmedAt" >= ${fromDate}::timestamp
+        AND "confirmedAt" <= ${toDate}::timestamp
+      GROUP BY period
+      ORDER BY period ASC
+    `;
+
+    ordersQuery = Prisma.sql`
+      SELECT
+        TO_CHAR("createdAt", ${sqlFormat}) AS period,
+        COUNT(*)::int AS count
+      FROM orders
+      WHERE 1=1
+        AND "createdAt" >= ${fromDate}::timestamp
+        AND "createdAt" <= ${toDate}::timestamp
+      GROUP BY period
+      ORDER BY period ASC
+    `;
+  } else {
+    revenueQuery = Prisma.sql`
+      SELECT
+        TO_CHAR("confirmedAt", ${sqlFormat}) AS period,
+        COALESCE(SUM(amount), 0) AS revenue
+      FROM payments
+      WHERE status = 'CONFIRMED'
+        AND "confirmedAt" >= NOW() - INTERVAL '12 months'
+      GROUP BY period
+      ORDER BY period ASC
+    `;
+
+    ordersQuery = Prisma.sql`
+      SELECT
+        TO_CHAR("createdAt", ${sqlFormat}) AS period,
+        COUNT(*)::int AS count
+      FROM orders
+      WHERE "createdAt" >= NOW() - INTERVAL '12 months'
+      GROUP BY period
+      ORDER BY period ASC
+    `;
+  }
 
   // ── Run chart + outstanding queries in parallel ──────────────────────────
   const [
@@ -140,29 +198,8 @@ export const getDashboardStats = async (req, res) => {
     ordersTimeSeries,
     outstandingOrders,
   ] = await Promise.all([
-    // Revenue time-series (respects date filter)
-    prisma.$queryRawUnsafe(`
-      SELECT
-        TO_CHAR("confirmedAt", '${sqlFormat}') AS period,
-        COALESCE(SUM(amount), 0) AS revenue
-      FROM payments
-      WHERE status = 'CONFIRMED'
-        ${revenueWhereClause}
-      GROUP BY period
-      ORDER BY period ASC
-    `),
-
-    // Orders time-series (respects date filter)
-    prisma.$queryRawUnsafe(`
-      SELECT
-        TO_CHAR("createdAt", '${sqlFormat}') AS period,
-        COUNT(*)::int AS count
-      FROM orders
-      WHERE 1=1
-        ${ordersWhereClause}
-      GROUP BY period
-      ORDER BY period ASC
-    `),
+    prisma.$queryRaw(revenueQuery),
+    prisma.$queryRaw(ordersQuery),
 
     // Outstanding Orders
     prisma.order.findMany({

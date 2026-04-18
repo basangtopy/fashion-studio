@@ -195,8 +195,8 @@ export const getAdminPayments = async (req, res) => {
     if (to) where.createdAt.lte = new Date(to);
   }
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const take = parseInt(limit);
+  const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 20, 100);
+  const take = Math.min(parseInt(limit) || 20, 100);
 
   const [total, payments] = await Promise.all([
     prisma.payment.count({ where }),
@@ -390,14 +390,23 @@ export const exportPayments = async (req, res) => {
   if (orderId) where.orderId = orderId;
   if (from || to) {
     where.createdAt = {};
-    if (from) where.createdAt.gte = new Date(from);
-    if (to) where.createdAt.lte = new Date(to);
+    if (from) {
+      const fromDate = new Date(from);
+      if (isNaN(fromDate.getTime())) throw new AppError("Invalid 'from' date format", 400);
+      where.createdAt.gte = fromDate;
+    }
+    if (to) {
+      const toDate = new Date(to);
+      if (isNaN(toDate.getTime())) throw new AppError("Invalid 'to' date format", 400);
+      where.createdAt.lte = toDate;
+    }
   }
 
   const payments = await prisma.payment.findMany({
     where,
     include: fullPaymentInclude,
     orderBy: { createdAt: "desc" },
+    take: 10000, // Hard cap to prevent OOM on large exports
   });
 
   if (payments.length === 0) {

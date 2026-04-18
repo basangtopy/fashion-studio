@@ -82,12 +82,16 @@ function StyleDetailContent() {
                         {/* Main image */}
                         <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F0F8] mb-4 group">
                             {images[selectedImage] ? (
-                                <Image
-                                    src={images[selectedImage]}
-                                    alt={style.name}
-                                    fill
-                                    className="object-cover transition-transform duration-300 group-hover:scale-110"
-                                />
+                                <>
+                                    {/* blurred background */}
+                                    <Image src={images[selectedImage]} alt={style.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                    <Image
+                                        src={images[selectedImage]}
+                                        alt={style.name}
+                                        fill
+                                        className="object-contain transition-transform duration-300 group-hover:scale-110"
+                                    />
+                                </>
                             ) : (
                                 <div className="w-full h-full bg-gradient-to-br from-[#F8E8F0] to-[#F4F0F8] flex items-center justify-center">
                                     <span className="text-[#999]">Style Image</span>

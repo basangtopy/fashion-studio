@@ -287,6 +287,8 @@ export default function PortfolioPage() {
                                                             className="lookbook-item-ph"
                                                             style={{ background: gradient }}
                                                         >
+                                                            {/* blurred background */}
+                                                            <Image src={item.images[0]} alt={item.title || item.description || "Portfolio piece"} fill className="object-cover blur-xl scale-110 opacity-100" />
                                                             <Image
                                                                 src={item.images[0]}
                                                                 alt={
@@ -365,13 +367,17 @@ export default function PortfolioPage() {
                             {/* Image Panel */}
                             <div className="lookbook-lb-img-wrap">
                                 {lightboxItem.images?.length > 0 ? (
-                                    <Image
-                                        key={lightboxItem.images[lightboxImageIdx] || lightboxItem.images[0]}
-                                        src={lightboxItem.images[lightboxImageIdx] || lightboxItem.images[0]}
-                                        alt={lightboxItem.title || ""}
-                                        fill
-                                        className="object-cover"
-                                    />
+                                    <>
+                                        {/* blurred background */}
+                                        <Image src={lightboxItem.images[lightboxImageIdx] || lightboxItem.images[0]} alt={lightboxItem.title || ""} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                        <Image
+                                            key={lightboxItem.images[lightboxImageIdx] || lightboxItem.images[0]}
+                                            src={lightboxItem.images[lightboxImageIdx] || lightboxItem.images[0]}
+                                            alt={lightboxItem.title || ""}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </>
                                 ) : (
                                     <div
                                         className="w-full h-full flex items-center justify-center"

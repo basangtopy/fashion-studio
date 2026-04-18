@@ -4,13 +4,31 @@
 // browser tabs open simultaneously — each gets its own connection
 const clients = new Map();
 
+// Maximum SSE connections per user — prevents memory exhaustion from
+// a single user opening too many tabs (or a malicious flood)
+const MAX_CONNECTIONS_PER_USER = 5;
+
 // ─── Register a new SSE connection ────────────────────────────────────────
 
 export const addClient = (userId, res) => {
   if (!clients.has(userId)) {
     clients.set(userId, new Set());
   }
-  clients.get(userId).add(res);
+
+  const userConnections = clients.get(userId);
+
+  // If user already has max connections, close the oldest one
+  if (userConnections.size >= MAX_CONNECTIONS_PER_USER) {
+    const oldest = userConnections.values().next().value;
+    try {
+      oldest.end();
+    } catch {
+      // Connection may already be dead — that's fine
+    }
+    userConnections.delete(oldest);
+  }
+
+  userConnections.add(res);
 };
 
 // ─── Remove an SSE connection (on disconnect) ─────────────────────────────

@@ -153,6 +153,7 @@ export default function AdminTestimonialsPage() {
                         <div key={t.id} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-3">
+
                                     <div className="w-9 h-9 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs shrink-0">
                                         {t.clientName?.charAt(0) || t.user?.fullName?.charAt(0) || "?"}
                                     </div>
@@ -190,11 +191,13 @@ export default function AdminTestimonialsPage() {
                             {/* Optional Garment Image */}
                             {t.photoUrl && (
                                 <div className="relative w-48 h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                    {/* blurred background */}
+                                    <Image src={t.photoUrl} alt={`Attached photo from ${t.clientName || 'Anonymous'}`} fill className="object-cover blur-xl scale-110 opacity-100" />
                                     <Image
                                         src={t.photoUrl}
                                         alt={`Attached photo from ${t.clientName || 'Anonymous'}`}
                                         fill
-                                        className="object-cover"
+                                        className="object-contain"
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                     />
                                 </div>

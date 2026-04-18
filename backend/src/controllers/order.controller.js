@@ -129,47 +129,6 @@ export const createOrder = async (req, res) => {
     }
   }
 
-  // Pre-validate items and stock for Model 3
-  const validatedItems = [];
-  let totalAgreedFee = null;
-
-  if (orderType === "MODEL_3" && items && items.length > 0) {
-    totalAgreedFee = 0;
-    for (const reqItem of items) {
-      const dbItem = await prisma.readyToWear.findUnique({
-        where: { id: reqItem.readyToWearId, isActive: true },
-      });
-      if (!dbItem)
-        throw new AppError(
-          "Selected item not found or no longer available",
-          404,
-        );
-
-      if (
-        dbItem.stockStatus === "OUT_OF_STOCK" ||
-        dbItem.stockCount < reqItem.quantity
-      ) {
-        throw new AppError(`Not enough stock for "${dbItem.name}"`, 400);
-      }
-
-      if (!dbItem.availableSizes.includes(reqItem.selectedSize)) {
-        throw new AppError(
-          `Size ${reqItem.selectedSize} is not available for "${dbItem.name}"`,
-          400,
-        );
-      }
-
-      validatedItems.push({
-        readyToWearId: dbItem.id,
-        selectedSize: reqItem.selectedSize,
-        quantity: reqItem.quantity,
-        priceAtPurchase: dbItem.price,
-      });
-
-      totalAgreedFee += Number(dbItem.price) * reqItem.quantity;
-    }
-  }
-
   // ── Get client's measurement record if they want to use it ──
 
   let measurementId = null;
@@ -184,9 +143,52 @@ export const createOrder = async (req, res) => {
   }
 
   // ── Create the order and items in a transaction ──
-  // Order number is generated INSIDE the transaction to prevent race conditions
+  // Order number AND stock validation happen INSIDE the transaction
+  // to prevent race conditions where two concurrent orders both pass
+  // the stock check before either decrements.
 
   const order = await prisma.$transaction(async (tx) => {
+    // Validate items and stock atomically inside the transaction
+    const validatedItems = [];
+    let totalAgreedFee = null;
+
+    if (orderType === "MODEL_3" && items && items.length > 0) {
+      totalAgreedFee = 0;
+      for (const reqItem of items) {
+        const dbItem = await tx.readyToWear.findUnique({
+          where: { id: reqItem.readyToWearId, isActive: true },
+        });
+        if (!dbItem)
+          throw new AppError(
+            "Selected item not found or no longer available",
+            404,
+          );
+
+        if (
+          dbItem.stockStatus === "OUT_OF_STOCK" ||
+          dbItem.stockCount < reqItem.quantity
+        ) {
+          throw new AppError(`Not enough stock for "${dbItem.name}"`, 400);
+        }
+
+        if (!dbItem.availableSizes.includes(reqItem.selectedSize)) {
+          throw new AppError(
+            `Size ${reqItem.selectedSize} is not available for "${dbItem.name}"`,
+            400,
+          );
+        }
+
+        validatedItems.push({
+          readyToWearId: dbItem.id,
+          selectedSize: reqItem.selectedSize,
+          quantity: reqItem.quantity,
+          priceAtPurchase: dbItem.price,
+        });
+
+        totalAgreedFee += Number(dbItem.price) * reqItem.quantity;
+      }
+    }
+
     const orderNumber = await generateOrderNumber(tx);
 
     // MODEL_3 (ready-to-wear) has fixed prices — skip PENDING_REVIEW
@@ -259,29 +261,37 @@ export const createOrder = async (req, res) => {
 // ─── GET /orders — Client's own orders ────────────────────────────────────
 
 export const getClientOrders = async (req, res) => {
-  const { status, type } = req.query;
+  const { status, type, page = 1, limit = 20 } = req.query;
 
   const where = { clientId: req.user.userId };
   if (status) where.status = status;
   if (type) where.orderType = type;
 
-  const orders = await prisma.order.findMany({
-    where,
-    include: {
-      style: { select: { id: true, name: true, images: true } },
-      items: {
-        include: {
-          readyToWear: { select: { id: true, name: true, images: true } },
+  const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 20, 100);
+  const take = Math.min(parseInt(limit) || 20, 100);
+
+  const [total, orders] = await Promise.all([
+    prisma.order.count({ where }),
+    prisma.order.findMany({
+      where,
+      include: {
+        style: { select: { id: true, name: true, images: true } },
+        items: {
+          include: {
+            readyToWear: { select: { id: true, name: true, images: true } },
+          },
+        },
+        payments: { where: { status: "CONFIRMED" }, select: { amount: true } },
+        chatMessages: {
+          where: { OR: [{ senderRole: "STAFF_ADMIN", isRead: false }, { senderRole: "SUPER_ADMIN", isRead: false }] },
+          select: { id: true },
         },
       },
-      payments: { where: { status: "CONFIRMED" }, select: { amount: true } },
-      chatMessages: {
-        where: { OR: [{ senderRole: "STAFF_ADMIN", isRead: false }, { senderRole: "SUPER_ADMIN", isRead: false }] },
-        select: { id: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      orderBy: { createdAt: "desc" },
+      skip,
+      take,
+    }),
+  ]);
 
   const formattedOrders = orders.map((order) => {
     const { chatMessages, ...rest } = order;
@@ -292,7 +302,9 @@ export const getClientOrders = async (req, res) => {
   });
 
   return successResponse(res, 200, "Orders retrieved", {
-    count: formattedOrders.length,
+    total,
+    page: Math.max(parseInt(page) || 1, 1),
+    totalPages: Math.ceil(total / take),
     orders: formattedOrders,
   });
 };
@@ -448,8 +460,8 @@ export const getAdminOrders = async (req, res) => {
   }
 
   // Pagination
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const take = parseInt(limit);
+  const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 20, 100);
+  const take = Math.min(parseInt(limit) || 20, 100);
 
   // Sortable columns whitelist
   const allowedSortFields = ["createdAt", "totalAgreedFee", "orderNumber", "status", "orderType"];

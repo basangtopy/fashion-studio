@@ -102,7 +102,8 @@ export const updateProfilePicture = async (req, res) => {
   });
 
   // Upload new image to Cloudinary 'avatars' folder
-  const newProfilePictureUrl = await uploadImage(req.file.buffer, "avatars");
+  const result = await uploadImage(req.file.buffer, "avatars");
+  const newProfilePictureUrl = result.secure_url;
 
   // If user had an existing Cloudinary avatar, delete it to save space
   if (user.profilePicture) {

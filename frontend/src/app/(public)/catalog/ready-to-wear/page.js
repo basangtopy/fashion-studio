@@ -131,7 +131,16 @@ export default function ReadyToWearPage() {
                                     <Link href={`/catalog/ready-to-wear/${item.id}`}>
                                         <div className="relative aspect-[4/5] bg-[#F4F0F8] overflow-hidden">
                                             {item.images?.[0] ? (
-                                                <Image src={item.images[0]} alt={item.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                                                <>
+                                                    {/* blurred background */}
+                                                    <Image src={item.images[0]} alt={item.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                                    <Image
+                                                        src={item.images[0]}
+                                                        alt={item.name}
+                                                        fill
+                                                        className="object-contain group-hover:scale-105 transition-transform duration-500"
+                                                    />
+                                                </>
                                             ) : (
                                                 <div className="w-full h-full bg-gradient-to-br from-[#F8E8F0] to-[#F4F0F8]" />
                                             )}

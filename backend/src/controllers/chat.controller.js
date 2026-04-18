@@ -169,8 +169,8 @@ export const markAsRead = async (req, res) => {
 
 export const getAdminInbox = async (req, res) => {
   const { page = 1, limit = 20 } = req.query;
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const take = parseInt(limit);
+  const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 20, 100);
+  const take = Math.min(parseInt(limit) || 20, 100);
 
   // Get all orders that have at least one chat message
   // Ordered by most recent message first

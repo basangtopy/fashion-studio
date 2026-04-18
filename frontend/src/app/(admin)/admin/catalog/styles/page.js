@@ -296,7 +296,11 @@ export default function AdminCatalogStylesPage() {
                                         {/* Image */}
                                         <div className="relative h-52 bg-gradient-to-br from-[#C2185B]/10 to-[#F4F0F8]">
                                             {style.images?.[0] ? (
-                                                <Image src={style.images[0]} alt={style.name} fill className="object-cover" />
+                                                <>
+                                                    {/* blurred background */}
+                                                    <Image src={style.images[0]} alt={style.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                                    <Image src={style.images[0]} alt={style.name} fill className="object-contain" />
+                                                </>
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
                                                     <Eye size={28} className="text-[#999]" />

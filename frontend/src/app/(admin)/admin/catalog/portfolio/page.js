@@ -258,7 +258,11 @@ export default function AdminCatalogPortfolioPage() {
                                         onClick={(e) => handleCardTap(e, entry.id)}>
                                         <div className="relative h-52 bg-gradient-to-br from-[#C2185B]/10 to-[#F4F0F8]">
                                             {entry.images?.[0] ? (
-                                                <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover" />
+                                                <>
+                                                    {/* blurred background */}
+                                                    <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                                    <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-contain" />
+                                                </>
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center"><ImageIcon size={28} className="text-[#999]" /></div>
                                             )}

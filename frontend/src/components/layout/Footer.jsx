@@ -1,8 +1,17 @@
 import Link from "next/link";
-import { Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { FaInstagram, FaFacebook, FaTiktok, FaWhatsapp } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { BRANDING } from "@/config/branding";
 
 export default function Footer() {
+    const iconMap = {
+        instagram: FaInstagram,
+        facebook: FaFacebook,
+        twitter: FaXTwitter,
+        tiktok: FaTiktok,
+    };
+
     return (
         <footer className="bg-[#1A1A2E] text-white">
             <div className="page-container py-16 lg:py-20">
@@ -14,14 +23,17 @@ export default function Footer() {
                             {BRANDING.tagline}
                         </p>
                         <div className="flex items-center gap-3 pt-2">
-                            <a
-                                href={BRANDING.socials.instagram}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#C2185B] transition-colors"
-                            >
-                                <Instagram size={16} />
-                            </a>
+
+                            {Object.entries(BRANDING.socials).map(([platform, url]) => {
+                                const Icon = iconMap[platform];
+                                if (!Icon) return null;
+                                return (
+                                    <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#C2185B] transition-colors">
+                                        <Icon size={16} />
+                                    </a>
+                                );
+                            })}
+
                         </div>
                     </div>
 
@@ -99,7 +111,7 @@ export default function Footer() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C2185B] transition-colors"
                             >
-                                <Phone size={14} className="shrink-0" />
+                                <FaWhatsapp size={14} className="shrink-0" />
                                 WhatsApp
                             </a>
                             <div className="flex items-start gap-2 text-sm text-white/60">

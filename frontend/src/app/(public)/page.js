@@ -23,7 +23,7 @@ function HeroSection() {
 
     const phrases = [
         "Designed for you.",
-        "Crafted in Lagos.",
+        "Crafted in Nigeria.",
         "Made to last.",
     ];
     const [phraseIndex, setPhraseIndex] = useState(0);
@@ -53,8 +53,14 @@ function HeroSection() {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#C2185B]/20 via-[#1A1A2E] to-[#F8E8F0]/10" />
 
                 {/* Simulated Fashion Image for Mobile Background */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                    <span className="text-white/20 text-sm tracking-widest uppercase">Fashion Image</span>
+                <div className="absolute inset-0 opacity-60 mix-blend-overlay">
+                    <Image
+                        src="/images/heromob.png"
+                        alt="Deshe Fashion Hero"
+                        fill
+                        priority
+                        className="object-cover object-center"
+                    />
                 </div>
 
                 {/* Aesthetic shapes floating in background */}
@@ -148,10 +154,15 @@ function HeroSection() {
                         style={{ y: portraitY }}
                         className="absolute top-[4%] left-[6%] w-[240px] h-[340px] rounded-xl overflow-hidden shadow-2xl border border-white/10 z-[2]"
                     >
-                        <div className="w-full h-full bg-gradient-to-br from-[#C2185B]/30 via-[#1A1A2E] to-[#F8E8F0]/20" style={{ transform: 'rotate(-2deg) scale(1.05)' }}>
-                            <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-white/20 text-xs">Fashion Image</span>
-                            </div>
+                        <div className="w-full h-full" style={{ transform: 'rotate(-2deg) scale(1.05)' }}>
+                            <Image
+                                src="/images/hero1.png"
+                                alt="Deshe Fashion"
+                                fill
+                                priority
+                                className="object-cover"
+                            />
+
                         </div>
                     </motion.div>
 
@@ -160,10 +171,16 @@ function HeroSection() {
                         style={{ y: shapeY2 }}
                         className="absolute bottom-[6%] right-[4%] w-[220px] h-[260px] rounded-xl overflow-hidden shadow-2xl border border-white/15 z-[3]"
                     >
-                        <div className="w-full h-full bg-gradient-to-tl from-[#F8E8F0]/15 via-[#1A1A2E] to-[#C2185B]/25" style={{ transform: 'rotate(3deg) scale(1.05)' }}>
-                            <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-white/20 text-xs">Fashion Image</span>
-                            </div>
+                        <div className="w-full h-full" style={{ transform: 'rotate(3deg) scale(1.05)' }}>
+                            {/* blurred background */}
+                            <Image src="/images/hero2.png" alt="Deshe Fashion" fill className="object-cover blur-xl scale-110 opacity-100" />
+                            <Image
+                                src="/images/hero2.png"
+                                alt="Deshe Fashion"
+                                fill
+                                priority
+                                className="object-contain"
+                            />
                         </div>
                     </motion.div>
 
@@ -311,7 +328,7 @@ function FeaturedStylesSection() {
     const displayStyles = styles?.length > 0 ? styles : placeholderStyles;
 
     /*
-     * Styles grid (reference homepage.html):
+     * Styles grid:
      * grid-template-columns: 2fr 1fr 1fr
      * grid-template-rows: 340px 240px
      * Row 1: [T1 col1 row1-2 (tall)] [T2 col2]  [T3 col3]
@@ -368,12 +385,20 @@ function FeaturedStylesSection() {
                             {/* Image or gradient placeholder */}
                             <div className="absolute inset-0 bg-gradient-to-br from-[#C2185B]/20 via-[#1A1A2E]/40 to-[#F8E8F0]/20">
                                 {style.images?.[0] ? (
-                                    <Image
-                                        src={style.images[0]}
-                                        alt={style.name}
-                                        fill
-                                        className="object-cover"
-                                    />
+                                    <>
+                                        {/* blurred background */}
+                                        < Image
+                                            src={style.images[0]}
+                                            alt={style.name}
+                                            fill
+                                            className="object-cover blur-xl scale-110 opacity-80" />
+                                        <Image
+                                            src={style.images[0]}
+                                            alt={style.name}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </>
                                 ) : null}
                             </div>
 
@@ -416,7 +441,15 @@ function FeaturedStylesSection() {
                             >
                                 <div className="absolute inset-0 bg-gradient-to-br from-[#C2185B]/20 via-[#1A1A2E]/40 to-[#F8E8F0]/20">
                                     {style.images?.[0] ? (
-                                        <Image src={style.images[0]} alt={style.name} fill className="object-cover" />
+                                        <>
+                                            {/* blurred background */}
+                                            <Image
+                                                src={style.images[0]}
+                                                alt={style.name}
+                                                fill
+                                                className="object-cover blur-xl scale-110 opacity-80" />
+                                            <Image src={style.images[0]} alt={style.name} fill className="object-contain" />
+                                        </>
                                     ) : null}
                                 </div>
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E]/80 via-[#1A1A2E]/20 to-transparent flex items-end p-4">
@@ -523,12 +556,19 @@ function ReadyToWearSection() {
                                 <Link href={`/catalog/ready-to-wear/${item.id}`} className="group block">
                                     <div className="relative h-[300px] lg:h-[320px] rounded-xl overflow-hidden bg-[#2A2A40] mb-3">
                                         {item.images?.[0] ? (
-                                            <Image
-                                                src={item.images[0]}
-                                                alt={item.name}
-                                                fill
-                                                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                                            />
+                                            <>
+                                                <Image
+                                                    src={item.images[0]}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-cover blur-xl scale-110 opacity-80" />
+                                                <Image
+                                                    src={item.images[0]}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-contain group-hover:scale-105 transition-transform duration-500"
+                                                />
+                                            </>
                                         ) : (
                                             <div className="w-full h-full bg-gradient-to-br from-[#C2185B]/20 to-[#2A2A40]" />
                                         )}
@@ -657,7 +697,10 @@ function PortfolioSection() {
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E]/30 to-[#C2185B]/20">
                                         {entry.images?.[0] && (
-                                            <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover" />
+                                            <>
+                                                <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover blur-xl scale-110 opacity-80" />
+                                                <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-contain" />
+                                            </>
                                         )}
                                     </div>
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent [@media(hover:hover)]:bg-none [@media(hover:hover)]:bg-black/0 [@media(hover:hover)]:group-hover:bg-black/60 transition-all duration-300 flex flex-col items-start justify-end p-6">
@@ -729,7 +772,10 @@ function PortfolioSection() {
                                     >
                                         <div className="absolute inset-0 bg-gradient-to-br from-[#1A1A2E]/30 to-[#C2185B]/20">
                                             {entry.images?.[0] && (
-                                                <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover" />
+                                                <>
+                                                    <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-cover blur-xl scale-110 opacity-80" />
+                                                    <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-contain" />
+                                                </>
                                             )}
                                         </div>
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-3 sm:p-4">

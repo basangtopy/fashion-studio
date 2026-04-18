@@ -81,7 +81,14 @@ const manageImages = async ({ model, recordId, urlsToDelete, newFiles }) => {
 
 // ─── Style images ──────────────────────────────────────────────────────────
 export const manageStyleImages = async (req, res) => {
-  const urlsToDelete = req.body.imageUrls ? JSON.parse(req.body.imageUrls) : [];
+  let urlsToDelete = [];
+  if (req.body.imageUrls) {
+    try {
+      urlsToDelete = JSON.parse(req.body.imageUrls);
+    } catch {
+      throw new AppError("Invalid imageUrls format — expected a JSON array of URLs", 400);
+    }
+  }
 
   const updated = await manageImages({
     model: "style",
@@ -97,7 +104,14 @@ export const manageStyleImages = async (req, res) => {
 
 // ─── Ready-to-wear images ──────────────────────────────────────────────────
 export const manageReadyToWearImages = async (req, res) => {
-  const urlsToDelete = req.body.imageUrls ? JSON.parse(req.body.imageUrls) : [];
+  let urlsToDelete = [];
+  if (req.body.imageUrls) {
+    try {
+      urlsToDelete = JSON.parse(req.body.imageUrls);
+    } catch {
+      throw new AppError("Invalid imageUrls format — expected a JSON array of URLs", 400);
+    }
+  }
 
   const updated = await manageImages({
     model: "readyToWear",
@@ -113,7 +127,14 @@ export const manageReadyToWearImages = async (req, res) => {
 
 // ─── Portfolio images ──────────────────────────────────────────────────────
 export const managePortfolioImages = async (req, res) => {
-  const urlsToDelete = req.body.imageUrls ? JSON.parse(req.body.imageUrls) : [];
+  let urlsToDelete = [];
+  if (req.body.imageUrls) {
+    try {
+      urlsToDelete = JSON.parse(req.body.imageUrls);
+    } catch {
+      throw new AppError("Invalid imageUrls format — expected a JSON array of URLs", 400);
+    }
+  }
 
   const updated = await manageImages({
     model: "portfolio",

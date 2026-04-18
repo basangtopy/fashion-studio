@@ -4,8 +4,8 @@
  */
 
 export const BRANDING = {
-    businessName: "Fashion Studio",
-    tagline: "Designed for you. Crafted in Lagos. Made to last.",
+    businessName: "Deshé Fashion",
+    tagline: "Designed for you. Crafted in Nigeria. Made to last.",
     establishedYear: "2024",
 
     colors: {
@@ -39,9 +39,13 @@ export const BRANDING = {
 
     socials: {
         instagram: "https://instagram.com/yourstudio",
+        facebook: "https://facebook.com/yourstudio",
+        twitter: "https://twitter.com/yourstudio",
+        tiktok: "https://tiktok.com/yourstudio",
+        whatsapp: "https://wa.me/yournumber",
     },
 
-    address: "Lagos, Nigeria",
+    address: "Abeokuta, Ogun State, Nigeria",
 
     currency: {
         symbol: "₦",
@@ -141,7 +145,6 @@ export const BRANDING = {
 
     manifestoLines: [
         "For the woman who demands precision.",
-        "For the man who wears intention.",
         "For the celebration that deserves more than ordinary.",
         "For the culture that runs through every thread.",
         "For you — because you deserve clothes that feel like they were made just for you.",

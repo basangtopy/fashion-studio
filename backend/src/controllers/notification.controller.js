@@ -10,8 +10,8 @@ export const getNotifications = async (req, res) => {
   const where = { userId: req.user.userId };
   if (unreadOnly === "true") where.isRead = false;
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
-  const take = parseInt(limit);
+  const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 30, 100);
+  const take = Math.min(parseInt(limit) || 30, 100);
 
   const [total, unreadCount, notifications] = await Promise.all([
     prisma.notification.count({ where }),
