@@ -249,11 +249,7 @@ export const createOrder = async (req, res) => {
     return newOrder;
   });
 
-  const client = await prisma.user.findUnique({
-    where: { id: clientId },
-    select: { id: true, fullName: true, email: true, phone: true },
-  });
-  await notifyOrderPlaced({ order, client });
+  await notifyOrderPlaced({ order, client: order.client });
 
   return successResponse(res, 201, "Order placed successfully", { order });
 };
@@ -653,6 +649,28 @@ export const setDeliveryFee = async (req, res) => {
   });
 
   return successResponse(res, 200, "Delivery fee set", { order: updated });
+};
+
+// ─── PUT /admin/orders/:id/admin-notes — Set admin notes ───────────────
+
+export const setAdminNotes = async (req, res) => {
+  const { adminNotes } = req.validatedBody;
+
+  const order = await prisma.order.findUnique({
+    where: { id: req.params.id },
+    select: { id: true },
+  });
+
+  if (!order) throw new AppError("Order not found", 404);
+
+  const updated = await prisma.order.update({
+    where: { id: req.params.id },
+    data: {
+      adminNotes: adminNotes || order.adminNotes || "",
+    },
+  });
+
+  return successResponse(res, 200, "Admin notes added", { order: updated });
 };
 
 // ─── POST /admin/orders/:clientId — Admin creates order for walk-in client ─

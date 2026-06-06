@@ -149,6 +149,16 @@ export const deliveryFeeSchema = z.object({
   deliveryAddress: z.string().max(500).trim().optional(),
 });
 
+// ─── Admin sets admin notes ───────────────────────────────────────────────
+
+export const adminNotesSchema = z.object({
+  adminNotes: z
+    .string()
+    .max(2000, "Admin notes must not exceed 2000 characters")
+    .trim()
+    .optional(),
+});
+
 // ─── Admin creates order on behalf of client ───────────────────────────────
 
 export const adminCreateOrderSchema = createOrderSchema;

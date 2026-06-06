@@ -181,7 +181,7 @@ export type PortfolioGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
 
 export type PortfolioGroupByOutputType = {
   id: string
-  orderId: string
+  orderId: string | null
   title: string | null
   description: string | null
   category: string
@@ -216,7 +216,7 @@ export type PortfolioWhereInput = {
   OR?: Prisma.PortfolioWhereInput[]
   NOT?: Prisma.PortfolioWhereInput | Prisma.PortfolioWhereInput[]
   id?: Prisma.StringFilter<"Portfolio"> | string
-  orderId?: Prisma.StringFilter<"Portfolio"> | string
+  orderId?: Prisma.StringNullableFilter<"Portfolio"> | string | null
   title?: Prisma.StringNullableFilter<"Portfolio"> | string | null
   description?: Prisma.StringNullableFilter<"Portfolio"> | string | null
   category?: Prisma.StringFilter<"Portfolio"> | string
@@ -226,12 +226,12 @@ export type PortfolioWhereInput = {
   isPublished?: Prisma.BoolFilter<"Portfolio"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
 }
 
 export type PortfolioOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -259,12 +259,12 @@ export type PortfolioWhereUniqueInput = Prisma.AtLeast<{
   isPublished?: Prisma.BoolFilter<"Portfolio"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
-  order?: Prisma.XOR<Prisma.OrderScalarRelationFilter, Prisma.OrderWhereInput>
+  order?: Prisma.XOR<Prisma.OrderNullableScalarRelationFilter, Prisma.OrderWhereInput> | null
 }, "id" | "orderId">
 
 export type PortfolioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  orderId?: Prisma.SortOrder
+  orderId?: Prisma.SortOrderInput | Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   category?: Prisma.SortOrder
@@ -284,7 +284,7 @@ export type PortfolioScalarWhereWithAggregatesInput = {
   OR?: Prisma.PortfolioScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PortfolioScalarWhereWithAggregatesInput | Prisma.PortfolioScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Portfolio"> | string
-  orderId?: Prisma.StringWithAggregatesFilter<"Portfolio"> | string
+  orderId?: Prisma.StringNullableWithAggregatesFilter<"Portfolio"> | string | null
   title?: Prisma.StringNullableWithAggregatesFilter<"Portfolio"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Portfolio"> | string | null
   category?: Prisma.StringWithAggregatesFilter<"Portfolio"> | string
@@ -307,12 +307,12 @@ export type PortfolioCreateInput = {
   isPublished?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
-  order: Prisma.OrderCreateNestedOneWithoutPortfolioEntryInput
+  order?: Prisma.OrderCreateNestedOneWithoutPortfolioEntryInput
 }
 
 export type PortfolioUncheckedCreateInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
   title?: string | null
   description?: string | null
   category: string
@@ -335,12 +335,12 @@ export type PortfolioUpdateInput = {
   isPublished?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  order?: Prisma.OrderUpdateOneRequiredWithoutPortfolioEntryNestedInput
+  order?: Prisma.OrderUpdateOneWithoutPortfolioEntryNestedInput
 }
 
 export type PortfolioUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
@@ -354,7 +354,7 @@ export type PortfolioUncheckedUpdateInput = {
 
 export type PortfolioCreateManyInput = {
   id?: string
-  orderId: string
+  orderId?: string | null
   title?: string | null
   description?: string | null
   category: string
@@ -381,7 +381,7 @@ export type PortfolioUpdateManyMutationInput = {
 
 export type PortfolioUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orderId?: Prisma.StringFieldUpdateOperationsInput | string
+  orderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   category?: Prisma.StringFieldUpdateOperationsInput | string
@@ -561,7 +561,7 @@ export type PortfolioSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   isPublished?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }, ExtArgs["result"]["portfolio"]>
 
 export type PortfolioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -576,7 +576,7 @@ export type PortfolioSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   isPublished?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }, ExtArgs["result"]["portfolio"]>
 
 export type PortfolioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -591,7 +591,7 @@ export type PortfolioSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   isPublished?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }, ExtArgs["result"]["portfolio"]>
 
 export type PortfolioSelectScalar = {
@@ -610,23 +610,23 @@ export type PortfolioSelectScalar = {
 
 export type PortfolioOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orderId" | "title" | "description" | "category" | "images" | "clientConsent" | "isFeatured" | "isPublished" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolio"]>
 export type PortfolioInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }
 export type PortfolioIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }
 export type PortfolioIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  order?: boolean | Prisma.OrderDefaultArgs<ExtArgs>
+  order?: boolean | Prisma.Portfolio$orderArgs<ExtArgs>
 }
 
 export type $PortfolioPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Portfolio"
   objects: {
-    order: Prisma.$OrderPayload<ExtArgs>
+    order: Prisma.$OrderPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    orderId: string
+    orderId: string | null
     title: string | null
     description: string | null
     category: string
@@ -1030,7 +1030,7 @@ readonly fields: PortfolioFieldRefs;
  */
 export interface Prisma__PortfolioClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  order<T extends Prisma.OrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrderDefaultArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  order<T extends Prisma.Portfolio$orderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Portfolio$orderArgs<ExtArgs>>): Prisma.Prisma__OrderClient<runtime.Types.Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1464,6 +1464,25 @@ export type PortfolioDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many Portfolios to delete.
    */
   limit?: number
+}
+
+/**
+ * Portfolio.order
+ */
+export type Portfolio$orderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Order
+   */
+  select?: Prisma.OrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Order
+   */
+  omit?: Prisma.OrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrderInclude<ExtArgs> | null
+  where?: Prisma.OrderWhereInput
 }
 
 /**

@@ -22,7 +22,7 @@ export default function useSSE() {
         const token = getAccessToken();
         if (!token) return;
 
-        const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const apiBase = "/api";
         const url = `${apiBase}/sse`;
 
         // Abort any previous connection

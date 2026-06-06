@@ -1,6 +1,267 @@
 import { format } from "@fast-csv/format";
 import PDFDocument from "pdfkit";
 
+// ─── Brand constants for PDF exports ───────────────────────────────────────
+// Mirrors the relevant subset from the frontend branding config (branding.js).
+// Update here if the business branding changes.
+const BRAND = {
+  name: "Deshé Fashion",
+  tagline: "Designed for you. Crafted in Nigeria. Made to last.",
+  address: "Abeokuta, Ogun State, Nigeria",
+  email: "hello@yourstudio.com",
+  phone: "+234 000 000 0000",
+  colors: {
+    primary: "#C2185B",
+    secondary: "#1A1A2E",
+    accent: "#F8E8F0",
+    headerText: "#FFFFFF",
+    bodyText: "#222222",
+    labelText: "#555555",
+    mutedText: "#999999",
+    rowAlt: "#FAF7FC",
+    border: "#E0D8E8",
+  },
+};
+
+// All standard measurement fields in display order
+const MEASUREMENT_FIELDS = [
+  { key: "bust", label: "Bust" },
+  { key: "waist", label: "Waist" },
+  { key: "hips", label: "Hips" },
+  { key: "shoulderWidth", label: "Shoulder" },
+  { key: "sleeveLength", label: "Sleeve" },
+  { key: "dressLength", label: "Dress Len" },
+  { key: "thigh", label: "Thigh" },
+  { key: "inseam", label: "Inseam" },
+  { key: "neck", label: "Neck" },
+  { key: "armLength", label: "Arm Len" },
+  { key: "armCircumference", label: "Arm Circ" },
+  { key: "ankleCircumference", label: "Ankle Circ" },
+  { key: "wristCircumference", label: "Wrist Circ" },
+  { key: "backLength", label: "Back Len" },
+  { key: "frontLength", label: "Front Len" },
+];
+
+// ─── PDF Helpers ──────────────────────────────────────────────────────────
+
+/**
+ * Draws the branded header strip at the top of the current page.
+ * @returns {number} The y-position below the header, ready for content.
+ */
+function drawBrandedHeader(doc, title) {
+  const pageWidth = doc.page.width;
+  const margin = doc.page.margins.left;
+  const contentWidth = pageWidth - margin * 2;
+
+  // ── Dark header strip ──
+  const stripHeight = 50;
+  doc.rect(0, 0, pageWidth, stripHeight).fill(BRAND.colors.secondary);
+
+  // Business name (left)
+  doc
+    .fontSize(17)
+    .font("Helvetica-Bold")
+    .fillColor(BRAND.colors.headerText)
+    .text(BRAND.name, margin, 14, {
+      width: contentWidth * 0.55,
+      lineBreak: false,
+    });
+
+  // Tagline (right)
+  doc
+    .fontSize(7)
+    .font("Helvetica-Oblique")
+    .fillColor("#B0B0C0")
+    .text(BRAND.tagline, margin, 18, {
+      width: contentWidth,
+      align: "right",
+      lineBreak: false,
+    });
+
+  // Contact line (right, below tagline)
+  doc
+    .fontSize(6.5)
+    .font("Helvetica")
+    .fillColor("#9090A0")
+    .text(`${BRAND.phone}  •  ${BRAND.email}`, margin, 28, {
+      width: contentWidth,
+      align: "right",
+      lineBreak: false,
+    });
+
+  // Accent line below strip
+  doc
+    .moveTo(0, stripHeight)
+    .lineTo(pageWidth, stripHeight)
+    .lineWidth(2.5)
+    .strokeColor(BRAND.colors.primary)
+    .stroke();
+
+  // ── Title + date below the strip ──
+  const titleY = stripHeight + 14;
+
+  doc
+    .fontSize(14)
+    .font("Helvetica-Bold")
+    .fillColor(BRAND.colors.secondary)
+    .text(title, margin, titleY, { width: contentWidth });
+
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  doc
+    .fontSize(8.5)
+    .font("Helvetica")
+    .fillColor(BRAND.colors.mutedText)
+    .text(`Generated on ${dateStr}`, margin, titleY + 18, {
+      width: contentWidth,
+    });
+
+  // Thin separator
+  const sepY = titleY + 34;
+  doc
+    .moveTo(margin, sepY)
+    .lineTo(pageWidth - margin, sepY)
+    .lineWidth(0.5)
+    .strokeColor(BRAND.colors.border)
+    .stroke();
+
+  return sepY + 10;
+}
+
+/**
+ * Draws a compact branded header for continuation pages (no title/date).
+ * @returns {number} The y-position below the mini header.
+ */
+function drawContinuationHeader(doc) {
+  const pageWidth = doc.page.width;
+  const margin = doc.page.margins.left;
+  const contentWidth = pageWidth - margin * 2;
+
+  // Thin coloured bar
+  const barHeight = 24;
+  doc.rect(0, 0, pageWidth, barHeight).fill(BRAND.colors.secondary);
+
+  doc
+    .fontSize(9)
+    .font("Helvetica-Bold")
+    .fillColor(BRAND.colors.headerText)
+    .text(BRAND.name, margin, 7, {
+      width: contentWidth * 0.5,
+      lineBreak: false,
+    });
+
+  doc
+    .fontSize(7)
+    .font("Helvetica")
+    .fillColor("#9090A0")
+    .text("Client Measurements Report (continued)", margin, 9, {
+      width: contentWidth,
+      align: "right",
+      lineBreak: false,
+    });
+
+  // Accent line
+  doc
+    .moveTo(0, barHeight)
+    .lineTo(pageWidth, barHeight)
+    .lineWidth(2)
+    .strokeColor(BRAND.colors.primary)
+    .stroke();
+
+  return barHeight + 10;
+}
+
+/**
+ * Draws branded footers on every buffered page.
+ * Must be called after all content is written and before doc.end().
+ */
+function drawBrandedFooters(doc) {
+  const { count } = doc.bufferedPageRange();
+  const pageWidth = doc.page.width;
+  const margin = doc.page.margins.left;
+  const contentWidth = pageWidth - margin * 2;
+  // Position footer well above the bottom margin boundary (page.height - 30)
+  // to prevent pdfkit from auto-creating blank pages on each doc.text() call.
+  const footerY = doc.page.height - 45;
+
+  for (let i = 0; i < count; i++) {
+    doc.switchToPage(i);
+
+    // Thin border line
+    doc
+      .moveTo(margin, footerY - 4)
+      .lineTo(pageWidth - margin, footerY - 4)
+      .lineWidth(0.5)
+      .strokeColor(BRAND.colors.border)
+      .stroke();
+
+    // Small accent dash
+    doc
+      .moveTo(margin, footerY - 4)
+      .lineTo(margin + 40, footerY - 4)
+      .lineWidth(1.5)
+      .strokeColor(BRAND.colors.primary)
+      .stroke();
+
+    // Left: brand info
+    doc
+      .fontSize(6.5)
+      .font("Helvetica")
+      .fillColor(BRAND.colors.mutedText)
+      .text(
+        `${BRAND.name}  •  ${BRAND.address}  •  ${BRAND.phone}`,
+        margin,
+        footerY,
+        { width: contentWidth * 0.7, lineBreak: false },
+      );
+
+    // Right: page + confidentiality
+    doc
+      .fontSize(6.5)
+      .font("Helvetica")
+      .fillColor(BRAND.colors.mutedText)
+      .text(`Confidential  •  Page ${i + 1} of ${count}`, margin, footerY, {
+        width: contentWidth,
+        align: "right",
+        lineBreak: false,
+      });
+  }
+}
+
+/**
+ * Draws a table header row and returns the y-position after it.
+ */
+function drawTableHeaderRow(doc, columns, y) {
+  const margin = doc.page.margins.left;
+  const tableWidth = doc.page.width - margin * 2;
+  const rowHeight = 20;
+
+  // Header background
+  doc.rect(margin, y, tableWidth, rowHeight).fill(BRAND.colors.secondary);
+
+  // Small accent on the left edge of the header
+  doc.rect(margin, y, 3, rowHeight).fill(BRAND.colors.primary);
+
+  let x = margin;
+  for (const col of columns) {
+    doc
+      .fontSize(7)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.headerText)
+      .text(col.label, x + 4, y + 6, {
+        width: col.width - 6,
+        lineBreak: false,
+      });
+    x += col.width;
+  }
+
+  return y + rowHeight;
+}
+
 // ─── CSV Export ────────────────────────────────────────────────────────────
 
 export const exportMeasurementsToCSV = (
@@ -59,233 +320,358 @@ export const exportMeasurementsToPDF = (
     `attachment; filename="${filename}.pdf"`,
   );
 
-  // Create PDF document and pipe directly to response
+  const isSingle = measurements.length === 1;
+
   const doc = new PDFDocument({
-    margin: 40,
+    margin: 30,
     size: "A4",
-    layout: measurements.length === 1 ? "portrait" : "landscape",
-    // Portrait for a single client (more readable), landscape for multiple (fits more columns)
+    layout: isSingle ? "portrait" : "landscape",
     bufferPages: true,
   });
 
   doc.pipe(res);
 
-  // ── Header ──
+  if (isSingle) {
+    drawSingleClientPDF(doc, measurements[0]);
+  } else {
+    drawMultiClientPDF(doc, measurements);
+  }
+
+  // ── Branded footers on every page ──
+  drawBrandedFooters(doc);
+
+  doc.end();
+};
+
+// ─── Single Client Layout (Portrait) ──────────────────────────────────────
+
+function drawSingleClientPDF(doc, m) {
+  const margin = doc.page.margins.left;
+  const contentWidth = doc.page.width - margin * 2;
+
+  let y = drawBrandedHeader(doc, "Client Measurement Record");
+
+  // ── Client info card ──
+  const cardPadding = 12;
+  const cardHeight = 62;
+
+  // Card background
   doc
-    .fontSize(20)
-    .font("Helvetica-Bold")
-    .text("Client Measurements Report", { align: "center" });
+    .roundedRect(margin, y, contentWidth, cardHeight, 4)
+    .fill(BRAND.colors.accent);
+
+  // Small coloured left border on the card
+  doc.rect(margin, y, 3, cardHeight).fill(BRAND.colors.primary);
+
+  y += cardPadding;
 
   doc
-    .fontSize(10)
+    .fontSize(14)
+    .font("Helvetica-Bold")
+    .fillColor(BRAND.colors.secondary)
+    .text(m.client?.fullName || "Unknown Client", margin + cardPadding + 4, y);
+
+  y += 18;
+
+  doc
+    .fontSize(9)
     .font("Helvetica")
-    .fillColor("#666666")
+    .fillColor(BRAND.colors.labelText)
     .text(
-      `Generated on ${new Date().toLocaleDateString("en-GB", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })}`,
-      { align: "center" },
+      `Email: ${m.client?.email || "N/A"}    •    Phone: ${m.client?.phone || "N/A"}`,
+      margin + cardPadding + 4,
+      y,
     );
 
-  doc.moveDown(1.5);
+  y += 13;
 
-  // ── Single client: detailed layout ────────────────────────────────────
-  if (measurements.length === 1) {
-    const m = measurements[0];
+  const updatedDate = m.updatedAt
+    ? m.updatedAt.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "N/A";
 
-    // Client info block
-    doc
-      .fontSize(14)
-      .font("Helvetica-Bold")
-      .fillColor("#000000")
-      .text(m.client?.fullName || "Unknown Client");
+  doc
+    .fontSize(8)
+    .font("Helvetica")
+    .fillColor(BRAND.colors.mutedText)
+    .text(
+      `Last updated: ${updatedDate} by ${m.updatedByRole || "N/A"}`,
+      margin + cardPadding + 4,
+      y,
+    );
+
+  y += 28;
+
+  // ── Section: Standard Measurements ──
+  doc
+    .fontSize(11)
+    .font("Helvetica-Bold")
+    .fillColor(BRAND.colors.secondary)
+    .text("Body Measurements", margin, y);
+
+  // Accent underline for section title
+  y += 15;
+  doc
+    .moveTo(margin, y)
+    .lineTo(margin + 120, y)
+    .lineWidth(2)
+    .strokeColor(BRAND.colors.primary)
+    .stroke();
+
+  y += 8;
+
+  // Two-column measurement grid
+  const colWidth = (contentWidth - 16) / 2;
+  const rowHeight = 22;
+  let col = 0;
+  let rowStartY = y;
+  let rowIndex = 0;
+
+  for (const field of MEASUREMENT_FIELDS) {
+    const value = m[field.key];
+    if (value === null || value === undefined) continue;
+
+    const x = margin + col * (colWidth + 16);
+
+    if (col === 0) {
+      rowStartY = y;
+      // Alternating row background
+      if (rowIndex % 2 === 0) {
+        doc
+          .roundedRect(margin, y - 3, contentWidth, rowHeight, 2)
+          .fill(BRAND.colors.accent);
+      }
+      rowIndex++;
+    }
+
+    const labelX = x + 8;
+    const drawY = col === 0 ? y : rowStartY;
 
     doc
       .fontSize(10)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.labelText)
+      .text(`${field.label}:`, labelX, drawY + 2, {
+        continued: true,
+        width: colWidth * 0.55,
+      });
+
+    doc
       .font("Helvetica")
-      .fillColor("#444444")
-      .text(`Email: ${m.client?.email || "N/A"}`)
-      .text(`Phone: ${m.client?.phone || "N/A"}`)
-      .text(
-        `Last updated: ${m.updatedAt?.toLocaleDateString("en-GB") || "N/A"} by ${m.updatedByRole || "N/A"}`,
-      );
+      .fillColor(BRAND.colors.bodyText)
+      .text(` ${value} cm`);
 
-    doc.moveDown(1);
-
-    // Measurements in a clean two-column layout
-    const measurementPairs = [
-      ["Bust", m.bust],
-      ["Waist", m.waist],
-      ["Hips", m.hips],
-      ["Shoulder Width", m.shoulderWidth],
-      ["Sleeve Length", m.sleeveLength],
-      ["Dress Length", m.dressLength],
-      ["Thigh", m.thigh],
-      ["Inseam", m.inseam],
-      ["Neck", m.neck],
-      ["Arm Length", m.armLength],
-      ["Arm Circumference", m.armCircumference],
-      ["Ankle Circumference", m.ankleCircumference],
-      ["Wrist Circumference", m.wristCircumference],
-      ["Back Length", m.backLength],
-      ["Front Length", m.frontLength],
-    ];
-
-    const pageWidth = doc.page.width - 80; // subtract margins
-    const colWidth = pageWidth / 2;
-    let col = 0;
-    let rowStartY = doc.y;
-
-    doc.fontSize(11);
-
-    for (const [label, value] of measurementPairs) {
-      if (value === null || value === undefined) continue;
-
-      const x = 40 + col * colWidth;
-      const y = col === 0 ? doc.y : rowStartY;
-
-      // Alternating row background for readability
-      if (col === 0) {
-        doc.rect(40, y - 2, pageWidth, 18).fill("#F8F8F8");
-        rowStartY = y;
-      }
-
-      doc
-        .font("Helvetica-Bold")
-        .fillColor("#333333")
-        .text(`${label}:`, x, y, { continued: true, width: colWidth * 0.55 })
-        .font("Helvetica")
-        .fillColor("#000000")
-        .text(`${value} cm`);
-
-      col = col === 0 ? 1 : 0;
-      if (col === 0) doc.moveDown(0.2);
+    if (col === 0) {
+      col = 1;
+    } else {
+      col = 0;
+      y += rowHeight;
     }
+  }
 
-    // Custom params if present
-    if (m.customParams && Object.keys(m.customParams).length > 0) {
-      doc.moveDown(1);
-      doc
-        .fontSize(12)
-        .font("Helvetica-Bold")
-        .fillColor("#000000")
-        .text("Additional Measurements");
+  // If we ended on the left column, advance y
+  if (col === 1) y += rowHeight;
 
-      doc.moveDown(0.3);
+  // ── Section: Custom Measurements ──
+  if (m.customParams && Object.keys(m.customParams).length > 0) {
+    y += 14;
 
-      for (const [key, value] of Object.entries(m.customParams)) {
+    doc
+      .fontSize(11)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.secondary)
+      .text("Additional Measurements", margin, y);
+
+    y += 15;
+    doc
+      .moveTo(margin, y)
+      .lineTo(margin + 150, y)
+      .lineWidth(2)
+      .strokeColor(BRAND.colors.primary)
+      .stroke();
+
+    y += 8;
+
+    let customIndex = 0;
+    for (const [key, value] of Object.entries(m.customParams)) {
+      if (customIndex % 2 === 0) {
         doc
-          .fontSize(11)
-          .font("Helvetica-Bold")
-          .fillColor("#333333")
-          .text(`${key}:`, { continued: true })
-          .font("Helvetica")
-          .fillColor("#000000")
-          .text(` ${value} cm`);
+          .roundedRect(margin, y - 3, contentWidth, rowHeight, 2)
+          .fill(BRAND.colors.accent);
+      }
+
+      doc
+        .fontSize(10)
+        .font("Helvetica-Bold")
+        .fillColor(BRAND.colors.labelText)
+        .text(`${key}:`, margin + 8, y + 2, {
+          continued: true,
+          width: colWidth * 0.55,
+        });
+
+      doc
+        .font("Helvetica")
+        .fillColor(BRAND.colors.bodyText)
+        .text(` ${value} cm`);
+
+      y += rowHeight;
+      customIndex++;
+    }
+  }
+
+  // ── Notes ──
+  if (m.notes) {
+    y += 14;
+    doc
+      .fontSize(11)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.secondary)
+      .text("Notes", margin, y);
+
+    y += 15;
+    doc
+      .moveTo(margin, y)
+      .lineTo(margin + 40, y)
+      .lineWidth(2)
+      .strokeColor(BRAND.colors.primary)
+      .stroke();
+
+    y += 8;
+
+    doc
+      .roundedRect(margin, y - 2, contentWidth, 30, 3)
+      .fill(BRAND.colors.accent);
+
+    doc
+      .fontSize(9)
+      .font("Helvetica")
+      .fillColor(BRAND.colors.bodyText)
+      .text(m.notes, margin + 8, y + 4, { width: contentWidth - 16 });
+  }
+}
+
+// ─── Multi-Client Layout (Landscape) ──────────────────────────────────────
+
+function drawMultiClientPDF(doc, measurements) {
+  const margin = doc.page.margins.left;
+  const contentWidth = doc.page.width - margin * 2;
+  const rowHeight = 20;
+  const footerReserve = 55; // space reserved for footer (matches drawBrandedFooters positioning)
+
+  // ── Discover all unique custom param keys across all measurements ──
+  const customKeySet = new Set();
+  for (const m of measurements) {
+    if (m.customParams && typeof m.customParams === "object") {
+      for (const key of Object.keys(m.customParams)) {
+        customKeySet.add(key);
       }
     }
+  }
+  const customKeys = Array.from(customKeySet).sort();
 
-    // ── Multiple clients: table layout ────────────────────────────────────
-  } else {
-    const columns = [
-      { label: "Name", key: "clientName", width: 100 },
-      { label: "Bust", key: "bust", width: 45 },
-      { label: "Waist", key: "waist", width: 45 },
-      { label: "Hips", key: "hips", width: 45 },
-      { label: "Shoulder", key: "shoulderWidth", width: 55 },
-      { label: "Sleeve", key: "sleeveLength", width: 50 },
-      { label: "Dress Len", key: "dressLength", width: 55 },
-      { label: "Neck", key: "neck", width: 45 },
-      { label: "Arm Len", key: "armLength", width: 50 },
-      { label: "Thigh", key: "thigh", width: 45 },
-    ];
+  // ── Build column definitions dynamically ──
+  const totalFields = MEASUREMENT_FIELDS.length + customKeys.length;
+  const nameColWidth = 88;
+  const remainingWidth = contentWidth - nameColWidth;
+  const fieldColWidth = Math.floor(remainingWidth / totalFields);
 
-    const tableTop = doc.y;
-    const rowHeight = 22;
-    let x = 40;
+  const columns = [
+    { label: "Client Name", key: "clientName", width: nameColWidth },
+    ...MEASUREMENT_FIELDS.map((f) => ({
+      label: f.label,
+      key: f.key,
+      width: fieldColWidth,
+    })),
+    ...customKeys.map((key) => ({
+      label: key.length > 8 ? key.substring(0, 7) + "…" : key,
+      key: `custom_${key}`,
+      width: fieldColWidth,
+    })),
+  ];
 
-    // Table header
-    doc.rect(40, tableTop, doc.page.width - 80, rowHeight).fill("#1A1A2E");
+  // ── Page 1: full branded header ──
+  let currentY = drawBrandedHeader(doc, "Client Measurements Report");
 
+  // Summary line
+  doc
+    .fontSize(8)
+    .font("Helvetica")
+    .fillColor(BRAND.colors.mutedText)
+    .text(`Total clients: ${measurements.length}`, margin, currentY);
+
+  currentY += 14;
+
+  // Draw first table header
+  currentY = drawTableHeaderRow(doc, columns, currentY);
+
+  // ── Render each row with proper pagination ──
+  for (let i = 0; i < measurements.length; i++) {
+    const m = measurements[i];
+
+    // ── Page overflow check ──
+    if (currentY + rowHeight > doc.page.height - footerReserve) {
+      doc.addPage();
+
+      // Draw continuation header on the new page
+      currentY = drawContinuationHeader(doc);
+
+      // Redraw the table header
+      currentY = drawTableHeaderRow(doc, columns, currentY);
+    }
+
+    // ── Draw row ──
+    const rowColor = i % 2 === 0 ? "#FFFFFF" : BRAND.colors.rowAlt;
+    doc.rect(margin, currentY, contentWidth, rowHeight).fill(rowColor);
+
+    // Subtle bottom border
+    doc
+      .moveTo(margin, currentY + rowHeight)
+      .lineTo(doc.page.width - margin, currentY + rowHeight)
+      .strokeColor(BRAND.colors.border)
+      .lineWidth(0.3)
+      .stroke();
+
+    // Build row data — standard fields
+    const rowData = {
+      clientName: m.client?.fullName || "N/A",
+    };
+    for (const field of MEASUREMENT_FIELDS) {
+      rowData[field.key] = m[field.key] ?? "—";
+    }
+    // Custom param fields
+    for (const key of customKeys) {
+      rowData[`custom_${key}`] =
+        m.customParams && m.customParams[key] != null
+          ? m.customParams[key]
+          : "—";
+    }
+
+    // Render each cell
+    let x = margin;
     for (const col of columns) {
+      const isName = col.key === "clientName";
       doc
-        .fontSize(9)
-        .font("Helvetica-Bold")
-        .fillColor("#FFFFFF")
-        .text(col.label, x + 4, tableTop + 6, {
-          width: col.width,
+        .fontSize(7.5)
+        .font(isName ? "Helvetica-Bold" : "Helvetica")
+        .fillColor(isName ? BRAND.colors.secondary : BRAND.colors.bodyText)
+        .text(String(rowData[col.key]), x + 4, currentY + 6, {
+          width: col.width - 6,
           lineBreak: false,
         });
       x += col.width;
     }
 
-    // Table rows
-    measurements.forEach((m, index) => {
-      const y = tableTop + rowHeight + index * rowHeight;
-
-      // Check if we need a new page
-      if (y + rowHeight > doc.page.height - 60) {
-        doc.addPage();
-        return;
-      }
-
-      // Alternating row colours
-      const rowColor = index % 2 === 0 ? "#FFFFFF" : "#F5F5F5";
-      doc.rect(40, y, doc.page.width - 80, rowHeight).fill(rowColor);
-
-      // Draw a subtle bottom border
-      doc
-        .moveTo(40, y + rowHeight)
-        .lineTo(doc.page.width - 40, y + rowHeight)
-        .strokeColor("#E0E0E0")
-        .lineWidth(0.5)
-        .stroke();
-
-      x = 40;
-      const rowData = {
-        clientName: m.client?.fullName || "N/A",
-        bust: m.bust ?? "—",
-        waist: m.waist ?? "—",
-        hips: m.hips ?? "—",
-        shoulderWidth: m.shoulderWidth ?? "—",
-        sleeveLength: m.sleeveLength ?? "—",
-        dressLength: m.dressLength ?? "—",
-        neck: m.neck ?? "—",
-        armLength: m.armLength ?? "—",
-        thigh: m.thigh ?? "—",
-      };
-
-      for (const col of columns) {
-        doc
-          .fontSize(9)
-          .font("Helvetica")
-          .fillColor("#222222")
-          .text(String(rowData[col.key]), x + 4, y + 6, {
-            width: col.width - 8,
-            lineBreak: false,
-          });
-        x += col.width;
-      }
-    });
+    currentY += rowHeight;
   }
 
-  // ── Footer ──
-  const pageCount = doc.bufferedPageRange().count;
-  for (let i = 0; i < pageCount; i++) {
-    doc.switchToPage(i);
-    doc
-      .fontSize(8)
-      .font("Helvetica")
-      .fillColor("#999999")
-      .text(
-        `Page ${i + 1} of ${pageCount}  •  Fashion Studio — Confidential`,
-        40,
-        doc.page.height - 30,
-        { align: "center", width: doc.page.width - 80 },
-      );
-  }
-
-  doc.end(); // finalises and flushes the PDF to the response
-};
+  // ── Table closing border ──
+  doc
+    .moveTo(margin, currentY)
+    .lineTo(doc.page.width - margin, currentY)
+    .strokeColor(BRAND.colors.secondary)
+    .lineWidth(0.5)
+    .stroke();
+}

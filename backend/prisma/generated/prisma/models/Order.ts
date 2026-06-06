@@ -1074,10 +1074,12 @@ export type OrderCreateNestedOneWithoutPortfolioEntryInput = {
   connect?: Prisma.OrderWhereUniqueInput
 }
 
-export type OrderUpdateOneRequiredWithoutPortfolioEntryNestedInput = {
+export type OrderUpdateOneWithoutPortfolioEntryNestedInput = {
   create?: Prisma.XOR<Prisma.OrderCreateWithoutPortfolioEntryInput, Prisma.OrderUncheckedCreateWithoutPortfolioEntryInput>
   connectOrCreate?: Prisma.OrderCreateOrConnectWithoutPortfolioEntryInput
   upsert?: Prisma.OrderUpsertWithoutPortfolioEntryInput
+  disconnect?: Prisma.OrderWhereInput | boolean
+  delete?: Prisma.OrderWhereInput | boolean
   connect?: Prisma.OrderWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.OrderUpdateToOneWithWhereWithoutPortfolioEntryInput, Prisma.OrderUpdateWithoutPortfolioEntryInput>, Prisma.OrderUncheckedUpdateWithoutPortfolioEntryInput>
 }

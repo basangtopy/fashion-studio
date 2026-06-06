@@ -74,7 +74,7 @@ export default function OrderDetailPage() {
     const [negotiateNote, setNegotiateNote] = useState("");
     const [showBackToTop, setShowBackToTop] = useState(false);
     const [lightboxImage, setLightboxImage] = useState(null);
-    const [mobileChatOpen, setMobileChatOpen] = useState(false);
+    const [mobileChatOpen, setMobileChatOpen] = useState(() => searchParams.get("chat") === "true");
 
     // Payment form state
     const [payAmount, setPayAmount] = useState("");
@@ -90,12 +90,7 @@ export default function OrderDetailPage() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
-    // ─── Auto-open chat from deep link ───
-    useEffect(() => {
-        if (searchParams.get("chat") === "true") {
-            setMobileChatOpen(true);
-        }
-    }, [searchParams]);
+
 
     // ─── Data fetching ───
     const { data: order, isLoading } = useQuery({
@@ -424,7 +419,7 @@ export default function OrderDetailPage() {
                         {order.statusHistory?.[order.statusHistory.length - 1]?.note && (
                             <div className="mt-4 p-3 rounded-lg bg-[#F4F0F8]">
                                 <p className="text-xs text-[#555] italic">
-                                    &ldquo;{order.statusHistory[order.statusHistory.length - 1].note}&rdquo;
+                                    &ldquo;{order.statusHistory[0].note}&rdquo;
                                 </p>
                             </div>
                         )}
@@ -504,18 +499,32 @@ export default function OrderDetailPage() {
                                         ? <span className="inline-flex items-center gap-1 text-[#2E7D32]"><CheckCircle2 size={12} /> Linked</span>
                                         : <span className="inline-flex items-center gap-1 text-[#E65100]"><AlertCircle size={12} /> Not linked</span>
                                 },
-                                order.customStyleDescription && { l: "Custom Description", v: order.customStyleDescription },
-                                order.fabricNotes && { l: "Fabric Notes", v: order.fabricNotes },
                                 order.deliveryAddress && { l: "Delivery Address", v: order.deliveryAddress },
                                 order.deliveryFee && { l: "Delivery Fee", v: <span className="font-mono-data">{formatCurrency(order.deliveryFee)}</span> },
                                 { l: "Created", v: new Date(order.createdAt).toLocaleDateString("en-NG", { dateStyle: "long" }) },
                             ].filter(Boolean).map(({ l, v }) => (
                                 <div key={l} className="flex items-start justify-between gap-4">
                                     <span className="text-[#999] shrink-0">{l}</span>
-                                    <span className="font-medium text-[#0D0D0D] text-right">{v}</span>
+                                    <span className="overflow-x-auto whitespace-nowrap no-scrollbar font-medium text-[#0D0D0D] text-right ml-2 max-w-[200px]">{v}</span>
                                 </div>
                             ))}
                         </div>
+
+                        {/* Custom description */}
+                        {order.customStyleDescription && (
+                            <div className="mt-4 pt-3 border-t border-[rgba(0,0,0,0.06)]">
+                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Custom Description</p>
+                                <p className="text-xs text-[#555] leading-relaxed">{order.customStyleDescription}</p>
+                            </div>
+                        )}
+
+                        {/* Fabric notes */}
+                        {order.fabricNotes && (
+                            <div className="mt-3 pt-3 border-t border-[rgba(0,0,0,0.06)]">
+                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Fabric Notes</p>
+                                <p className="text-xs text-[#555] leading-relaxed">{order.fabricNotes}</p>
+                            </div>
+                        )}
 
                         {/* Model 3 — order items list */}
                         {isModel3 && order.items?.length > 0 && (
@@ -546,7 +555,9 @@ export default function OrderDetailPage() {
                         {order.style?.images?.[0] && (
                             <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.06)]">
                                 <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F4F0F8]">
-                                    <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover" />
+                                    {/* blurred background */}
+                                    <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                    <Image src={order.style.images[0]} alt={order.style.name} fill className="object-contain" />
                                 </div>
                             </div>
                         )}
@@ -565,6 +576,14 @@ export default function OrderDetailPage() {
                             </div>
                         )}
                     </div>
+
+                    {/* Client notes */}
+                    {order.clientNotes && (
+                        <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                            <h3 className="text-sm font-semibold text-[#0D0D0D] mb-2">Client Notes</h3>
+                            <p className="text-sm text-[#555] leading-relaxed">{order.clientNotes}</p>
+                        </div>
+                    )}
 
                     {/* ── Payment History Card ── */}
                     <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">

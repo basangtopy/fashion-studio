@@ -66,7 +66,7 @@ export default function AdminAppointmentsPage() {
         onError: (err) => toast.error("Error", err.response?.data?.message || "Action failed"),
     });
 
-    const allAppointments = Array.isArray(data) ? data : [];
+    const allAppointments = useMemo(() => Array.isArray(data) ? data : [], [data]);
     const filteredAppointments = allAppointments.filter(a => a.status === activeTab);
 
     // This week's confirmed appointments

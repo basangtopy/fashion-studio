@@ -122,10 +122,10 @@ export const updateAppointment = async (req, res) => {
 
   // Validate status transitions — you can't confirm a completed appointment, etc.
   const validTransitions = {
-    REQUESTED: ["CONFIRMED", "CANCELLED"],
-    CONFIRMED: ["COMPLETED", "CANCELLED"],
-    COMPLETED: [], // terminal state
-    CANCELLED: [], // terminal state
+    REQUESTED: ["REQUESTED", "CONFIRMED", "CANCELLED"],
+    CONFIRMED: ["CONFIRMED", "COMPLETED", "CANCELLED"],
+    COMPLETED: ["COMPLETED"], // terminal state
+    CANCELLED: ["CANCELLED"], // terminal state
   };
 
   if (!validTransitions[appointment.status].includes(status)) {
@@ -150,7 +150,7 @@ export const updateAppointment = async (req, res) => {
     },
   });
 
-  if (status === "CONFIRMED") {
+  if (status === "CONFIRMED" && appointment.status !== "CONFIRMED") {
     const client = await prisma.user.findUnique({
       where: { id: appointment.clientId },
       select: { id: true, fullName: true, email: true, phone: true },
@@ -158,7 +158,7 @@ export const updateAppointment = async (req, res) => {
     await notifyAppointmentConfirmed({ appointment: updated, client });
   }
 
-  if (status === "CANCELLED") {
+  if (status === "CANCELLED" && appointment.status !== "CANCELLED") {
     const client = await prisma.user.findUnique({
       where: { id: appointment.clientId },
       select: { id: true, fullName: true, email: true, phone: true },

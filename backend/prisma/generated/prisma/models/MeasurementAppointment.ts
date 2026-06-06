@@ -32,6 +32,7 @@ export type MeasurementAppointmentMinAggregateOutputType = {
   status: $Enums.AppointmentStatus | null
   clientNotes: string | null
   adminNotes: string | null
+  cancelReason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -44,6 +45,7 @@ export type MeasurementAppointmentMaxAggregateOutputType = {
   status: $Enums.AppointmentStatus | null
   clientNotes: string | null
   adminNotes: string | null
+  cancelReason: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -56,6 +58,7 @@ export type MeasurementAppointmentCountAggregateOutputType = {
   status: number
   clientNotes: number
   adminNotes: number
+  cancelReason: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -70,6 +73,7 @@ export type MeasurementAppointmentMinAggregateInputType = {
   status?: true
   clientNotes?: true
   adminNotes?: true
+  cancelReason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -82,6 +86,7 @@ export type MeasurementAppointmentMaxAggregateInputType = {
   status?: true
   clientNotes?: true
   adminNotes?: true
+  cancelReason?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,6 +99,7 @@ export type MeasurementAppointmentCountAggregateInputType = {
   status?: true
   clientNotes?: true
   adminNotes?: true
+  cancelReason?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -179,6 +185,7 @@ export type MeasurementAppointmentGroupByOutputType = {
   status: $Enums.AppointmentStatus
   clientNotes: string | null
   adminNotes: string | null
+  cancelReason: string | null
   createdAt: Date
   updatedAt: Date
   _count: MeasurementAppointmentCountAggregateOutputType | null
@@ -212,6 +219,7 @@ export type MeasurementAppointmentWhereInput = {
   status?: Prisma.EnumAppointmentStatusFilter<"MeasurementAppointment"> | $Enums.AppointmentStatus
   clientNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
+  cancelReason?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
   client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -225,6 +233,7 @@ export type MeasurementAppointmentOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   clientNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   client?: Prisma.UserOrderByWithRelationInput
@@ -241,6 +250,7 @@ export type MeasurementAppointmentWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.EnumAppointmentStatusFilter<"MeasurementAppointment"> | $Enums.AppointmentStatus
   clientNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
+  cancelReason?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
   client?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -254,6 +264,7 @@ export type MeasurementAppointmentOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   clientNotes?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotes?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MeasurementAppointmentCountOrderByAggregateInput
@@ -272,6 +283,7 @@ export type MeasurementAppointmentScalarWhereWithAggregatesInput = {
   status?: Prisma.EnumAppointmentStatusWithAggregatesFilter<"MeasurementAppointment"> | $Enums.AppointmentStatus
   clientNotes?: Prisma.StringNullableWithAggregatesFilter<"MeasurementAppointment"> | string | null
   adminNotes?: Prisma.StringNullableWithAggregatesFilter<"MeasurementAppointment"> | string | null
+  cancelReason?: Prisma.StringNullableWithAggregatesFilter<"MeasurementAppointment"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"MeasurementAppointment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"MeasurementAppointment"> | Date | string
 }
@@ -283,6 +295,7 @@ export type MeasurementAppointmentCreateInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.UserCreateNestedOneWithoutAppointmentsInput
@@ -296,6 +309,7 @@ export type MeasurementAppointmentUncheckedCreateInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -307,6 +321,7 @@ export type MeasurementAppointmentUpdateInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.UserUpdateOneRequiredWithoutAppointmentsNestedInput
@@ -320,6 +335,7 @@ export type MeasurementAppointmentUncheckedUpdateInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -332,6 +348,7 @@ export type MeasurementAppointmentCreateManyInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -343,6 +360,7 @@ export type MeasurementAppointmentUpdateManyMutationInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -355,6 +373,7 @@ export type MeasurementAppointmentUncheckedUpdateManyInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -377,6 +396,7 @@ export type MeasurementAppointmentCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   clientNotes?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -389,6 +409,7 @@ export type MeasurementAppointmentMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   clientNotes?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -401,6 +422,7 @@ export type MeasurementAppointmentMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   clientNotes?: Prisma.SortOrder
   adminNotes?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -458,6 +480,7 @@ export type MeasurementAppointmentCreateWithoutClientInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -469,6 +492,7 @@ export type MeasurementAppointmentUncheckedCreateWithoutClientInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -510,6 +534,7 @@ export type MeasurementAppointmentScalarWhereInput = {
   status?: Prisma.EnumAppointmentStatusFilter<"MeasurementAppointment"> | $Enums.AppointmentStatus
   clientNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   adminNotes?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
+  cancelReason?: Prisma.StringNullableFilter<"MeasurementAppointment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"MeasurementAppointment"> | Date | string
 }
@@ -521,6 +546,7 @@ export type MeasurementAppointmentCreateManyClientInput = {
   status?: $Enums.AppointmentStatus
   clientNotes?: string | null
   adminNotes?: string | null
+  cancelReason?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -532,6 +558,7 @@ export type MeasurementAppointmentUpdateWithoutClientInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -543,6 +570,7 @@ export type MeasurementAppointmentUncheckedUpdateWithoutClientInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -554,6 +582,7 @@ export type MeasurementAppointmentUncheckedUpdateManyWithoutClientInput = {
   status?: Prisma.EnumAppointmentStatusFieldUpdateOperationsInput | $Enums.AppointmentStatus
   clientNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -568,6 +597,7 @@ export type MeasurementAppointmentSelect<ExtArgs extends runtime.Types.Extension
   status?: boolean
   clientNotes?: boolean
   adminNotes?: boolean
+  cancelReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -581,6 +611,7 @@ export type MeasurementAppointmentSelectCreateManyAndReturn<ExtArgs extends runt
   status?: boolean
   clientNotes?: boolean
   adminNotes?: boolean
+  cancelReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -594,6 +625,7 @@ export type MeasurementAppointmentSelectUpdateManyAndReturn<ExtArgs extends runt
   status?: boolean
   clientNotes?: boolean
   adminNotes?: boolean
+  cancelReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -607,11 +639,12 @@ export type MeasurementAppointmentSelectScalar = {
   status?: boolean
   clientNotes?: boolean
   adminNotes?: boolean
+  cancelReason?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MeasurementAppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "requestedDate" | "confirmedDate" | "status" | "clientNotes" | "adminNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["measurementAppointment"]>
+export type MeasurementAppointmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "clientId" | "requestedDate" | "confirmedDate" | "status" | "clientNotes" | "adminNotes" | "cancelReason" | "createdAt" | "updatedAt", ExtArgs["result"]["measurementAppointment"]>
 export type MeasurementAppointmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -635,6 +668,7 @@ export type $MeasurementAppointmentPayload<ExtArgs extends runtime.Types.Extensi
     status: $Enums.AppointmentStatus
     clientNotes: string | null
     adminNotes: string | null
+    cancelReason: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["measurementAppointment"]>
@@ -1068,6 +1102,7 @@ export interface MeasurementAppointmentFieldRefs {
   readonly status: Prisma.FieldRef<"MeasurementAppointment", 'AppointmentStatus'>
   readonly clientNotes: Prisma.FieldRef<"MeasurementAppointment", 'String'>
   readonly adminNotes: Prisma.FieldRef<"MeasurementAppointment", 'String'>
+  readonly cancelReason: Prisma.FieldRef<"MeasurementAppointment", 'String'>
   readonly createdAt: Prisma.FieldRef<"MeasurementAppointment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"MeasurementAppointment", 'DateTime'>
 }

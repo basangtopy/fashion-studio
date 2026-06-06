@@ -8,7 +8,7 @@ export const submitPaymentSchema = z.object({
     .cuid("Must be a valid order ID"),
 
   amount: z
-    .number({ required_error: "Amount is required" })
+    .coerce.number({ required_error: "Amount is required" })
     .positive("Amount must be greater than zero"),
 
   paymentType: z.enum(["INSTALLMENT", "FULL"], {

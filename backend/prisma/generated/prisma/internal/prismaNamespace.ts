@@ -1881,6 +1881,7 @@ export const MeasurementAppointmentScalarFieldEnum = {
   status: 'status',
   clientNotes: 'clientNotes',
   adminNotes: 'adminNotes',
+  cancelReason: 'cancelReason',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

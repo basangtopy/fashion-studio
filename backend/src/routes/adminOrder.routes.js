@@ -5,6 +5,7 @@ import {
   updateOrderStatus,
   setOrderQuote,
   setDeliveryFee,
+  setAdminNotes,
   adminCreateOrder,
 } from "../controllers/order.controller.js";
 import { authenticate, authorise } from "../middleware/auth.middleware.js";
@@ -14,6 +15,7 @@ import {
   updateStatusSchema,
   quoteOrderSchema,
   deliveryFeeSchema,
+  adminNotesSchema,
 } from "../validators/order.validators.js";
 import { uploadMultiple } from "../middleware/upload.middleware.js";
 
@@ -26,6 +28,7 @@ router.get("/:id", getAdminOrder);
 router.put("/:id/status", validate(updateStatusSchema), updateOrderStatus);
 router.put("/:id/quote", validate(quoteOrderSchema), setOrderQuote);
 router.put("/:id/delivery-fee", validate(deliveryFeeSchema), setDeliveryFee);
+router.put("/:id/admin-notes", validate(adminNotesSchema), setAdminNotes);
 router.post("/client/:clientId", uploadMultiple("customStyleImages"), validate(createOrderSchema), adminCreateOrder);
 
 export default router;

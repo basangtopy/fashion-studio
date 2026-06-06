@@ -306,12 +306,16 @@ export default function StylesCatalogPage() {
                             {/* Image Panel */}
                             <div className="lookbook-lb-img-wrap">
                                 {quickViewStyle.images?.[quickViewImageIdx] || quickViewStyle.images?.[0] ? (
-                                    <Image
-                                        src={quickViewStyle.images[quickViewImageIdx] || quickViewStyle.images[0]}
-                                        alt={quickViewStyle.name}
-                                        fill
-                                        className="object-cover"
-                                    />
+                                    <>
+                                        {/* blurred background */}
+                                        <Image src={quickViewStyle.images[quickViewImageIdx] || quickViewStyle.images[0]} alt={quickViewStyle.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                                        <Image
+                                            src={quickViewStyle.images[quickViewImageIdx] || quickViewStyle.images[0]}
+                                            alt={quickViewStyle.name}
+                                            fill
+                                            className="object-contain"
+                                        />
+                                    </>
                                 ) : (
                                     <div className="w-full h-full bg-gradient-to-br from-[#F8E8F0] to-[#F4F0F8]" />
                                 )}

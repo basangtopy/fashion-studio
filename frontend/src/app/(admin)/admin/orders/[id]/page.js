@@ -61,7 +61,7 @@ export default function AdminOrderDetailPage() {
     const [statusNote, setStatusNote] = useState("");
     const [cancelReason, setCancelReason] = useState("");
     const [adminNotes, setAdminNotes] = useState("");
-    const [adminNotesLoaded, setAdminNotesLoaded] = useState(false);
+    const [prevOrderData, setPrevOrderData] = useState(null);
     const [deliveryFee, setDeliveryFee] = useState("");
     const [rejectModal, setRejectModal] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
@@ -91,19 +91,19 @@ export default function AdminOrderDetailPage() {
     const { data: orderPayments } = useQuery({
         queryKey: ["order-payments", id],
         queryFn: async () => {
-            const { data } = await api.get(`/admin/payments`, { params: { orderId: id } });
+            const { data } = await api.get(`/payments/order/${id}`);
             return data.data?.payments || data.data || [];
         },
     });
 
-    // Load admin notes from order
-    useEffect(() => {
-        if (order && !adminNotesLoaded) {
-            setAdminNotes(order.adminNotes || "");
-            setDeliveryFee(order.deliveryFee ? String(order.deliveryFee) : "");
-            setAdminNotesLoaded(true);
-        }
-    }, [order, adminNotesLoaded]);
+    // Seed local admin-notes / delivery-fee state from the fetched order.
+    // Uses React's documented "adjusting state during render" pattern
+    // to avoid both setState-in-effect and ref-during-render violations.
+    if (order && order !== prevOrderData) {
+        setPrevOrderData(order);
+        setAdminNotes(order.adminNotes || "");
+        setDeliveryFee(order.deliveryFee ? String(order.deliveryFee) : "");
+    }
 
     // Scroll chat to bottom (scroll the container, not the page)
     useEffect(() => {
@@ -115,6 +115,11 @@ export default function AdminOrderDetailPage() {
             }, 10);
         }
     }, [chatMessages, mobileChatOpen]);
+
+    const markMessagesRead = useMutation({
+        mutationFn: async () => { await api.put(`/chat/${id}/read`); },
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["chat", id] }); queryClient.invalidateQueries({ queryKey: ["admin-chat"] }); },
+    });
 
     // Intersection Observer — mark messages as read
     useEffect(() => {
@@ -161,7 +166,7 @@ export default function AdminOrderDetailPage() {
 
     const saveAdminNotesMutation = useMutation({
         mutationFn: async () => {
-            const { data } = await api.put(`/admin/orders/${id}`, { adminNotes });
+            const { data } = await api.put(`/admin/orders/${id}/admin-notes`, { adminNotes });
             return data;
         },
         onSuccess: () => { toast.success("Notes saved!"); queryClient.invalidateQueries({ queryKey: ["admin-order", id] }); },
@@ -170,7 +175,7 @@ export default function AdminOrderDetailPage() {
 
     const updateDeliveryFeeMutation = useMutation({
         mutationFn: async () => {
-            const { data } = await api.put(`/admin/orders/${id}`, { deliveryFee: Number(deliveryFee) });
+            const { data } = await api.put(`/admin/orders/${id}/delivery-fee`, { deliveryFee: Number(deliveryFee) });
             return data;
         },
         onSuccess: () => { toast.success("Delivery fee updated!"); queryClient.invalidateQueries({ queryKey: ["admin-order", id] }); },
@@ -192,10 +197,7 @@ export default function AdminOrderDetailPage() {
         onSuccess: () => { setChatMessage(""); setChatAttachment(null); setChatAttachmentPreview(null); queryClient.invalidateQueries({ queryKey: ["chat", id] }); },
     });
 
-    const markMessagesRead = useMutation({
-        mutationFn: async () => { await api.put(`/chat/${id}/read`); },
-        onSuccess: () => { queryClient.invalidateQueries({ queryKey: ["chat", id] }); queryClient.invalidateQueries({ queryKey: ["admin-chat"] }); },
-    });
+
 
     const handleSendMessage = () => {
         const msg = chatMessage.trim();
@@ -238,8 +240,8 @@ export default function AdminOrderDetailPage() {
     const canSendQuote = ["PENDING_REVIEW", "AWAITING_CLIENT_RESPONSE"].includes(order.status);
     const allowedTransitions = ORDER_STATUS_TRANSITIONS[order.status] || [];
     const currentStepIndex = STATUS_STEPS.indexOf(order.status);
-    const isDeliveryOrder = order.deliveryMethod === "DELIVERY";
-    const totalPaidCalc = payments.filter(p => p.status === "CONFIRMED").reduce((sum, p) => sum + (p.amount || 0), 0) || order.totalPaid || 0;
+    const isDeliveryOrder = order.fulfillmentMethod === "DELIVERY";
+    const totalPaidCalc = order.totalPaid || 0;
 
     return (
         <div className="pb-20 lg:pb-0">
@@ -524,7 +526,7 @@ export default function AdminOrderDetailPage() {
                         <div className="flex items-center gap-3 mb-4">
                             <div className="w-12 h-12 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-lg shrink-0 overflow-hidden">
                                 {order.client?.profilePicture ? (
-                                    <img src={order.client.profilePicture} alt="" className="w-full h-full object-cover" />
+                                    <Image src={order.client.profilePicture} alt="" width={48} height={48} className="w-full h-full object-cover" />
                                 ) : (
                                     order.client?.fullName?.charAt(0) || "?"
                                 )}
@@ -586,12 +588,12 @@ export default function AdminOrderDetailPage() {
                                 { l: "Agreed Fee", v: order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—" },
                                 { l: "Total Paid", v: formatCurrency(totalPaidCalc) },
                                 { l: "Balance", v: order.totalAgreedFee ? formatCurrency(Math.max(0, order.totalAgreedFee - totalPaidCalc)) : "—" },
-                                ...(isDeliveryOrder ? [{ l: "Delivery Fee", v: order.deliveryFee ? formatCurrency(order.deliveryFee) : "Not set" }] : []),
+                                ...(isDeliveryOrder ? [{ l: "Delivery Fee", v: order.deliveryFee ? formatCurrency(order.deliveryFee) : "Not set" }, ...(order.deliveryAddress ? [{ l: "Delivery Address", v: order.deliveryAddress }] : [])] : []),
                                 { l: "Created", v: new Date(order.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" }) },
                             ].map(({ l, v }) => (
                                 <div key={l} className="flex items-center justify-between">
                                     <span className="text-[#999]">{l}</span>
-                                    <span className="font-medium text-[#0D0D0D] text-right truncate ml-2 max-w-[140px]">{v}</span>
+                                    <span className="overflow-x-auto whitespace-nowrap no-scrollbar font-medium text-[#0D0D0D] text-right ml-2 max-w-[200px]">{v}</span>
                                 </div>
                             ))}
                         </div>
@@ -661,7 +663,10 @@ export default function AdminOrderDetailPage() {
                     {/* Associated images */}
                     {order.style?.images?.[0] && (
                         <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-[#F4F0F8]">
-                            <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover" />
+                            {/* blurred background */}
+                            <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover blur-xl scale-110 opacity-100" />
+                            {/* overlay */}
+                            <Image src={order.style.images[0]} alt={order.style.name} fill className="object-contain" />
                         </div>
                     )}
                     {order.customStyleImages?.length > 0 && (
@@ -710,9 +715,9 @@ export default function AdminOrderDetailPage() {
                                             {pay.paymentType?.replace(/_/g, " ")} · {new Date(pay.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                         </p>
                                         {/* Payment proof thumbnail */}
-                                        {(pay.proofImage || pay.proofImages?.length > 0) && (
-                                            <div className="flex gap-1.5 mt-2">
-                                                {(pay.proofImages || [pay.proofImage]).filter(Boolean).map((img, i) => (
+                                        {(pay.proofUrl || pay.proofImages?.length > 0) && (
+                                            <div className="flex justify-center items-center gap-1.5 mt-2">
+                                                {(pay.proofImages || [pay.proofUrl]).filter(Boolean).map((img, i) => (
                                                     <button key={i} onClick={() => setLightboxImage(img)}
                                                         className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
                                                         <Image src={img} alt="Proof" fill className="object-cover" />
