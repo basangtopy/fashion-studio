@@ -68,7 +68,7 @@ function SignupContent() {
             }
             router.push(targetPath);
         } catch (err) {
-            toast.error("Signup failed", err.response?.data?.message || err.message);
+            toast.error("Signup failed", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || err.message);
         } finally {
             setIsLoading(false);
         }
@@ -168,7 +168,7 @@ function SignupContent() {
                             <Label className="mb-1.5 block text-[#0D0D0D]">Confirm Password</Label>
                             <div className="relative">
                                 <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
-                                <Input type="password" required value={formData.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Confirm your password" className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                                <Input type={showPassword ? "text" : "password"} required value={formData.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} placeholder="Confirm your password" className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
                             </div>
                         </div>
 

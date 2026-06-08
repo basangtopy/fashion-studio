@@ -268,7 +268,7 @@ export const confirmPayment = async (req, res) => {
   });
   await notifyPaymentConfirmed({
     payment: confirmed,
-    order: confirmed.order,
+    order: { ...confirmed.order, totalPaid: newTotalPaid },
     client,
   });
 

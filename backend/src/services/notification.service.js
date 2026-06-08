@@ -57,6 +57,16 @@ export const notifyOrderPlaced = async ({ order, client }) => {
     html: orderPlacedTemplate({
       clientName: client.fullName,
       orderNumber: order.orderNumber,
+      orderType: order.orderType,
+      styleName: order.style?.name,
+      styleImages: order.style?.images,
+      customStyleDescription: order.customStyleDescription,
+      customStyleImages: order.customStyleImages,
+      items: order.items,
+      fulfillmentMethod: order.fulfillmentMethod,
+      deliveryAddress: order.deliveryAddress,
+      totalAgreedFee: order.totalAgreedFee,
+      createdAt: order.createdAt,
     }),
   });
 };
@@ -107,6 +117,11 @@ export const notifyOrderStatusChanged = async ({
       orderNumber: order.orderNumber,
       message,
       note,
+      newStatus,
+      orderType: order.orderType,
+      fulfillmentMethod: order.fulfillmentMethod,
+      totalAgreedFee: order.totalAgreedFee,
+      totalPaid: order.totalPaid,
     }),
   });
 
@@ -145,6 +160,9 @@ export const notifyPaymentConfirmed = async ({ payment, order, client }) => {
       clientName: client.fullName,
       orderNumber: order.orderNumber,
       amount: payment.amount,
+      paymentType: payment.paymentType,
+      totalPaid: order.totalPaid,
+      totalAgreedFee: order.totalAgreedFee,
     }),
   });
 };
@@ -169,6 +187,8 @@ export const notifyPaymentRejected = async ({ payment, order, client }) => {
       clientName: client.fullName,
       orderNumber: order.orderNumber,
       reason: payment.rejectionReason,
+      amount: payment.amount,
+      totalAgreedFee: order.totalAgreedFee,
     }),
   });
 };

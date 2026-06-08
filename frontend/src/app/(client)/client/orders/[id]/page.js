@@ -127,7 +127,7 @@ export default function OrderDetailPage() {
             setNegotiateNote("");
             queryClient.invalidateQueries({ queryKey: ["order", id] });
         },
-        onError: (err) => toast.error("Error", err.response?.data?.message || "Failed"),
+        onError: (err) => toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Failed"),
     });
 
     const sendMessage = useMutation({

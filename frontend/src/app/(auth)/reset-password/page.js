@@ -34,7 +34,7 @@ function ResetPasswordForm() {
             toast.success("Password reset!", "Your password has been updated.");
             setTimeout(() => router.push("/login"), 2000);
         } catch (err) {
-            toast.error("Error", err.response?.data?.message || "Could not reset password.");
+            toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Could not reset password.");
         } finally {
             setIsLoading(false);
         }
@@ -69,7 +69,7 @@ function ResetPasswordForm() {
                     <Label className="mb-1.5 block text-[#0D0D0D]">Confirm Password</Label>
                     <div className="relative">
                         <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
-                        <Input type="password" required value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} placeholder="Confirm password" className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                        <Input type={showPassword ? "text" : "password"} required value={formData.confirmPassword} onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })} placeholder="Confirm password" className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
                     </div>
                 </div>
                 <Button type="submit" disabled={isLoading} className="w-full h-11 bg-[#C2185B] hover:bg-[#A01548] text-white font-semibold">

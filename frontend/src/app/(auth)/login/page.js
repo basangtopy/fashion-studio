@@ -70,7 +70,7 @@ function LoginContent() {
             }
             router.push(targetPath);
         } catch (err) {
-            const msg = err.response?.data?.message || err.message || "Login failed";
+            const msg = err.response?.data?.errors?.[0]?.message || err.response?.data?.message || err.message || "Login failed";
             if (err.response?.status === 429) {
                 toast.error("Too many attempts", "Please wait before trying again.");
             } else {

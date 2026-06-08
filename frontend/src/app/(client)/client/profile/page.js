@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, Mail, Phone, Lock, Save, Camera, Shield, CheckCircle2, AlertTriangle, Calendar, LogOut } from "lucide-react";
+import { User, Mail, Phone, Lock, Save, Camera, Shield, CheckCircle2, AlertTriangle, Calendar, Eye, EyeOff, LogOut } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
@@ -28,6 +28,8 @@ export default function ClientProfilePage() {
     });
     const [passwordData, setPasswordData] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
     const [showPasswordForm, setShowPasswordForm] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
     const [uploadingAvatar, setUploadingAvatar] = useState(false);
     const fileInputRef = useRef(null);
 
@@ -73,7 +75,7 @@ export default function ClientProfilePage() {
             setUser((prev) => ({ ...prev, ...data.user || data }));
             setIsEditing(false);
         },
-        onError: (err) => toast.error("Error", err.response?.data?.message || "Failed to update."),
+        onError: (err) => toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Failed to update."),
     });
 
     const changePassword = useMutation({
@@ -86,12 +88,12 @@ export default function ClientProfilePage() {
             setPasswordData({ currentPassword: "", newPassword: "", confirmPassword: "" });
             setShowPasswordForm(false);
         },
-        onError: (err) => toast.error("Error", err.response?.data?.message || "Failed to change password."),
+        onError: (err) => toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || err.message || "Failed to change password."),
     });
 
     const resendVerification = useMutation({
         mutationFn: async () => {
-            const { data } = await api.post("/auth/resend-verification");
+            const { data } = await api.post("/auth/send-verification");
             return data;
         },
         onSuccess: () => toast.success("Verification email sent!", "Please check your inbox."),
@@ -109,7 +111,7 @@ export default function ClientProfilePage() {
             toast.error("Password must be at least 8 characters");
             return;
         }
-        changePassword.mutate({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword });
+        changePassword.mutate({ currentPassword: passwordData.currentPassword, newPassword: passwordData.newPassword, confirmPassword: passwordData.confirmPassword });
     };
 
     const memberSince = user?.createdAt
@@ -346,16 +348,43 @@ export default function ClientProfilePage() {
                                         <div className="space-y-4 pt-2">
                                             <div>
                                                 <Label className="text-xs text-[#999] mb-1.5 block">Current Password</Label>
-                                                <Input type="password" value={passwordData.currentPassword} onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} className="h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                                                <div className="relative">
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Input
+                                                        type={showPassword ? "text" : "password"}
+                                                        value={passwordData.currentPassword}
+                                                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                    />
+                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] z-10 hover:text-[#555]">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                                                </div>
                                             </div>
                                             <div>
                                                 <Label className="text-xs text-[#999] mb-1.5 block">New Password</Label>
-                                                <Input type="password" value={passwordData.newPassword} onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} className="h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                                                <div className="relative">
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Input
+                                                        type={showNewPassword ? "text" : "password"}
+                                                        value={passwordData.newPassword}
+                                                        onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                    />
+                                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] z-10 hover:text-[#555]">{showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                                                </div>
                                                 <p className="text-[10px] text-[#999] mt-1">Minimum 8 characters</p>
                                             </div>
                                             <div>
                                                 <Label className="text-xs text-[#999] mb-1.5 block">Confirm New Password</Label>
-                                                <Input type="password" value={passwordData.confirmPassword} onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} className="h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                                                <div className="relative">
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Input
+                                                        type={showNewPassword ? "text" : "password"}
+                                                        value={passwordData.confirmPassword}
+                                                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                    />
+                                                    
+                                                </div>
                                             </div>
                                             <Button
                                                 onClick={handleChangePassword}

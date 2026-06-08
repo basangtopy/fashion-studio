@@ -314,11 +314,15 @@ export const sendVerificationEmail = async (req, res) => {
   });
 
   const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${rawToken}`;
-  sendEmail({
+  const result = await sendEmail({
     to: user.email,
     subject: "Verify Your Email Address",
     html: emailVerificationTemplate({ clientName: user.fullName, verifyUrl }),
   });
+
+  if (result?.error) {
+    throw new AppError("Failed to send verification email. Please try again.", 500);
+  }
 
   return successResponse(res, 200, "Verification email sent");
 };

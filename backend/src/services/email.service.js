@@ -14,10 +14,10 @@ const transporter = nodemailer.createTransport({
 
 export const sendEmail = async ({ to, subject, html, text }) => {
   // In development, skip sending and just log
-  if (process.env.NODE_ENV === "development") {
-    console.log(`[EMAIL] To: ${to} | Subject: ${subject}`);
-    return { skipped: true };
-  }
+  // if (process.env.NODE_ENV === "development") {
+  //   console.log(`[EMAIL] To: ${to} | Subject: ${subject}`);
+  //   return { skipped: true };
+  // }
 
   try {
     const info = await transporter.sendMail({

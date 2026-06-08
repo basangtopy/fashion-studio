@@ -24,15 +24,11 @@ export default function VerifyEmailPage() {
 function VerifyEmailContent() {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
-    const [status, setStatus] = useState("loading"); // loading | success | error
-    const [message, setMessage] = useState("");
+    const [status, setStatus] = useState(token ? "loading" : "error"); // loading | success | error
+    const [message, setMessage] = useState(token ? "" : "No verification token provided.");
 
     useEffect(() => {
-        if (!token) {
-            setStatus("error");
-            setMessage("No verification token provided.");
-            return;
-        }
+        if (!token) return;
 
         const verify = async () => {
             try {
