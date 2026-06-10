@@ -29,9 +29,9 @@ export default function AdminSettingsPage() {
                 </div>
                 <div className="space-y-3">
                     <SettingsRow label="Business Name" value={BRANDING.businessName} />
-                    <SettingsRow label="Email" value={BRANDING.email} />
-                    <SettingsRow label="Phone" value={BRANDING.phone} />
-                    <SettingsRow label="Instagram" value={BRANDING.instagramUrl || "Not set"} />
+                    <SettingsRow label="Email" value={BRANDING.contact.email} />
+                    <SettingsRow label="Phone" value={BRANDING.contact.phone} />
+                    <SettingsRow label="Instagram" value={BRANDING.socials.instagram || "Not set"} />
                 </div>
                 <p className="text-[10px] text-[#999] mt-4">
                     To update branding, edit the branding configuration in <code className="bg-[#F4F0F8] px-1 rounded text-[10px]">config/branding.js</code>

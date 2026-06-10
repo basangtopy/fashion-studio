@@ -14,6 +14,7 @@ import {
     LayoutDashboard,
     ShoppingBag,
     Users,
+    User,
     MessageSquare,
     Palette,
     Ruler,
@@ -103,6 +104,7 @@ const CMD_PALETTE_ITEMS = [
     { href: "/admin/payments", label: "Payments", icon: CreditCard, section: "Finance", superAdminOnly: true },
     { href: "/admin/finance", label: "Finance Summary", icon: BarChart3, section: "Finance", superAdminOnly: true },
     { href: "/admin/settings", label: "Settings", icon: Settings, section: "System", superAdminOnly: true },
+    { href: "/admin/profile", label: "Profile", icon: User, section: "System" },
 ];
 
 /*
@@ -266,6 +268,7 @@ export default function AdminLayout({ children }) {
             { href: "/admin/finance", label: "Finance", icon: BarChart3 },
             { href: "/admin/settings", label: "Settings", icon: Settings },
         ] : []),
+        { href: "/admin/profile", label: "Profile", icon: User },
     ];
 
     return (
@@ -375,7 +378,8 @@ export default function AdminLayout({ children }) {
                 {/* User block at bottom — per spec */}
                 <Separator className="bg-white/8 shrink-0" />
                 <div className="px-3 py-3 shrink-0 overflow-hidden">
-                    <div className="flex items-center">
+                    <div className="flex items-center justify-between">
+                        <Link href="/admin/profile" className="flex items-center">
                         <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden relative">
                             {(user?.avatarUrl || user?.profilePicture) ? (
                                 <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
@@ -391,6 +395,8 @@ export default function AdminLayout({ children }) {
                                 </span>
                             </div>
                         </div>
+                        </Link>
+
                         {!collapsed && (
                             <button
                                 onClick={logout}
