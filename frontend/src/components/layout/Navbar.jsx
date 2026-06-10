@@ -25,6 +25,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Logo from "../../../public/images/logo-with-name.svg";
 
 const NAV_LINKS = [
     { href: "/", label: "Home" },
@@ -90,12 +91,11 @@ export default function Navbar() {
                 <div className="page-container h-full flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 shrink-0">
-                        <span
-                            className="text-xl font-bold tracking-tight"
-                            style={{ color: isHeroPage && !isScrolled ? "#fff" : BRANDING.colors.primary }}
-                        >
-                            {BRANDING.businessName}
-                        </span>
+                        <Logo
+                            height={36}
+                            style={{ fill: isHeroPage && !isScrolled ? "#fff" : BRANDING.colors.primary }}
+                        />
+
                     </Link>
 
                     {/* Center Nav Links — Desktop */}

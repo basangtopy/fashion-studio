@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -39,11 +40,13 @@ import { BRANDING } from "@/config/branding";
 import NotificationDrawer, { NotificationBellButton } from "@/components/admin/NotificationDrawer";
 import useSSE from "@/hooks/useSSE";
 import { Separator } from "@/components/ui/separator";
+import LogoWithName from "../../../public/images/logo-with-name.svg";
+import Logo from "../../../public/images/logo.svg";
 
 const EXPANDED_W = 240;
 const COLLAPSED_W = 64;
 
-/* ─── Sidebar sections matching the spec exactly ─── */
+/* ─── Sidebar sections ─── */
 const SIDEBAR_SECTIONS = [
     {
         label: "Overview",
@@ -277,12 +280,9 @@ export default function AdminLayout({ children }) {
             >
                 {/* Brand */}
                 <div className="h-16 flex items-center px-3 shrink-0 overflow-hidden">
-                    <div className="w-10 h-10 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0">
-                        F
-                    </div>
-                    <span className={`${textCls} ml-2 text-sm font-bold text-white tracking-tight`}>
-                        {BRANDING.businessName}
-                    </span>
+
+                    {collapsed ? <Logo style={{ fill: "#C2185B" }} className="w-10 h-10" /> : <LogoWithName style={{ fill: "#C2185B" }} className="tracking-tight" />}
+
                 </div>
                 <Separator className="bg-white/8 shrink-0" />
 
@@ -376,11 +376,11 @@ export default function AdminLayout({ children }) {
                 <Separator className="bg-white/8 shrink-0" />
                 <div className="px-3 py-3 shrink-0 overflow-hidden">
                     <div className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+                        <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden relative">
                             {(user?.avatarUrl || user?.profilePicture) ? (
-                                <img src={user.avatarUrl || user.profilePicture} alt="" className="w-full h-full object-cover" />
+                                <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                             ) : (
-                                user?.fullName?.charAt(0) || "A"
+                                <span className="text-lg">{user?.fullName?.charAt(0) || "A"}</span>
                             )}
                         </div>
                         <div className={`${textCls} ml-2 min-w-0 flex-1`}>
@@ -425,8 +425,8 @@ export default function AdminLayout({ children }) {
                 <header className="flex items-center justify-between h-14 px-4 sm:px-6 bg-white border-b border-[rgba(0,0,0,0.06)] sticky top-0 z-40">
                     {/* Left: breadcrumb on desktop, brand on mobile */}
                     <div className="flex items-center gap-3">
-                        <div className="lg:hidden w-8 h-8 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            F
+                        <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                            {<Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />}
                         </div>
                         <h2 className="text-sm font-semibold text-[#0D0D0D] capitalize hidden sm:block">
                             {breadcrumb}

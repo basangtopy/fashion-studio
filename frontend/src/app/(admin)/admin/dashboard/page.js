@@ -302,8 +302,8 @@ export default function AdminDashboard() {
             else if (sortKey === "status") { av = a.status || ""; bv = b.status || ""; }
             else if (sortKey === "fee") { av = a.totalAgreedFee || 0; bv = b.totalAgreedFee || 0; }
             else if (sortKey === "paid") {
-                av = a.payments?.reduce((s, p) => s + (p.amount || 0), 0) || a.totalPaid || 0;
-                bv = b.payments?.reduce((s, p) => s + (p.amount || 0), 0) || b.totalPaid || 0;
+                av = a.totalPaid || 0;
+                bv = b.totalPaid || 0;
             }
             if (av < bv) return sortDir === "asc" ? -1 : 1;
             if (av > bv) return sortDir === "asc" ? 1 : -1;
@@ -632,7 +632,6 @@ export default function AdminDashboard() {
                                     </thead>
                                     <tbody>
                                         {recentOrders.map((order) => {
-                                            const totalPaid = order.payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || order.totalPaid || 0;
                                             const isExpanded = expandedRow === order.id;
                                             return (
                                                 <Fragment key={order.id}>
@@ -648,7 +647,7 @@ export default function AdminDashboard() {
                                                         <td className="py-3 pr-4 text-[#555] text-xs whitespace-nowrap">{order.orderType?.replace(/_/g, " ") || "—"}</td>
                                                         <td className="py-3 pr-4 whitespace-nowrap"><StatusPill status={order.status} size="small" /></td>
                                                         <td className="py-3 pr-4 text-right font-mono-data text-[#0D0D0D] whitespace-nowrap">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#555] whitespace-nowrap">{formatCurrency(totalPaid)}</td>
+                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#555] whitespace-nowrap">{formatCurrency(order.totalPaid)}</td>
                                                         <td className="py-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                             <Link href={`/admin/orders/${order.id}`}
                                                                 className="text-xs text-[#C2185B] font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">

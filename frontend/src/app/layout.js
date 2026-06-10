@@ -7,6 +7,9 @@ export const metadata = {
     default: `${BRANDING.businessName} — ${BRANDING.tagline}`,
     template: `%s | ${BRANDING.businessName}`,
   },
+  icons: {
+    icon: "/images/logo.png",
+  },
   description:
     "Premium fashion design studio in Lagos, Nigeria. Custom sewing, designer-sourced fabric, and ready-to-wear collections. Crafted with care, made to last.",
   keywords: [
@@ -36,7 +39,6 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>

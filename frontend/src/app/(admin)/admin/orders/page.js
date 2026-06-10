@@ -307,7 +307,7 @@ export default function AdminOrdersPage() {
                     )}
                     {searchQuery && (
                         <button onClick={() => { setSearchQuery(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1565C0]/8 text-[#1565C0] text-[11px] font-medium hover:bg-[#1565C0]/15 transition-colors">
-                            "{searchQuery}" <X size={12} />
+                            {searchQuery} <X size={12} />
                         </button>
                     )}
                     {(dateRange?.from || dateRange?.to) && (
@@ -377,7 +377,6 @@ export default function AdminOrdersPage() {
                                     </thead>
                                     <tbody>
                                         {orders.map((order) => {
-                                            const totalPaid = order.payments?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0;
                                             return (
                                                 <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors group">
                                                     <td className="py-3 px-4"><Link href={`/admin/orders/${order.id}`} className="font-mono-data text-xs text-[#C2185B] hover:underline">{order.orderNumber}</Link></td>
@@ -385,7 +384,7 @@ export default function AdminOrdersPage() {
                                                     <td className="py-3 px-4 text-xs text-[#555]">{ORDER_TYPES[order.orderType]?.short || "—"}</td>
                                                     <td className="py-3 px-4"><StatusPill status={order.status} size="small" /></td>
                                                     <td className="py-3 px-4 text-right font-mono-data">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                    <td className="py-3 px-4 text-right font-mono-data text-[#555]">{formatCurrency(totalPaid)}</td>
+                                                    <td className="py-3 px-4 text-right font-mono-data text-[#555]">{formatCurrency(order.totalPaid)}</td>
                                                     <td className="py-3 px-4 text-right text-xs text-[#999]">{new Date(order.createdAt).toLocaleDateString("en-NG")}</td>
                                                     <td className="py-3 px-4 text-right">
                                                         <Link href={`/admin/orders/${order.id}`}

@@ -58,7 +58,7 @@ export const BRANDING = {
     mission:
         "To craft garments that honour individuality — where every stitch carries intention, every silhouette tells a story, and every client leaves feeling seen.",
     vision:
-        "To become West Africa's most trusted name in bespoke fashion, setting the standard for precision, creativity, and client care.",
+        "To become West Africa's most trusted name in bespoke fashion, setting the standard for precision, creativity, and client satisfaction.",
 
     aboutHeroQuote:
         "We don't just make clothes. We craft confidence, one stitch at a time.",

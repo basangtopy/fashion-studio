@@ -103,7 +103,7 @@ function useScrollSpy(sectionIds) {
 // ============================================================
 function PolicyHero() {
     return (
-        <section className="relative bg-[#1A1A2E] pt-[calc(var(--nav-height)+40px)] pb-16 sm:pb-20 lg:pb-24 overflow-hidden">
+        <section className="relative bg-[#1A1A2E] pt-[calc(var(--nav-height)_+_40px)] pb-16 sm:pb-20 lg:pb-24 overflow-hidden">
             {/* Subtle background shapes */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute top-[10%] right-[10%] w-48 h-56 rounded-3xl bg-[#C2185B]/5 rotate-12" />
@@ -280,7 +280,7 @@ export default function PrivacyPolicyPage() {
                     <div className="flex gap-12 lg:gap-16">
                         {/* Sticky TOC — Desktop */}
                         <aside className="hidden lg:block w-64 shrink-0">
-                            <div className="sticky top-[calc(var(--nav-height)+32px)]">
+                            <div className="sticky top-[calc(var(--nav-height)_+_32px)]">
                                 <TOCSidebar sections={SECTIONS} activeId={activeId} />
                             </div>
                         </aside>

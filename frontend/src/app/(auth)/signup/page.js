@@ -172,6 +172,18 @@ function SignupContent() {
                             </div>
                         </div>
 
+                        {/* Disclaimer Snippet */}
+                        <p className="text-[13px] text-[#555] text-center my-2 leading-relaxed">
+                            By creating an account, you agree to our{" "}
+                            <Link href="/terms" className="text-[#C2185B] hover:underline">
+                                Terms of Service
+                            </Link>{" "}
+                            and{" "}
+                            <Link href="/privacy" className="text-[#C2185B] hover:underline">
+                                Privacy Policy
+                            </Link>.
+                        </p>
+
                         <Button type="submit" disabled={isLoading} className="w-full h-11 bg-[#C2185B] hover:bg-[#A01548] text-white font-semibold mt-2">
                             {isLoading ? <div className="border-[3px] border-white/30 border-t-white rounded-full animate-spin size-5" /> : <><UserPlus size={16} />Create Account</>}
                         </Button>

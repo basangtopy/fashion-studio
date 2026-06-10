@@ -90,6 +90,7 @@ export const getDashboardStats = async (req, res) => {
         orderType: true,
         status: true,
         totalAgreedFee: true,
+        totalPaid: true,
         createdAt: true,
         customStyleDescription: true,
         clientProvidesFabric: true,

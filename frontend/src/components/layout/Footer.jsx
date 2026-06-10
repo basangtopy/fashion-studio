@@ -3,6 +3,7 @@ import { Mail, Phone, MapPin } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { BRANDING } from "@/config/branding";
+import Logo from "../../../public/images/logo-with-name.svg";
 
 export default function Footer() {
     const iconMap = {
@@ -18,7 +19,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
                     {/* Column 1 — Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-white">{BRANDING.businessName}</h3>
+                        <Logo width={200} style={{ fill: "#fff" }} />
                         <p className="text-sm text-white/60 leading-relaxed">
                             {BRANDING.tagline}
                         </p>

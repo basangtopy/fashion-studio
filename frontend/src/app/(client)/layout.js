@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
@@ -25,6 +26,8 @@ import NotificationDrawer, { NotificationBellButton } from "@/components/shared/
 import useSSE from "@/hooks/useSSE";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import LogoWithName from "../../../public/images/logo-with-name.svg";
+import Logo from "../../../public/images/logo.svg";
 
 /* ─── Sidebar links (blueprint Section 4) ─── */
 const SIDEBAR_LINKS = [
@@ -115,10 +118,12 @@ export default function ClientLayout({ children }) {
                     {/* Brand */}
                     <div className="h-14 flex items-center px-5 shrink-0">
                         <Link href="/" className="flex items-center gap-2 text-white">
-                            <div className="w-8 h-8 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs">
+                            {/* <div className="w-8 h-8 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs">
                                 F
                             </div>
-                            <span className="text-sm font-bold tracking-tight">Fashion Studio</span>
+                            <span className="text-sm font-bold tracking-tight">Fashion Studio</span> */}
+
+                            <LogoWithName style={{ fill: "#C2185B" }} className="h-10" />
                         </Link>
                     </div>
                     <Separator className="bg-white/8 shrink-0" />
@@ -148,9 +153,9 @@ export default function ClientLayout({ children }) {
                     <div className="px-3 py-4 space-y-3">
                         {/* User info */}
                         <div className="flex items-center gap-3 px-2">
-                            <div className="w-9 h-9 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+                            <div className="relative w-9 h-9 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
                                 {(user?.avatarUrl || user?.profilePicture) ? (
-                                    <img src={user.avatarUrl || user.profilePicture} alt="" className="w-full h-full object-cover" />
+                                    <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                                 ) : (
                                     user?.fullName?.charAt(0) || "U"
                                 )}
@@ -179,8 +184,8 @@ export default function ClientLayout({ children }) {
                         {/* Left: page title */}
                         <div className="flex items-center gap-3">
                             {/* Mobile brand mark */}
-                            <div className="lg:hidden w-8 h-8 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs shrink-0">
-                                F
+                            <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                                {<Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />}
                             </div>
                             <h1 className="text-sm font-semibold text-[#0D0D0D]">{pageTitle}</h1>
                         </div>
@@ -217,9 +222,9 @@ export default function ClientLayout({ children }) {
                                 href="/client/profile"
                                 className="hidden sm:flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#F4F0F8] transition-colors"
                             >
-                                <div className="w-7 h-7 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
+                                <div className="relative w-7 h-7 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
                                     {(user?.avatarUrl || user?.profilePicture) ? (
-                                        <img src={user.avatarUrl || user.profilePicture} alt="" className="w-full h-full object-cover" />
+                                        <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                                     ) : (
                                         user?.fullName?.charAt(0) || "U"
                                     )}

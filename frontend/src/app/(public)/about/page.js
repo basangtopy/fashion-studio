@@ -79,7 +79,7 @@ function AboutHero() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5 }}
-                    className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+                    className="absolute top-100 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
                 >
                     <span className="text-[10px] uppercase tracking-[0.3em] text-white/30 font-medium">Scroll to explore</span>
                     <motion.div
@@ -122,7 +122,7 @@ function OriginSection() {
                         </div>
 
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0D0D0D] mb-6 leading-tight">
-                            Crafted in Lagos.{" "}
+                            Crafted in Nigeria.{" "}
                             <span className="text-[#C2185B]">Made for You.</span>
                         </h2>
 
