@@ -58,8 +58,7 @@ const baseTemplate = ({ title, preheader, body }) => `
 
       <!-- Header -->
       <div class="header">
-        ${process.env.BRAND_LOGO_URL ? `<img src="${process.env.BRAND_LOGO_URL}" alt="${process.env.EMAIL_FROM_NAME || "Fashion Studio"}" height="60" style="max-height:60px;width:auto;margin-bottom:8px;" />` : ""}
-        <div class="header-title">${process.env.EMAIL_FROM_NAME || "Fashion Studio"}</div>
+        ${process.env.BRAND_LOGO_URL ? `<img src="${process.env.BRAND_LOGO_URL}" alt="${process.env.EMAIL_FROM_NAME || "Fashion Studio"}" height="60" style="max-height:60px;width:auto;margin-bottom:8px;" />` : `<div class="header-title">${process.env.EMAIL_FROM_NAME || "Fashion Studio"}</div>`}  
       </div>
 
       <!-- Body -->

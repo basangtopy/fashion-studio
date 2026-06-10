@@ -85,3 +85,14 @@ export const createClientSchema = z.object({
   dateOfBirth: z.iso.date().optional(),
   address: z.string().min(5).max(300).trim().optional(),
 });
+
+export const changeUserRoleSchema = z.object({
+  newRole: z.enum(["STAFF_ADMIN", "CLIENT"], {
+    required_error: "New role is required",
+    invalid_type_error: "Role must be either STAFF_ADMIN or CLIENT",
+  }),
+
+  confirmPassword: z
+    .string({ required_error: "Password confirmation is required" })
+    .min(1, "Password is required"),
+});

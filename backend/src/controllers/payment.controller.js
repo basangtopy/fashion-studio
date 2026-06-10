@@ -455,7 +455,7 @@ export const exportPayments = async (req, res) => {
     };
   }
 
-  return exportPaymentsToPDF(res, payments, filename, summary);
+  return await exportPaymentsToPDF(res, payments, filename, summary);
 };
 
 // ─── GET /admin/finance/summary ───────────────────────────────────────────

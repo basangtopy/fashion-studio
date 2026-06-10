@@ -3,6 +3,7 @@
 import { Settings, User, Bell, Shield, Palette } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { BRANDING } from "@/config/branding";
+import RoleManagementSection from "@/components/admin/RoleManagementSection";
 
 export default function AdminSettingsPage() {
     const { user, isSuperAdmin } = useAuth();
@@ -50,6 +51,9 @@ export default function AdminSettingsPage() {
                     <SettingsRow label="Role" value={user?.role === "SUPER_ADMIN" ? "Super Admin" : "Staff Admin"} />
                 </div>
             </section>
+
+            {/* Role Management */}
+            <RoleManagementSection />
 
             {/* Notification Preferences */}
             <section className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">

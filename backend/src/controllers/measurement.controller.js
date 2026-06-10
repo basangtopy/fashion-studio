@@ -287,7 +287,7 @@ export const exportMeasurements = async (req, res) => {
     : `all-measurements-${new Date().toISOString().split("T")[0]}`;
 
   if (format === "pdf") {
-    exportMeasurementsToPDF(res, measurements, filename);
+    await exportMeasurementsToPDF(res, measurements, filename);
   } else {
     exportMeasurementsToCSV(res, measurements, filename);
   }

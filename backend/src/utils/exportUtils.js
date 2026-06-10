@@ -1,5 +1,7 @@
 import { format } from "@fast-csv/format";
 import PDFDocument from "pdfkit";
+import https from "https";
+import http from "http";
 
 // ─── Brand constants for PDF exports ───────────────────────────────────────
 // Mirrors the relevant subset from the frontend branding config (branding.js).
@@ -22,6 +24,45 @@ const BRAND = {
     border: "#E0D8E8",
   },
 };
+
+// ─── Logo cache ──────────────────────────────────────────────────────────────
+// Fetched once on first PDF export, then reused for subsequent exports.
+let _logoBuffer = null;
+let _logoFetchAttempted = false;
+
+/**
+ * Fetches the brand logo from BRAND_LOGO_URL and caches it as a Buffer.
+ * Resolves with the buffer, or null if unavailable/fetch fails.
+ */
+function fetchLogoBuffer() {
+  if (_logoFetchAttempted) return Promise.resolve(_logoBuffer);
+  _logoFetchAttempted = true;
+
+  const url = process.env.BRAND_LOGO_URL;
+  if (!url) return Promise.resolve(null);
+
+  return new Promise((resolve) => {
+    const client = url.startsWith("https") ? https : http;
+    client
+      .get(url, (res) => {
+        if (res.statusCode !== 200) {
+          res.resume();
+          console.warn(`[exportUtils] Logo fetch failed: HTTP ${res.statusCode}`);
+          return resolve(null);
+        }
+        const chunks = [];
+        res.on("data", (chunk) => chunks.push(chunk));
+        res.on("end", () => {
+          _logoBuffer = Buffer.concat(chunks);
+          resolve(_logoBuffer);
+        });
+      })
+      .on("error", (err) => {
+        console.warn(`[exportUtils] Logo fetch error: ${err.message}`);
+        resolve(null);
+      });
+  });
+}
 
 // All standard measurement fields in display order
 const MEASUREMENT_FIELDS = [
@@ -48,7 +89,7 @@ const MEASUREMENT_FIELDS = [
  * Draws the branded header strip at the top of the current page.
  * @returns {number} The y-position below the header, ready for content.
  */
-function drawBrandedHeader(doc, title) {
+function drawBrandedHeader(doc, title, logoBuffer = null) {
   const pageWidth = doc.page.width;
   const margin = doc.page.margins.left;
   const contentWidth = pageWidth - margin * 2;
@@ -57,15 +98,20 @@ function drawBrandedHeader(doc, title) {
   const stripHeight = 50;
   doc.rect(0, 0, pageWidth, stripHeight).fill(BRAND.colors.secondary);
 
-  // Business name (left)
-  doc
-    .fontSize(17)
-    .font("Helvetica-Bold")
-    .fillColor(BRAND.colors.headerText)
-    .text(BRAND.name, margin, 14, {
-      width: contentWidth * 0.55,
-      lineBreak: false,
-    });
+  // Business name / logo (left)
+  if (logoBuffer) {
+    // Draw logo image — constrain to fit within the strip with some padding
+    doc.image(logoBuffer, margin, 7, { height: 36, fit: [160, 36] });
+  } else {
+    doc
+      .fontSize(17)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.headerText)
+      .text(BRAND.name, margin, 14, {
+        width: contentWidth * 0.55,
+        lineBreak: false,
+      });
+  }
 
   // Tagline (right)
   doc
@@ -136,7 +182,7 @@ function drawBrandedHeader(doc, title) {
  * Draws a compact branded header for continuation pages (no title/date).
  * @returns {number} The y-position below the mini header.
  */
-function drawContinuationHeader(doc) {
+function drawContinuationHeader(doc, logoBuffer = null) {
   const pageWidth = doc.page.width;
   const margin = doc.page.margins.left;
   const contentWidth = pageWidth - margin * 2;
@@ -145,14 +191,18 @@ function drawContinuationHeader(doc) {
   const barHeight = 24;
   doc.rect(0, 0, pageWidth, barHeight).fill(BRAND.colors.secondary);
 
-  doc
-    .fontSize(9)
-    .font("Helvetica-Bold")
-    .fillColor(BRAND.colors.headerText)
-    .text(BRAND.name, margin, 7, {
-      width: contentWidth * 0.5,
-      lineBreak: false,
-    });
+  if (logoBuffer) {
+    doc.image(logoBuffer, margin, 3, { height: 18, fit: [80, 18] });
+  } else {
+    doc
+      .fontSize(9)
+      .font("Helvetica-Bold")
+      .fillColor(BRAND.colors.headerText)
+      .text(BRAND.name, margin, 7, {
+        width: contentWidth * 0.5,
+        lineBreak: false,
+      });
+  }
 
   doc
     .fontSize(7)
@@ -309,7 +359,7 @@ export const exportMeasurementsToCSV = (
 
 // ─── PDF Export ────────────────────────────────────────────────────────────
 
-export const exportMeasurementsToPDF = (
+export const exportMeasurementsToPDF = async (
   res,
   measurements,
   filename = "measurements",
@@ -319,6 +369,9 @@ export const exportMeasurementsToPDF = (
     "Content-Disposition",
     `attachment; filename="${filename}.pdf"`,
   );
+
+  // Fetch the brand logo once (cached after first call)
+  const logoBuffer = await fetchLogoBuffer();
 
   const isSingle = measurements.length === 1;
 
@@ -332,9 +385,9 @@ export const exportMeasurementsToPDF = (
   doc.pipe(res);
 
   if (isSingle) {
-    drawSingleClientPDF(doc, measurements[0]);
+    drawSingleClientPDF(doc, measurements[0], logoBuffer);
   } else {
-    drawMultiClientPDF(doc, measurements);
+    drawMultiClientPDF(doc, measurements, logoBuffer);
   }
 
   // ── Branded footers on every page ──
@@ -345,11 +398,11 @@ export const exportMeasurementsToPDF = (
 
 // ─── Single Client Layout (Portrait) ──────────────────────────────────────
 
-function drawSingleClientPDF(doc, m) {
+function drawSingleClientPDF(doc, m, logoBuffer = null) {
   const margin = doc.page.margins.left;
   const contentWidth = doc.page.width - margin * 2;
 
-  let y = drawBrandedHeader(doc, "Client Measurement Record");
+  let y = drawBrandedHeader(doc, "Client Measurement Record", logoBuffer);
 
   // ── Client info card ──
   const cardPadding = 12;
@@ -555,7 +608,7 @@ function drawSingleClientPDF(doc, m) {
 
 // ─── Multi-Client Layout (Landscape) ──────────────────────────────────────
 
-function drawMultiClientPDF(doc, measurements) {
+function drawMultiClientPDF(doc, measurements, logoBuffer = null) {
   const margin = doc.page.margins.left;
   const contentWidth = doc.page.width - margin * 2;
   const rowHeight = 20;
@@ -593,7 +646,7 @@ function drawMultiClientPDF(doc, measurements) {
   ];
 
   // ── Page 1: full branded header ──
-  let currentY = drawBrandedHeader(doc, "Client Measurements Report");
+  let currentY = drawBrandedHeader(doc, "Client Measurements Report", logoBuffer);
 
   // Summary line
   doc
@@ -616,7 +669,7 @@ function drawMultiClientPDF(doc, measurements) {
       doc.addPage();
 
       // Draw continuation header on the new page
-      currentY = drawContinuationHeader(doc);
+      currentY = drawContinuationHeader(doc, logoBuffer);
 
       // Redraw the table header
       currentY = drawTableHeaderRow(doc, columns, currentY);

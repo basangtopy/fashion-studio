@@ -8,6 +8,8 @@ import {
   getClientOnlineStatus,
   createClientAccount,
   updateClientAccount,
+  changeUserRole,
+  getStaffAdmins,
 } from "../controllers/user.controller.js";
 import { authenticate, authorise } from "../middleware/auth.middleware.js";
 import { uploadSingle } from "../middleware/upload.middleware.js";
@@ -16,6 +18,7 @@ import {
   updateProfileSchema,
   changePasswordSchema,
   createClientSchema,
+  changeUserRoleSchema,
 } from "../validators/user.validators.js";
 
 const router = Router();
@@ -62,6 +65,20 @@ router.put(
   authorise("STAFF_ADMIN", "SUPER_ADMIN"),
   validate(updateProfileSchema),
   updateClientAccount,
+);
+
+// ── Super Admin role management ──────────────────────────────────────────
+router.get(
+  "/admin/staff",
+  authorise("SUPER_ADMIN"),
+  getStaffAdmins,
+);
+
+router.patch(
+  "/admin/users/:id/role",
+  authorise("SUPER_ADMIN"),
+  validate(changeUserRoleSchema),
+  changeUserRole,
 );
 
 export default router;

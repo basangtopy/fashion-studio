@@ -300,3 +300,100 @@ export const updateClientAccount = async (req, res) => {
     client: sanitizeUser(updated),
   });
 };
+
+// ─── Super Admin: GET /admin/staff ────────────────────────────────────────────
+// Lists all staff admin users (for role management)
+export const getStaffAdmins = async (req, res) => {
+  const { search } = req.query;
+
+  const where = { role: "STAFF_ADMIN" };
+
+  if (search) {
+    where.OR = [
+      { fullName: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  const staff = await prisma.user.findMany({
+    where,
+    select: {
+      id: true,
+      fullName: true,
+      email: true,
+      profilePicture: true,
+      createdAt: true,
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  return successResponse(res, 200, "Staff admins retrieved", { staff });
+};
+
+// ─── Super Admin: PATCH /admin/users/:id/role ────────────────────────────────
+// Changes a user's role — requires password re-confirmation
+export const changeUserRole = async (req, res) => {
+  const { id } = req.params;
+  const { newRole, confirmPassword } = req.validatedBody;
+
+  // 1. Only SUPER_ADMIN can change roles (enforced by middleware too, but double-check)
+  if (req.user.role !== "SUPER_ADMIN") {
+    throw new AppError("Only a Super Admin can change user roles", 403);
+  }
+
+  // 2. Prevent changing your own role
+  if (id === req.user.userId) {
+    throw new AppError("You cannot change your own role", 400);
+  }
+
+  // 3. Re-authenticate: verify the super admin's password
+  const superAdmin = await prisma.user.findUnique({
+    where: { id: req.user.userId },
+    select: { passwordHash: true },
+  });
+
+  if (!superAdmin || !superAdmin.passwordHash) {
+    throw new AppError("Unable to verify your identity", 400);
+  }
+
+  const isPasswordValid = await bcrypt.compare(confirmPassword, superAdmin.passwordHash);
+  if (!isPasswordValid) {
+    throw new AppError("Incorrect password. Role change denied.", 403);
+  }
+
+  // 4. Find the target user
+  const targetUser = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, role: true, fullName: true, email: true },
+  });
+
+  if (!targetUser) {
+    throw new AppError("User not found", 404);
+  }
+
+  // 5. Prevent changing a SUPER_ADMIN's role
+  if (targetUser.role === "SUPER_ADMIN") {
+    throw new AppError("Cannot change the role of another Super Admin", 400);
+  }
+
+  // 6. Prevent setting role to SUPER_ADMIN
+  if (newRole === "SUPER_ADMIN") {
+    throw new AppError("Cannot promote a user to Super Admin", 400);
+  }
+
+  // 7. No-op check
+  if (targetUser.role === newRole) {
+    throw new AppError(`User is already a ${newRole === "STAFF_ADMIN" ? "Staff Admin" : "Client"}`, 400);
+  }
+
+  // 8. Update the role
+  const updated = await prisma.user.update({
+    where: { id },
+    data: { role: newRole },
+  });
+
+  return successResponse(res, 200, `Role updated to ${newRole === "STAFF_ADMIN" ? "Staff Admin" : "Client"} successfully`, {
+    user: sanitizeUser(updated),
+  });
+};

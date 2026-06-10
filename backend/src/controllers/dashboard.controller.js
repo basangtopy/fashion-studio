@@ -1,8 +1,7 @@
 import prisma from "../config/prisma.js";
 import { Prisma } from "../../prisma/generated/prisma/client.ts";
 import { successResponse } from "../utils/apiResponse.js";
-import { format as formatCsv } from "fast-csv";
-import PDFDocument from "pdfkit";
+import { exportDashboardToCSV, exportDashboardToPDF } from "../utils/dashboardExport.js";
 import { getOnlineUserIds } from "../utils/sseManager.js";
 
 // ─── GET /admin/dashboard ─────────────────────────────────────────────────
@@ -349,145 +348,25 @@ export const exportDashboard = async (req, res) => {
       ? `${new Date(from).toLocaleDateString()} – ${new Date(to).toLocaleDateString()}`
       : "All time";
 
+  // ── Normalise Prisma aggregates and dispatch to export utility ──
+  const data = {
+    periodLabel,
+    totalClients,
+    totalOrders,
+    activeOrders,
+    totalRevenue: Number(totalRevenue._sum.amount || 0),
+    ordersInPeriod,
+    revenueInPeriod: Number(revenueInPeriod._sum.amount || 0),
+    newClientsInPeriod,
+    ordersByStatus,
+    ordersByType,
+  };
+  const filename = `dashboard-${new Date().toISOString().split("T")[0]}`;
+
   if (format === "csv") {
-    // ── CSV Export ──────────────────────────────────────────────────────
-    res.setHeader("Content-Type", "text/csv");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="dashboard-${new Date().toISOString().split("T")[0]}.csv"`,
-    );
-
-    const csvStream = formatCsv({ headers: true });
-    csvStream.pipe(res);
-
-    // Summary row
-    csvStream.write({
-      Metric: "Period",
-      Value: periodLabel,
-    });
-    csvStream.write({ Metric: "Total Clients", Value: totalClients });
-    csvStream.write({ Metric: "Total Orders", Value: totalOrders });
-    csvStream.write({ Metric: "Active Orders", Value: activeOrders });
-    csvStream.write({
-      Metric: "Total Revenue",
-      Value: Number(totalRevenue._sum.amount || 0),
-    });
-    csvStream.write({
-      Metric: "Orders in Period",
-      Value: ordersInPeriod,
-    });
-    csvStream.write({
-      Metric: "Revenue in Period",
-      Value: Number(revenueInPeriod._sum.amount || 0),
-    });
-    csvStream.write({
-      Metric: "New Clients in Period",
-      Value: newClientsInPeriod,
-    });
-
-    // Status breakdown
-    for (const row of ordersByStatus) {
-      csvStream.write({
-        Metric: `Orders — ${row.status}`,
-        Value: row._count,
-      });
-    }
-
-    // Type breakdown
-    for (const row of ordersByType) {
-      csvStream.write({
-        Metric: `Orders — ${row.orderType}`,
-        Value: row._count,
-      });
-    }
-
-    csvStream.end();
+    return exportDashboardToCSV(res, data, filename);
   } else {
-    // ── PDF Export ──────────────────────────────────────────────────────
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="dashboard-${new Date().toISOString().split("T")[0]}.pdf"`,
-    );
-
-    const doc = new PDFDocument({ margin: 50 });
-    doc.pipe(res);
-
-    // Title
-    doc
-      .fontSize(20)
-      .font("Helvetica-Bold")
-      .text("Dashboard Report", { align: "center" });
-    doc.moveDown(0.5);
-    doc
-      .fontSize(10)
-      .font("Helvetica")
-      .fillColor("#999999")
-      .text(`Generated: ${new Date().toLocaleDateString()}`, {
-        align: "center",
-      });
-    doc.text(`Period: ${periodLabel}`, { align: "center" });
-    doc.moveDown(1.5);
-
-    // Summary section
-    doc
-      .fontSize(14)
-      .font("Helvetica-Bold")
-      .fillColor("#333333")
-      .text("Summary");
-    doc.moveDown(0.5);
-    doc.fontSize(11).font("Helvetica").fillColor("#555555");
-
-    const summaryData = [
-      ["Total Clients", totalClients],
-      ["Total Orders", totalOrders],
-      ["Active Orders", activeOrders],
-      [
-        "Total Revenue",
-        `₦${Number(totalRevenue._sum.amount || 0).toLocaleString()}`,
-      ],
-      ["Orders in Period", ordersInPeriod],
-      [
-        "Revenue in Period",
-        `₦${Number(revenueInPeriod._sum.amount || 0).toLocaleString()}`,
-      ],
-      ["New Clients in Period", newClientsInPeriod],
-    ];
-
-    for (const [label, value] of summaryData) {
-      doc.text(`${label}: ${value}`);
-    }
-
-    doc.moveDown(1);
-
-    // Order breakdown
-    doc
-      .fontSize(14)
-      .font("Helvetica-Bold")
-      .fillColor("#333333")
-      .text("Orders by Status");
-    doc.moveDown(0.5);
-    doc.fontSize(11).font("Helvetica").fillColor("#555555");
-
-    for (const row of ordersByStatus) {
-      doc.text(`${row.status}: ${row._count}`);
-    }
-
-    doc.moveDown(1);
-
-    doc
-      .fontSize(14)
-      .font("Helvetica-Bold")
-      .fillColor("#333333")
-      .text("Orders by Type");
-    doc.moveDown(0.5);
-    doc.fontSize(11).font("Helvetica").fillColor("#555555");
-
-    for (const row of ordersByType) {
-      doc.text(`${row.orderType}: ${row._count}`);
-    }
-
-    doc.end();
+    return await exportDashboardToPDF(res, data, filename);
   }
 };
 
