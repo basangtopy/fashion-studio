@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -12,16 +12,22 @@ import {
     ArrowRight,
     Eye,
     MessageSquare,
+    Star,
+    Send,
+    X,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/components/ui/toaster";
 import { formatCurrency, getGreeting, ORDER_STATUS, ORDER_TYPES } from "@/config/branding";
 import StatusPill from "@/components/shared/StatusPill";
 import { SkeletonStat, SkeletonCard } from "@/components/shared/Skeleton";
 import OrderListItem from "@/components/shared/OrderListItem";
 import { useScrollReveal, useCountUp } from "@/hooks/useAnimations";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import ImageUpload from "@/components/shared/ImageUpload";
 import EmptyState from "@/components/shared/EmptyState";
 import NewOrderDialog from "@/components/shared/NewOrderDialog";
 const LIFECYCLE_STEPS = [
@@ -112,6 +118,12 @@ export default function ClientDashboard() {
     const { user } = useAuth();
     const pathname = usePathname();
     const [dialogOpen, setDialogOpen] = useState(false);
+    const toast = useToast();
+    const queryClient = useQueryClient();
+
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [reviewFormData, setReviewFormData] = useState({ rating: 5, review: "" });
+    const [reviewNewImageFiles, setReviewNewImageFiles] = useState([]);
 
     const { data: orders, isLoading: ordersLoading } = useQuery({
         queryKey: ["client-orders"],
@@ -159,6 +171,32 @@ export default function ClientDashboard() {
         year: "numeric",
         month: "long",
         day: "numeric",
+    });
+
+    const reviewSubmitMutation = useMutation({
+        mutationFn: async (payload) => {
+            const formData = new FormData();
+            formData.append("rating", payload.rating);
+            formData.append("review", payload.review);
+            if (reviewNewImageFiles[0]) {
+                formData.append("reviews", reviewNewImageFiles[0]);
+            }
+
+            const { data } = await api.post("/testimonials", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+            return data;
+        },
+        onSuccess: () => {
+            toast.success("Thank you!", "Your review has been submitted and is pending approval.");
+            setShowReviewForm(false);
+            setReviewFormData({ rating: 5, review: "" });
+            setReviewNewImageFiles([]);
+            queryClient.invalidateQueries({ queryKey: ["testimonials"] });
+        },
+        onError: (err) => {
+            toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Could not submit review.");
+        },
     });
 
     const pendingAppointmentDate = pendingAppointment?.requestedDate;
@@ -346,14 +384,17 @@ export default function ClientDashboard() {
                         </Link>
                     </motion.div>
 
-                    {/* View Portfolio */}
+                    {/* Write Review */}
                     <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
-                        <Link href="/portfolio" className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2">
+                        <button
+                            onClick={() => setShowReviewForm(true)}
+                            className="w-full h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                        >
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2E7D3215" }}>
-                                <Eye size={18} style={{ color: "#2E7D32" }} />
+                                <Star size={18} style={{ color: "#2E7D32" }} />
                             </div>
-                            <span className="text-xs font-medium text-[#555]">View Portfolio</span>
-                        </Link>
+                            <span className="text-xs font-medium text-[#555]">Write a Review</span>
+                        </button>
                     </motion.div>
                 </motion.div>
             </div>
@@ -395,6 +436,95 @@ export default function ClientDashboard() {
                     </div>
                 )
             }
+
+            {/* Review Submission Modal */}
+            <AnimatePresence>
+                {showReviewForm && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setShowReviewForm(false)}
+                    >
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            className="bg-white rounded-xl max-w-md w-full p-6"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-lg font-semibold text-[#0D0D0D]">Share Your Review</h3>
+                                <Button variant="ghost" size="icon" onClick={() => setShowReviewForm(false)} className="w-8 h-8 rounded-md hover:bg-[#F4F0F8]">
+                                    <X size={18} className="text-[#999]" />
+                                </Button>
+                            </div>
+
+                            {/* Star Rating */}
+                            <div className="mb-4">
+                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Rating</label>
+                                <div className="flex gap-1">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setReviewFormData((prev) => ({ ...prev, rating: i + 1 }))}
+                                            className="p-1 transition-transform hover:scale-110"
+                                        >
+                                            <Star
+                                                size={28}
+                                                className={
+                                                    i < reviewFormData.rating
+                                                        ? "text-[#F9A825] fill-[#F9A825]"
+                                                        : "text-[#E0E0E0]"
+                                                }
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Review Text */}
+                            <div className="mb-6">
+                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Your Review</label>
+                                <Textarea
+                                    value={reviewFormData.review}
+                                    onChange={(e) =>
+                                        setReviewFormData((prev) => ({ ...prev, review: e.target.value }))
+                                    }
+                                    placeholder="Tell us about your experience..."
+                                    rows={4}
+                                    className="resize-none"
+                                />
+                            </div>
+
+                            {/* Image Upload */}
+                            <div className="mb-6">
+                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Add a Photo (Optional)</label>
+                                <ImageUpload
+                                    existingImages={[]}
+                                    newFiles={reviewNewImageFiles}
+                                    onNewFilesChange={setReviewNewImageFiles}
+                                    onExistingImagesReorder={() => { }}
+                                    onExistingImageDelete={() => { }}
+                                    maxFiles={1}
+                                />
+                            </div>
+
+                            <Button
+                                onClick={() => reviewSubmitMutation.mutate(reviewFormData)}
+                                disabled={!reviewFormData.review.trim() || reviewSubmitMutation.isPending}
+                                className="w-full flex h-auto items-center justify-center gap-2 py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors disabled:opacity-50"
+                            >
+                                <Send size={16} />
+                                {reviewSubmitMutation.isPending ? "Submitting..." : "Submit Review"}
+                            </Button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* New Order Dialog */}
             <NewOrderDialog open={dialogOpen} onOpenChange={setDialogOpen} />
         </div>

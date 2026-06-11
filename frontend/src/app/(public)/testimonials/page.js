@@ -70,7 +70,7 @@ export default function TestimonialsPage() {
             queryClient.invalidateQueries({ queryKey: ["testimonials"] });
         },
         onError: (err) => {
-            toast.error("Error", err.response?.data?.message || "Could not submit review.");
+            toast.error("Error", err.response?.data?.errors?.[0]?.message || err.response?.data?.message || "Could not submit review.");
         },
     });
 
