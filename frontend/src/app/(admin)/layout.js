@@ -432,7 +432,9 @@ export default function AdminLayout({ children }) {
                     {/* Left: breadcrumb on desktop, brand on mobile */}
                     <div className="flex items-center gap-3">
                         <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                            {<Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />}
+                            {<Link href="/">
+                                <Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />
+                            </Link>}
                         </div>
                         <h2 className="text-sm font-semibold text-[#0D0D0D] capitalize hidden sm:block">
                             {breadcrumb}

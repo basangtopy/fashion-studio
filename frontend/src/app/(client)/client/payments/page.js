@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { CreditCard, ChevronDown, AlertTriangle } from "lucide-react";
+import { CreditCard, ChevronDown, AlertTriangle, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { formatCurrency, PAYMENT_STATUS } from "@/config/branding";
@@ -12,9 +12,12 @@ import { SkeletonStat, SkeletonCard } from "@/components/shared/Skeleton";
 import EmptyState from "@/components/shared/EmptyState";
 import StatusPill from "@/components/shared/StatusPill";
 import { Button } from "@/components/ui/button";
+import ImageLightbox from "@/components/shared/ImageLightbox";
 
 export default function ClientPaymentsPage() {
     const [expanded, setExpanded] = useState(null);
+    const [lightboxImage, setLightboxImage] = useState(null);
+
 
     const { data, isLoading } = useQuery({
         queryKey: ["client-payments"],
@@ -270,8 +273,8 @@ export default function ClientPaymentsPage() {
                                                             <p className="text-xs font-semibold text-[#0D0D0D] mb-3 flex items-center gap-1.5">
                                                                 Payment Proof
                                                             </p>
-                                                            <div className="relative w-full max-w-[280px] aspect-[4/3] rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
-                                                                <Image src={payment.proofUrl} alt="Payment proof" fill className="object-cover" />
+                                                            <div onClick={() => { setLightboxImage(payment.proofUrl) }} className="cursor-pointer relative w-full max-w-[280px] aspect-[4/3] rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#FAFAFA] hover:opacity-80 transition-opacity">
+                                                                <Image src={payment.proofUrl} alt="Payment proof" fill className="object-contain" />
                                                             </div>
                                                         </div>
                                                     )}
@@ -285,6 +288,9 @@ export default function ClientPaymentsPage() {
                     })}
                 </motion.div>
             )}
+
+            {/* ─── Image Lightbox ─── */}
+            <ImageLightbox lightboxImage={lightboxImage} setLightboxImage={setLightboxImage} />
         </div>
     );
 }

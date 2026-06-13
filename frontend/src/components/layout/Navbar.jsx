@@ -269,7 +269,15 @@ export default function Navbar() {
                         className="fixed inset-0 z-[60] bg-[#1A1A2E]"
                     >
                         <div className="flex items-center justify-between p-4">
-                            <span className="text-xl font-bold text-white">{BRANDING.businessName}</span>
+                            {/* Logo */}
+                            <Link href="/" className="flex items-center gap-2 shrink-0">
+                                <Logo
+                                    height={36}
+                                    style={{ fill: BRANDING.colors.primary }}
+                                />
+
+                            </Link>
+
                             <button onClick={() => setMobileMenuOpen(false)} className="text-white p-2">
                                 <X size={24} />
                             </button>

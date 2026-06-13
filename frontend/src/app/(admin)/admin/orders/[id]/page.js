@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/toaster";
 import { useAuth } from "@/context/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ImageLightbox from "@/components/shared/ImageLightbox";
 
 // Must match the backend's ORDER_STATUS_TRANSITIONS exactly
 const ORDER_STATUS_TRANSITIONS = {
@@ -719,7 +720,7 @@ export default function AdminOrderDetailPage() {
                                             <div className="flex justify-center items-center gap-1.5 mt-2">
                                                 {(pay.proofImages || [pay.proofUrl]).filter(Boolean).map((img, i) => (
                                                     <button key={i} onClick={() => setLightboxImage(img)}
-                                                        className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
+                                                        className="cursor-pointer relative w-12 h-12 rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity">
                                                         <Image src={img} alt="Proof" fill className="object-cover" />
                                                     </button>
                                                 ))}
@@ -927,35 +928,7 @@ export default function AdminOrderDetailPage() {
             </AnimatePresence>
 
             {/* ─── Image Lightbox ─── */}
-            <AnimatePresence>
-                {lightboxImage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[90] bg-black/80 flex items-center justify-center p-4"
-                        onClick={() => setLightboxImage(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9 }}
-                            animate={{ scale: 1 }}
-                            exit={{ scale: 0.9 }}
-                            className="relative max-w-3xl max-h-[85vh] w-full"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <button
-                                onClick={() => setLightboxImage(null)}
-                                className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center"
-                            >
-                                <X size={16} className="text-[#0D0D0D]" />
-                            </button>
-                            <div className="relative w-full h-[70vh] rounded-xl overflow-hidden bg-black">
-                                <Image src={lightboxImage} alt="" fill className="object-contain" />
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <ImageLightbox lightboxImage={lightboxImage} setLightboxImage={setLightboxImage} />
         </div>
     );
 }

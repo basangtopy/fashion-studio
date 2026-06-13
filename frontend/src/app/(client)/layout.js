@@ -118,11 +118,6 @@ export default function ClientLayout({ children }) {
                     {/* Brand */}
                     <div className="h-14 flex items-center px-5 shrink-0">
                         <Link href="/" className="flex items-center gap-2 text-white">
-                            {/* <div className="w-8 h-8 rounded-lg bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs">
-                                F
-                            </div>
-                            <span className="text-sm font-bold tracking-tight">Fashion Studio</span> */}
-
                             <LogoWithName style={{ fill: "#C2185B" }} className="h-10" />
                         </Link>
                     </div>
@@ -185,7 +180,9 @@ export default function ClientLayout({ children }) {
                         <div className="flex items-center gap-3">
                             {/* Mobile brand mark */}
                             <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                                {<Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />}
+                                <Link href="/">
+                                    <Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />
+                                </Link>
                             </div>
                             <h1 className="text-sm font-semibold text-[#0D0D0D]">{pageTitle}</h1>
                         </div>
