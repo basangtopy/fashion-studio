@@ -8,7 +8,7 @@ export const metadata = {
     template: `%s | ${BRANDING.businessName}`,
   },
   icons: {
-    icon: "/images/logo.png",
+    icon: "/images/logo-brand.png",
   },
   description:
     "Premium fashion design studio in Lagos, Nigeria. Custom sewing, designer-sourced fabric, and ready-to-wear collections. Crafted with care, made to last.",
