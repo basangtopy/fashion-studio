@@ -69,21 +69,21 @@ const MEASUREMENT_OPTIONS = [
         label: "Use my saved measurements",
         description: "The studio will use the measurements already on file for your profile.",
         icon: Ruler,
-        color: "#2E7D32",
+        color: 'var(--color-status-success)',
     },
     {
         value: "update",
         label: "Update my measurements",
         description: "I'll update my measurements on the measurements page after placing this order.",
         icon: Ruler,
-        color: "#1565C0",
+        color: 'var(--color-status-info)',
     },
     {
         value: "fitting",
         label: "Book a fitting appointment",
         description: "I'd like to schedule an in-studio fitting session with the team.",
         icon: Calendar,
-        color: "#C2185B",
+        color: 'var(--color-brand-primary)',
     },
 ];
 
@@ -91,24 +91,24 @@ const MEASUREMENT_OPTIONS = [
 
 function StylePreviewCard({ style, orderType, onChangeStyle }) {
     const models = [];
-    if (style.availableForModel1) models.push({ label: "Client Brings Fabric", color: "#C2185B", bg: "#F8E8F0" });
-    if (style.availableForModel2) models.push({ label: "Studio Sources Fabric", color: "#1565C0", bg: "#E3F2FD" });
+    if (style.availableForModel1) models.push({ label: "Client Brings Fabric", color: 'var(--color-brand-primary)', bg: "#F8E8F0" });
+    if (style.availableForModel2) models.push({ label: "Studio Sources Fabric", color: 'var(--color-status-info)', bg: "#E3F2FD" });
 
     return (
-        <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden">
-            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                <Eye size={16} className="text-[#C2185B]" />
-                <h2 className="font-semibold text-sm text-[#0D0D0D]">Style Selected</h2>
+        <div className="rounded-xl border border-border bg-white overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                <Eye size={16} className="text-primary" />
+                <h2 className="font-semibold text-sm text-foreground">Style Selected</h2>
                 <button
                     onClick={onChangeStyle}
-                    className="ml-auto text-xs text-[#C2185B] hover:underline font-medium"
+                    className="ml-auto text-xs text-primary hover:underline font-medium"
                 >
                     Change Style
                 </button>
             </div>
             <div className="flex items-start gap-4 px-5 py-4">
                 {/* Thumbnail */}
-                <div className="w-16 h-20 rounded-lg bg-[#F4F0F8] overflow-hidden shrink-0 relative">
+                <div className="w-16 h-20 rounded-lg bg-muted overflow-hidden shrink-0 relative">
                     {style.images?.[0] ? (
                         <Image
                             src={style.images[0]}
@@ -121,10 +121,10 @@ function StylePreviewCard({ style, orderType, onChangeStyle }) {
                     )}
                 </div>
                 <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#C2185B] uppercase tracking-wider mb-1">
+                    <p className="text-xs font-medium text-primary uppercase tracking-wider mb-1">
                         {style.category}
                     </p>
-                    <p className="text-base font-bold text-[#0D0D0D] mb-2">{style.name}</p>
+                    <p className="text-base font-bold text-foreground mb-2">{style.name}</p>
                     <div className="flex flex-wrap gap-1.5">
                         {models.map((m) => (
                             <span
@@ -137,7 +137,7 @@ function StylePreviewCard({ style, orderType, onChangeStyle }) {
                         ))}
                     </div>
                     {style.description && (
-                        <p className="text-xs text-[#999] mt-2 line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-text-light mt-2 line-clamp-2 leading-relaxed">
                             {style.description}
                         </p>
                     )}
@@ -175,8 +175,8 @@ function ImageUploader({ images, onChange }) {
                 onClick={() => images.length < MAX && inputRef.current?.click()}
                 className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200 cursor-pointer
                     ${images.length >= MAX
-                        ? "border-[#E0E0E0] bg-[#FAFAFA] cursor-not-allowed opacity-60"
-                        : "border-[#C2185B]/30 bg-[#FFF5F8] hover:border-[#C2185B]/60 hover:bg-[#FFF0F5]"
+                        ? "border-input bg-surface-2 cursor-not-allowed opacity-60"
+                        : "border-primary/30 bg-[#FFF5F8] hover:border-primary/60 hover:bg-[#FFF0F5]"
                     }`}
             >
                 <input
@@ -187,13 +187,13 @@ function ImageUploader({ images, onChange }) {
                     onChange={(e) => handleFiles(e.target.files)}
                     className="hidden"
                 />
-                <Upload size={20} className="mx-auto mb-2 text-[#C2185B]/60" />
-                <p className="text-sm font-medium text-[#555]">
+                <Upload size={20} className="mx-auto mb-2 text-primary/60" />
+                <p className="text-sm font-medium text-muted-foreground">
                     {images.length >= MAX
                         ? "Maximum 5 images uploaded"
                         : "Drop style images here or click to browse"}
                 </p>
-                <p className="text-xs text-[#999] mt-1">
+                <p className="text-xs text-text-light mt-1">
                     PNG, JPG, WEBP · Max 5 images · Any reference photos welcome
                 </p>
             </div>
@@ -204,7 +204,7 @@ function ImageUploader({ images, onChange }) {
                     {images.map((file, i) => (
                         <div
                             key={i}
-                            className="relative aspect-square rounded-lg overflow-hidden bg-[#F4F0F8] group"
+                            className="relative aspect-square rounded-lg overflow-hidden bg-muted group"
                         >
                             <Image
                                 src={URL.createObjectURL(file)}
@@ -223,7 +223,7 @@ function ImageUploader({ images, onChange }) {
                     {images.length < MAX && (
                         <button
                             onClick={() => inputRef.current?.click()}
-                            className="aspect-square rounded-lg border-2 border-dashed border-[#E0E0E0] flex items-center justify-center hover:border-[#C2185B]/40 transition-colors"
+                            className="aspect-square rounded-lg border-2 border-dashed border-input flex items-center justify-center hover:border-primary/40 transition-colors"
                         >
                             <ImagePlus size={18} className="text-[#BDBDBD]" />
                         </button>
@@ -247,16 +247,16 @@ function MeasurementSnapshot({ measurement }) {
     if (fields.length === 0) return null;
 
     return (
-        <div className="flex flex-wrap gap-3 mt-3 p-3 rounded-lg bg-[#F4F0F8]">
+        <div className="flex flex-wrap gap-3 mt-3 p-3 rounded-lg bg-muted">
             {fields.map(([label, value]) => (
                 <div key={label} className="flex flex-col">
-                    <span className="text-[10px] text-[#999] uppercase tracking-wider">{label}</span>
-                    <span className="text-sm font-semibold font-mono text-[#0D0D0D]">{value}cm</span>
+                    <span className="text-[10px] text-text-light uppercase tracking-wider">{label}</span>
+                    <span className="text-sm font-semibold font-mono text-foreground">{value}cm</span>
                 </div>
             ))}
             <div className="flex flex-col">
-                <span className="text-[10px] text-[#999] uppercase tracking-wider">Updated</span>
-                <span className="text-sm font-semibold text-[#0D0D0D]">
+                <span className="text-[10px] text-text-light uppercase tracking-wider">Updated</span>
+                <span className="text-sm font-semibold text-foreground">
                     {measurement?.updatedAt
                         ? new Date(measurement.updatedAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })
                         : "—"}
@@ -288,10 +288,10 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                 className="mb-6 relative"
             >
                 <div className="w-20 h-20 rounded-full bg-[#E8F5E9] flex items-center justify-center">
-                    <CheckCircle2 size={40} className="text-[#2E7D32]" strokeWidth={1.5} />
+                    <CheckCircle2 size={40} className="text-status-success" strokeWidth={1.5} />
                 </div>
                 <span
-                    className="absolute inset-0 rounded-full animate-ping bg-[#2E7D32]/10"
+                    className="absolute inset-0 rounded-full animate-ping bg-status-success/10"
                     style={{ animationDuration: "1.4s" }}
                 />
             </motion.div>
@@ -302,8 +302,8 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                 transition={{ delay: 0.22, duration: 0.4 }}
                 className="text-center mb-8 max-w-lg"
             >
-                <h1 className="text-2xl sm:text-3xl font-bold text-[#0D0D0D] mb-2">Order Placed!</h1>
-                <p className="text-sm text-[#555] leading-relaxed">
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Order Placed!</h1>
+                <p className="text-sm text-muted-foreground leading-relaxed">
                     Your bespoke order has been received. Our studio will review it and send you a
                     quote within 24 hours.
                 </p>
@@ -318,33 +318,33 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                     className="space-y-4"
                 >
                     {/* Order number */}
-                    <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white p-5">
-                        <p className="text-xs text-[#999] uppercase tracking-wider mb-1.5">Order Number</p>
-                        <p className="text-xl font-bold font-mono text-[#C2185B] tracking-wider">
+                    <div className="rounded-xl border border-border bg-white p-5">
+                        <p className="text-xs text-text-light uppercase tracking-wider mb-1.5">Order Number</p>
+                        <p className="text-xl font-bold font-mono text-primary tracking-wider">
                             {order.orderNumber}
                         </p>
                         <Separator className="my-4" />
 
                         <div className="space-y-2">
                             <div className="flex justify-between text-sm">
-                                <span className="text-[#999]">Type</span>
-                                <span className="font-medium text-[#0D0D0D]">
+                                <span className="text-text-light">Type</span>
+                                <span className="font-medium text-foreground">
                                     {isCustom ? "Custom Style" : order.style?.name || "Catalog Style"}
                                 </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-[#999]">Model</span>
-                                <span className="font-medium text-[#0D0D0D]">{modelLabel}</span>
+                                <span className="text-text-light">Model</span>
+                                <span className="font-medium text-foreground">{modelLabel}</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-[#999]">Status</span>
-                                <span className="inline-flex items-center gap-1.5 font-semibold text-[#E65100]">
+                                <span className="text-text-light">Status</span>
+                                <span className="inline-flex items-center gap-1.5 font-semibold text-status-warning">
                                     <Clock size={12} className="animate-pulse" /> Pending Review
                                 </span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-[#999]">Fulfilment</span>
-                                <span className="font-medium text-[#0D0D0D]">
+                                <span className="text-text-light">Fulfilment</span>
+                                <span className="font-medium text-foreground">
                                     {order.fulfillmentMethod === "DELIVERY" ? "Home Delivery" : "Studio Pickup"}
                                 </span>
                             </div>
@@ -353,10 +353,10 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
 
                     {/* What happens next */}
                     <div className="rounded-xl bg-[#E3F2FD] border border-[#1565C0]/15 p-4 flex gap-3">
-                        <Info size={16} className="text-[#1565C0] shrink-0 mt-0.5" />
+                        <Info size={16} className="text-status-info shrink-0 mt-0.5" />
                         <div>
-                            <p className="text-sm font-semibold text-[#1565C0] mb-1">What happens next?</p>
-                            <p className="text-xs text-[#1565C0]/80 leading-relaxed">
+                            <p className="text-sm font-semibold text-status-info mb-1">What happens next?</p>
+                            <p className="text-xs text-status-info/80 leading-relaxed">
                                 Our studio will review your order and send you a quote within 24 hours. Once
                                 you approve the quote, you'll make a payment (full or installment) and
                                 production begins.
@@ -368,16 +368,16 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                     {measurementChoice === "fitting" && (
                         <button
                             onClick={onBookFitting}
-                            className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#FFF5F8] border border-[#C2185B]/20 hover:bg-[#FFF0F5] transition-colors text-left"
+                            className="w-full flex items-center gap-3 p-4 rounded-xl bg-[#FFF5F8] border border-primary/20 hover:bg-[#FFF0F5] transition-colors text-left"
                         >
-                            <div className="w-9 h-9 rounded-lg bg-[#C2185B]/10 flex items-center justify-center shrink-0">
-                                <Calendar size={16} className="text-[#C2185B]" />
+                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                <Calendar size={16} className="text-primary" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-[#C2185B]">Book Fitting Appointment</p>
-                                <p className="text-xs text-[#999]">You indicated you'd like an in-studio fitting.</p>
+                                <p className="text-sm font-semibold text-primary">Book Fitting Appointment</p>
+                                <p className="text-xs text-text-light">You indicated you'd like an in-studio fitting.</p>
                             </div>
-                            <ArrowRight size={14} className="text-[#C2185B] ml-auto shrink-0" />
+                            <ArrowRight size={14} className="text-primary ml-auto shrink-0" />
                         </button>
                     )}
 
@@ -386,14 +386,14 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                             href="/client/measurements"
                             className="flex items-center gap-3 p-4 rounded-xl bg-[#E3F2FD] border border-[#1565C0]/20 hover:bg-[#EFF6FF] transition-colors"
                         >
-                            <div className="w-9 h-9 rounded-lg bg-[#1565C0]/10 flex items-center justify-center shrink-0">
-                                <Ruler size={16} className="text-[#1565C0]" />
+                            <div className="w-9 h-9 rounded-lg bg-status-info/10 flex items-center justify-center shrink-0">
+                                <Ruler size={16} className="text-status-info" />
                             </div>
                             <div>
-                                <p className="text-sm font-semibold text-[#1565C0]">Update My Measurements</p>
-                                <p className="text-xs text-[#999]">You indicated you'd like to update your measurements.</p>
+                                <p className="text-sm font-semibold text-status-info">Update My Measurements</p>
+                                <p className="text-xs text-text-light">You indicated you'd like to update your measurements.</p>
                             </div>
-                            <ArrowRight size={14} className="text-[#1565C0] ml-auto shrink-0" />
+                            <ArrowRight size={14} className="text-status-info ml-auto shrink-0" />
                         </Link>
                     )}
 
@@ -401,14 +401,14 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                     <div className="flex flex-col sm:flex-row gap-3">
                         <Link
                             href={`/client/orders/${order.id}`}
-                            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-[#C2185B] text-white text-sm font-semibold hover:bg-[#A01548] transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
                         >
                             <ExternalLink size={15} />
                             View Order Details
                         </Link>
                         <Link
                             href="/catalog/styles"
-                            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-[#E0E0E0] text-[#555] text-sm font-semibold hover:bg-[#F4F0F8] transition-colors"
+                            className="flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-input text-muted-foreground text-sm font-semibold hover:bg-muted transition-colors"
                         >
                             <Shirt size={15} />
                             Browse More Styles
@@ -424,11 +424,11 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                     className="space-y-4"
                 >
                     <PaymentInfoCard compact orderNumber={order.orderNumber} />
-                    <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-[#FAFAFA] p-4">
-                        <p className="text-xs font-semibold text-[#555] uppercase tracking-wider mb-2">
+                    <div className="rounded-xl border border-border bg-surface-2 p-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                             Payment note
                         </p>
-                        <p className="text-xs text-[#999] leading-relaxed">
+                        <p className="text-xs text-text-light leading-relaxed">
                             For bespoke orders, payment is made after the studio sends you a quote and you
                             approve it. Once approved, use the account details above to make your payment —
                             full or an initial installment — and send your proof via the order chat.
@@ -444,7 +444,7 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
 
 export default function NewOrderPage() {
     return (
-        <Suspense fallback={<div className="max-w-5xl mx-auto h-96 animate-pulse bg-[#F4F0F8] rounded-2xl" />}>
+        <Suspense fallback={<div className="max-w-5xl mx-auto h-96 animate-pulse bg-muted rounded-2xl" />}>
             <NewOrderContent />
         </Suspense>
     );
@@ -579,7 +579,7 @@ function NewOrderContent() {
             label: "Client Brings Fabric",
             description: "You supply the fabric/material. Our studio handles cutting, sewing, and finishing.",
             icon: Scissors,
-            color: "#C2185B",
+            color: 'var(--color-brand-primary)',
             bg: "#FFF5F8",
         },
         canBeModel2 && {
@@ -587,7 +587,7 @@ function NewOrderContent() {
             label: "Studio Sources Fabric",
             description: "We source fabric to match your style and preference. You just approve and we handle the rest.",
             icon: ShoppingBag,
-            color: "#1565C0",
+            color: 'var(--color-status-info)',
             bg: "#EFF6FF",
         },
     ].filter(Boolean);
@@ -613,7 +613,7 @@ function NewOrderContent() {
                 {[1, 2, 3].map((i) => (
                     <div
                         key={i}
-                        className="h-36 rounded-xl bg-[#F4F0F8] animate-pulse"
+                        className="h-36 rounded-xl bg-muted animate-pulse"
                     />
                 ))}
             </div>
@@ -624,12 +624,12 @@ function NewOrderContent() {
     return (
         <div className="max-w-5xl mx-auto sm:max-lg:mb-20">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-1.5 text-xs text-[#999] mb-6">
-                <Link href="/client/orders" className="hover:text-[#C2185B] transition-colors">
+            <nav className="flex items-center gap-1.5 text-xs text-text-light mb-6">
+                <Link href="/client/orders" className="hover:text-primary transition-colors">
                     My Orders
                 </Link>
                 <ChevronRight size={12} />
-                <span className="text-[#0D0D0D] font-medium">New Order</span>
+                <span className="text-foreground font-medium">New Order</span>
             </nav>
 
             <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6">
@@ -649,13 +649,13 @@ function NewOrderContent() {
                                 onChangeStyle={() => router.push("/catalog/styles")}
                             />
                         ) : (
-                            <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden">
-                                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                                    <Sparkles size={16} className="text-[#C2185B]" />
-                                    <h2 className="font-semibold text-sm text-[#0D0D0D]">Your Custom Style</h2>
+                            <div className="rounded-xl border border-border bg-white overflow-hidden">
+                                <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                                    <Sparkles size={16} className="text-primary" />
+                                    <h2 className="font-semibold text-sm text-foreground">Your Custom Style</h2>
                                     <Link
                                         href="/catalog/styles"
-                                        className="ml-auto text-xs text-[#555] hover:text-[#C2185B] transition-colors"
+                                        className="ml-auto text-xs text-muted-foreground hover:text-primary transition-colors"
                                     >
                                         Browse catalog instead →
                                     </Link>
@@ -663,9 +663,9 @@ function NewOrderContent() {
                                 <div className="px-5 py-4 space-y-4">
                                     {/* Image upload */}
                                     <div>
-                                        <Label className="text-sm font-medium text-[#0D0D0D] mb-2 block">
+                                        <Label className="text-sm font-medium text-foreground mb-2 block">
                                             Reference Images{" "}
-                                            <span className="text-[#999] font-normal">(up to 5)</span>
+                                            <span className="text-text-light font-normal">(up to 5)</span>
                                         </Label>
                                         <ImageUploader
                                             images={customImages}
@@ -675,7 +675,7 @@ function NewOrderContent() {
 
                                     {/* Description */}
                                     <div>
-                                        <Label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">
+                                        <Label className="text-sm font-medium text-foreground mb-1.5 block">
                                             Style Description
                                         </Label>
                                         <Textarea
@@ -683,9 +683,9 @@ function NewOrderContent() {
                                             onChange={(e) => setCustomDesc(e.target.value)}
                                             placeholder="Describe your desired outfit in detail — color, cut, silhouette, occasion, length, neckline, sleeve style, embellishments, or any reference you have in mind..."
                                             maxLength={2000}
-                                            className="resize-none border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] min-h-[120px]"
+                                            className="resize-none border-input focus-visible:ring-ring focus-visible:border-ring min-h-[120px]"
                                         />
-                                        <p className="text-xs text-[#999] mt-1 text-right">
+                                        <p className="text-xs text-text-light mt-1 text-right">
                                             {customDesc.length}/2000
                                         </p>
                                     </div>
@@ -699,11 +699,11 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.06 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden"
+                        className="rounded-xl border border-border bg-white overflow-hidden"
                     >
-                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                            <Scissors size={16} className="text-[#C2185B]" />
-                            <h2 className="font-semibold text-sm text-[#0D0D0D]">Fabric &amp; Service Model</h2>
+                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                            <Scissors size={16} className="text-primary" />
+                            <h2 className="font-semibold text-sm text-foreground">Fabric &amp; Service Model</h2>
                         </div>
                         <div className="px-5 py-4 space-y-3">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -717,27 +717,27 @@ function NewOrderContent() {
                                             onClick={() => setOrderType(opt.value)}
                                             className={`relative flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all duration-150
                                                 ${isSelected
-                                                    ? "border-[#C2185B] bg-[#FFF5F8]"
-                                                    : "border-[#E0E0E0] bg-white hover:border-[#C2185B]/30"
+                                                    ? "border-primary bg-[#FFF5F8]"
+                                                    : "border-input bg-white hover:border-primary/30"
                                                 }`}
                                         >
                                             <div
                                                 className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors
-                                                    ${isSelected ? "bg-[#C2185B] text-white" : "text-[#999]"}`}
+                                                    ${isSelected ? "bg-primary text-primary-foreground" : "text-text-light"}`}
                                                 style={!isSelected ? { background: opt.bg } : {}}
                                             >
                                                 <Icon size={16} style={!isSelected ? { color: opt.color } : {}} />
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-semibold ${isSelected ? "text-[#C2185B]" : "text-[#0D0D0D]"}`}>
+                                                <p className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-foreground"}`}>
                                                     {opt.label}
                                                 </p>
-                                                <p className="text-xs text-[#999] leading-snug mt-0.5">
+                                                <p className="text-xs text-text-light leading-snug mt-0.5">
                                                     {opt.description}
                                                 </p>
                                             </div>
                                             {isSelected && (
-                                                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#C2185B] flex items-center justify-center">
+                                                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                                                     <Check size={10} className="text-white" strokeWidth={3} />
                                                 </div>
                                             )}
@@ -757,9 +757,9 @@ function NewOrderContent() {
                                         className="overflow-hidden"
                                     >
                                         <div className="pt-1">
-                                            <Label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">
+                                            <Label className="text-sm font-medium text-foreground mb-1.5 block">
                                                 Fabric Notes{" "}
-                                                <span className="text-[#999] font-normal">(Optional)</span>
+                                                <span className="text-text-light font-normal">(Optional)</span>
                                             </Label>
                                             <Textarea
                                                 value={fabricNotes}
@@ -770,7 +770,7 @@ function NewOrderContent() {
                                                         : "Any preferences for the fabric the studio sources — color family, texture, material type, or things to avoid..."
                                                 }
                                                 maxLength={1000}
-                                                className="resize-none border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] min-h-[80px]"
+                                                className="resize-none border-input focus-visible:ring-ring focus-visible:border-ring min-h-[80px]"
                                             />
                                         </div>
                                     </motion.div>
@@ -784,16 +784,16 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.1 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden"
+                        className="rounded-xl border border-border bg-white overflow-hidden"
                     >
-                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                            <Ruler size={16} className="text-[#C2185B]" />
-                            <h2 className="font-semibold text-sm text-[#0D0D0D]">Measurements</h2>
+                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                            <Ruler size={16} className="text-primary" />
+                            <h2 className="font-semibold text-sm text-foreground">Measurements</h2>
                         </div>
                         <div className="px-5 py-4 space-y-3">
                             {hasMeasurements ? (
                                 <>
-                                    <p className="text-xs text-[#555] leading-relaxed">
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
                                         We have your measurements on file. How would you like to proceed?
                                     </p>
                                     <MeasurementSnapshot measurement={measurement} />
@@ -808,24 +808,24 @@ function NewOrderContent() {
                                                     onClick={() => setMeasurementChoice(opt.value)}
                                                     className={`w-full flex items-start gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-150
                                                         ${isSelected
-                                                            ? "border-[#C2185B] bg-[#FFF5F8]"
-                                                            : "border-[#E0E0E0] hover:border-[#C2185B]/30"
+                                                            ? "border-primary bg-[#FFF5F8]"
+                                                            : "border-input hover:border-primary/30"
                                                         }`}
                                                 >
                                                     <div
                                                         className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 border-2 transition-colors
                                                             ${isSelected
-                                                                ? "border-[#C2185B] bg-[#C2185B]"
-                                                                : "border-[#E0E0E0] bg-white"
+                                                                ? "border-primary bg-primary"
+                                                                : "border-input bg-white"
                                                             }`}
                                                     >
                                                         {isSelected && <Check size={12} className="text-white" strokeWidth={3} />}
                                                     </div>
                                                     <div>
-                                                        <p className={`text-sm font-semibold ${isSelected ? "text-[#C2185B]" : "text-[#0D0D0D]"}`}>
+                                                        <p className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-foreground"}`}>
                                                             {opt.label}
                                                         </p>
-                                                        <p className="text-xs text-[#999] leading-relaxed mt-0.5">
+                                                        <p className="text-xs text-text-light leading-relaxed mt-0.5">
                                                             {opt.description}
                                                         </p>
                                                     </div>
@@ -837,10 +837,10 @@ function NewOrderContent() {
                             ) : (
                                 <div className="space-y-3">
                                     <div className="flex gap-3 p-3.5 rounded-xl bg-[#FFF8E1] border border-[#F9A825]/20">
-                                        <Info size={15} className="text-[#E65100] shrink-0 mt-0.5" />
+                                        <Info size={15} className="text-status-warning shrink-0 mt-0.5" />
                                         <div>
-                                            <p className="text-sm font-semibold text-[#E65100]">No measurements on file</p>
-                                            <p className="text-xs text-[#E65100]/80 leading-relaxed mt-0.5">
+                                            <p className="text-sm font-semibold text-status-warning">No measurements on file</p>
+                                            <p className="text-xs text-status-warning/80 leading-relaxed mt-0.5">
                                                 For the best fit, we strongly recommend having your measurements on record. You can proceed now and add them after,
                                                 or book a fitting with our team.
                                             </p>
@@ -856,21 +856,21 @@ function NewOrderContent() {
                                                     onClick={() => setMeasurementChoice(opt.value)}
                                                     className={`w-full flex items-start gap-3 p-3.5 rounded-xl border-2 text-left transition-all duration-150
                                                         ${isSelected
-                                                            ? "border-[#C2185B] bg-[#FFF5F8]"
-                                                            : "border-[#E0E0E0] hover:border-[#C2185B]/30"
+                                                            ? "border-primary bg-[#FFF5F8]"
+                                                            : "border-input hover:border-primary/30"
                                                         }`}
                                                 >
                                                     <div
                                                         className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 border-2 transition-colors
-                                                            ${isSelected ? "border-[#C2185B] bg-[#C2185B]" : "border-[#E0E0E0] bg-white"}`}
+                                                            ${isSelected ? "border-primary bg-primary" : "border-input bg-white"}`}
                                                     >
                                                         {isSelected && <Check size={12} className="text-white" strokeWidth={3} />}
                                                     </div>
                                                     <div>
-                                                        <p className={`text-sm font-semibold ${isSelected ? "text-[#C2185B]" : "text-[#0D0D0D]"}`}>
+                                                        <p className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-foreground"}`}>
                                                             {opt.label}
                                                         </p>
-                                                        <p className="text-xs text-[#999] leading-relaxed mt-0.5">
+                                                        <p className="text-xs text-text-light leading-relaxed mt-0.5">
                                                             {opt.description}
                                                         </p>
                                                     </div>
@@ -888,25 +888,25 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.14 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden"
+                        className="rounded-xl border border-border bg-white overflow-hidden"
                     >
-                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                            <User size={16} className="text-[#C2185B]" />
-                            <h2 className="font-semibold text-sm text-[#0D0D0D]">Your Information</h2>
+                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                            <User size={16} className="text-primary" />
+                            <h2 className="font-semibold text-sm text-foreground">Your Information</h2>
                         </div>
                         <div className="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <p className="text-[11px] text-[#999] uppercase tracking-wider mb-0.5">Email</p>
-                                <p className="text-sm font-medium text-[#0D0D0D] break-all">{user?.email || "—"}</p>
+                                <p className="text-[11px] text-text-light uppercase tracking-wider mb-0.5">Email</p>
+                                <p className="text-sm font-medium text-foreground break-all">{user?.email || "—"}</p>
                             </div>
                             <div>
-                                <p className="text-[11px] text-[#999] uppercase tracking-wider mb-0.5">Phone</p>
-                                <p className="text-sm font-medium text-[#0D0D0D]">{user?.phone || "—"}</p>
+                                <p className="text-[11px] text-text-light uppercase tracking-wider mb-0.5">Phone</p>
+                                <p className="text-sm font-medium text-foreground">{user?.phone || "—"}</p>
                             </div>
                             {user?.address && (
                                 <div className="sm:col-span-2">
-                                    <p className="text-[11px] text-[#999] uppercase tracking-wider mb-0.5">Saved Address</p>
-                                    <p className="text-sm font-medium text-[#0D0D0D]">{user.address}</p>
+                                    <p className="text-[11px] text-text-light uppercase tracking-wider mb-0.5">Saved Address</p>
+                                    <p className="text-sm font-medium text-foreground">{user.address}</p>
                                 </div>
                             )}
                         </div>
@@ -917,11 +917,11 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.17 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden"
+                        className="rounded-xl border border-border bg-white overflow-hidden"
                     >
-                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                            <Truck size={16} className="text-[#C2185B]" />
-                            <h2 className="font-semibold text-sm text-[#0D0D0D]">Fulfilment Method</h2>
+                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                            <Truck size={16} className="text-primary" />
+                            <h2 className="font-semibold text-sm text-foreground">Fulfilment Method</h2>
                         </div>
                         <div className="px-5 py-4 space-y-3">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -935,19 +935,19 @@ function NewOrderContent() {
                                             onClick={() => setFulfillmentMethod(opt.value)}
                                             className={`relative flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all duration-150
                                                 ${isSelected
-                                                    ? "border-[#C2185B] bg-[#FFF5F8]"
-                                                    : "border-[#E0E0E0] bg-white hover:border-[#C2185B]/30"
+                                                    ? "border-primary bg-[#FFF5F8]"
+                                                    : "border-input bg-white hover:border-primary/30"
                                                 }`}
                                         >
-                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected ? "bg-[#C2185B] text-white" : "bg-[#F4F0F8] text-[#999]"}`}>
+                                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors ${isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-text-light"}`}>
                                                 <Icon size={16} />
                                             </div>
                                             <div>
-                                                <p className={`text-sm font-semibold ${isSelected ? "text-[#C2185B]" : "text-[#0D0D0D]"}`}>{opt.label}</p>
-                                                <p className="text-xs text-[#999] leading-snug mt-0.5">{opt.description}</p>
+                                                <p className={`text-sm font-semibold ${isSelected ? "text-primary" : "text-foreground"}`}>{opt.label}</p>
+                                                <p className="text-xs text-text-light leading-snug mt-0.5">{opt.description}</p>
                                             </div>
                                             {isSelected && (
-                                                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-[#C2185B] flex items-center justify-center">
+                                                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
                                                     <Check size={10} className="text-white" strokeWidth={3} />
                                                 </div>
                                             )}
@@ -968,33 +968,33 @@ function NewOrderContent() {
                                     >
                                         <div className="pt-2 space-y-3">
                                             {user?.address && (
-                                                <div className="flex items-start gap-3 p-3 rounded-lg bg-[#F4F0F8]">
+                                                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted">
                                                     <Checkbox
                                                         id="useProfileAddress"
                                                         checked={useProfileAddress}
                                                         onCheckedChange={setUseProfileAddress}
-                                                        className="mt-0.5 border-[#C2185B] data-[state=checked]:bg-[#C2185B] data-[state=checked]:border-[#C2185B]"
+                                                        className="mt-0.5 border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                                     />
                                                     <div>
-                                                        <Label htmlFor="useProfileAddress" className="text-sm font-medium text-[#0D0D0D] cursor-pointer leading-snug">
+                                                        <Label htmlFor="useProfileAddress" className="text-sm font-medium text-foreground cursor-pointer leading-snug">
                                                             Deliver to my saved address
                                                         </Label>
-                                                        <p className="text-xs text-[#555] mt-0.5">{user.address}</p>
+                                                        <p className="text-xs text-muted-foreground mt-0.5">{user.address}</p>
                                                     </div>
                                                 </div>
                                             )}
                                             {(!user?.address || !useProfileAddress) && (
                                                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
-                                                    <Label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">
-                                                        Delivery Address <span className="text-[#C62828]">*</span>
+                                                    <Label className="text-sm font-medium text-foreground mb-1.5 block">
+                                                        Delivery Address <span className="text-destructive">*</span>
                                                     </Label>
                                                     <div className="relative">
-                                                        <MapPin size={15} className="absolute left-3 top-3 text-[#999] z-10" />
+                                                        <MapPin size={15} className="absolute left-3 top-3 text-text-light z-10" />
                                                         <Textarea
                                                             value={deliveryAddress}
                                                             onChange={(e) => setDeliveryAddress(e.target.value)}
                                                             placeholder="Enter your full delivery address including landmark..."
-                                                            className="pl-9 resize-none border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] min-h-[80px]"
+                                                            className="pl-9 resize-none border-input focus-visible:ring-ring focus-visible:border-ring min-h-[80px]"
                                                         />
                                                     </div>
                                                 </motion.div>
@@ -1011,20 +1011,20 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.2 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden"
+                        className="rounded-xl border border-border bg-white overflow-hidden"
                     >
-                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                            <FileText size={16} className="text-[#C2185B]" />
-                            <h2 className="font-semibold text-sm text-[#0D0D0D]">Order Note</h2>
-                            <span className="ml-auto text-xs text-[#999]">Optional</span>
+                        <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
+                            <FileText size={16} className="text-primary" />
+                            <h2 className="font-semibold text-sm text-foreground">Order Note</h2>
+                            <span className="ml-auto text-xs text-text-light">Optional</span>
                         </div>
                         <div className="px-5 py-4 space-y-3">
-                            <div className="flex gap-2.5 p-3 rounded-lg bg-[#F4F0F8]">
-                                <Info size={14} className="text-[#C2185B] shrink-0 mt-0.5" />
-                                <p className="text-xs text-[#555] leading-relaxed">
+                            <div className="flex gap-2.5 p-3 rounded-lg bg-muted">
+                                <Info size={14} className="text-primary shrink-0 mt-0.5" />
+                                <p className="text-xs text-muted-foreground leading-relaxed">
                                     Use this space to share any specifics about your order — preferred length,
                                     lining, event occasion, color adjustments, or anything else your tailor
-                                    should know. <strong className="text-[#0D0D0D]">The more detail you provide, the closer we'll get to your vision on the first try.</strong>
+                                    should know. <strong className="text-foreground">The more detail you provide, the closer we'll get to your vision on the first try.</strong>
                                 </p>
                             </div>
                             <Textarea
@@ -1032,9 +1032,9 @@ function NewOrderContent() {
                                 onChange={(e) => setClientNotes(e.target.value)}
                                 placeholder="e.g. I need this for a wedding in April — I'd like the hem to be tea-length and the sleeves to be detachable..."
                                 maxLength={1000}
-                                className="resize-none border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] min-h-[100px]"
+                                className="resize-none border-input focus-visible:ring-ring focus-visible:border-ring min-h-[100px]"
                             />
-                            <p className="text-xs text-[#999] text-right">{clientNotes.length}/1000</p>
+                            <p className="text-xs text-text-light text-right">{clientNotes.length}/1000</p>
                         </div>
                     </motion.div>
 
@@ -1043,21 +1043,21 @@ function NewOrderContent() {
                         initial={{ opacity: 0, y: 16 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: 0.24 }}
-                        className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white p-5 space-y-5"
+                        className="rounded-xl border border-border bg-white p-5 space-y-5"
                     >
                         <div className="flex items-center gap-3">
                             <Checkbox
                                 id="authorised"
                                 checked={authorised}
                                 onCheckedChange={setAuthorised}
-                                className="border-[#C2185B] data-[state=checked]:bg-[#C2185B] data-[state=checked]:border-[#C2185B]"
+                                className="border-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                             <Label
                                 htmlFor="authorised"
-                                className="text-sm text-[#555] leading-relaxed cursor-pointer inline text-justify"
+                                className="text-sm text-muted-foreground leading-relaxed cursor-pointer inline text-justify"
                             >
                                 I have reviewed my order details and confirm they are correct. I understand
-                                this is a <span className="font-semibold text-[#C2185B]">bespoke order</span> —
+                                this is a <span className="font-semibold text-primary">bespoke order</span> —
                                 pricing will be provided by the studio after review, and payment (full or
                                 installment) is required before production begins.
                             </Label>
@@ -1068,8 +1068,8 @@ function NewOrderContent() {
                             disabled={!authorised || isSubmitting}
                             className={`w-full h-12 text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2
                                 ${authorised
-                                    ? "bg-[#C2185B] hover:bg-[#A01548] text-white"
-                                    : "bg-[#E0E0E0] text-[#999] cursor-not-allowed"
+                                    ? "bg-primary hover:bg-primary/90 text-primary-foreground"
+                                    : "bg-[#E0E0E0] text-text-light cursor-not-allowed"
                                 }`}
                         >
                             {isSubmitting ? (
@@ -1085,7 +1085,7 @@ function NewOrderContent() {
                             )}
                         </Button>
 
-                        <p className="text-xs text-[#999] text-center leading-relaxed">
+                        <p className="text-xs text-text-light text-center leading-relaxed">
                             No payment is collected now. The studio will send you a quote within 24 hours.
                         </p>
                     </motion.div>
@@ -1099,11 +1099,11 @@ function NewOrderContent() {
                     className="lg:sticky lg:top-20 h-fit space-y-4"
                 >
                     <PaymentInfoCard compact />
-                    <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-[#FAFAFA] p-4">
-                        <p className="text-xs font-semibold text-[#555] uppercase tracking-wider mb-2">
+                    <div className="rounded-xl border border-border bg-surface-2 p-4">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
                             How pricing works
                         </p>
-                        <p className="text-xs text-[#999] leading-relaxed">
+                        <p className="text-xs text-text-light leading-relaxed">
                             Bespoke orders are priced after our studio reviews your specifications.
                             You'll receive a personalised quote within 24 hours — no surprise costs.
                             Payment (full or installment) is only required once you've approved the quote.

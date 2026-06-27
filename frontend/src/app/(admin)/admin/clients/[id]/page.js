@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
     ArrowLeft, User, Mail, Phone, MapPin, Calendar, ShoppingBag, CreditCard,
     Ruler, CheckCircle2, XCircle, Plus, Pencil, MessageSquare, ChevronDown, ChevronUp, Download, FileText, History, Clock
@@ -136,8 +137,8 @@ export default function AdminClientDetailPage() {
     if (!client) {
         return (
             <div className="text-center py-12">
-                <p className="text-[#555]">Client not found.</p>
-                <Link href="/admin/clients" className="text-sm text-[#C2185B] font-semibold mt-2 inline-block">
+                <p className="text-muted-foreground">Client not found.</p>
+                <Link href="/admin/clients" className="text-sm text-primary font-semibold mt-2 inline-block">
                     ← Back to Clients
                 </Link>
             </div>
@@ -150,23 +151,23 @@ export default function AdminClientDetailPage() {
 
     return (
         <div className="pb-20 lg:pb-0">
-            <Link href="/admin/clients" className="inline-flex items-center gap-1 text-sm text-[#999] hover:text-[#C2185B] mb-6 transition-colors">
+            <Link href="/admin/clients" className="inline-flex items-center gap-1 text-sm text-text-light hover:text-primary mb-6 transition-colors">
                 <ArrowLeft size={14} /> All Clients
             </Link>
 
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                 {/* Client Profile Card */}
-                <div className="md:max-xl:flex items-center justify-around p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                <div className="md:max-xl:flex items-center justify-around p-6 rounded-xl border border-border bg-white">
                     <div className="flex flex-col items-center text-center mb-6">
-                        <div className="w-16 h-16 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-xl mb-3">
+                        <div className="w-16 h-16 rounded-full bg-primary relative flex items-center justify-center text-primary-foreground font-bold text-xl mb-3">
                             {client.profilePicture ? (
-                                <img src={client.profilePicture} alt="" className="w-full h-full rounded-full object-cover" />
+                                <Image src={client.profilePicture} alt={client.fullName || "Client Image"} fill className="rounded-full object-cover" />
                             ) : client.fullName?.charAt(0) || "?"}
                         </div>
-                        <h2 className="text-lg font-bold text-[#0D0D0D]">{client.fullName}</h2>
+                        <h2 className="text-lg font-bold text-foreground">{client.fullName}</h2>
                         <div className="flex items-center gap-1.5 mt-1">
-                            <div className={`w-2 h-2 rounded-full ${client.online ? "bg-[#2E7D32]" : "bg-[#999]"}`} />
-                            <span className={`text-xs ${client.online ? "text-[#2E7D32] font-medium" : "text-[#999]"}`}>
+                            <div className={`w-2 h-2 rounded-full ${client.online ? "bg-status-success" : "bg-[#999]"}`} />
+                            <span className={`text-xs ${client.online ? "text-status-success font-medium" : "text-text-light"}`}>
                                 {client.online ? "Online now" : "Offline"}
                             </span>
                         </div>
@@ -183,13 +184,13 @@ export default function AdminClientDetailPage() {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 mt-6">
-                            <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
-                                <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.orders || 0}</p>
-                                <p className="text-[10px] text-[#999] uppercase">Orders</p>
+                            <div className="p-3 rounded-lg bg-muted text-center">
+                                <p className="text-lg font-bold text-foreground">{client._count?.orders || 0}</p>
+                                <p className="text-[10px] text-text-light uppercase">Orders</p>
                             </div>
-                            <div className="p-3 rounded-lg bg-[#F4F0F8] text-center">
-                                <p className="text-lg font-bold text-[#0D0D0D]">{client._count?.payments || 0}</p>
-                                <p className="text-[10px] text-[#999] uppercase">Payments</p>
+                            <div className="p-3 rounded-lg bg-muted text-center">
+                                <p className="text-lg font-bold text-foreground">{client._count?.payments || 0}</p>
+                                <p className="text-[10px] text-text-light uppercase">Payments</p>
                             </div>
                         </div>
                     </div>
@@ -197,14 +198,14 @@ export default function AdminClientDetailPage() {
 
                 {/* Main content with tabs */}
                 <div className="xl:col-span-3">
-                    <div className="flex gap-1 mb-6 bg-[#F4F0F8] rounded-lg p-1 overflow-x-auto">
+                    <div className="flex gap-1 mb-6 bg-muted rounded-lg p-1 overflow-x-auto">
                         {TABS.map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 className={`flex-1 py-2 px-3 rounded-md text-sm font-medium capitalize transition-colors ${activeTab === tab
-                                    ? "bg-white text-[#0D0D0D] shadow-sm"
-                                    : "text-[#999] hover:text-[#555]"
+                                    ? "bg-white text-foreground shadow-sm"
+                                    : "text-text-light hover:text-muted-foreground"
                                     }`}
                             >
                                 {tab}
@@ -218,29 +219,29 @@ export default function AdminClientDetailPage() {
                             <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-6">
                                 {/* Stats Cards */}
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                                        <p className="text-2xl font-bold text-[#0D0D0D]">{client._count?.orders || orders.length}</p>
-                                        <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Total Orders</p>
+                                    <div className="p-5 rounded-xl border border-border bg-white text-center">
+                                        <p className="text-2xl font-bold text-foreground">{client._count?.orders || orders.length}</p>
+                                        <p className="text-[10px] text-text-light uppercase tracking-wider mt-1">Total Orders</p>
                                     </div>
-                                    <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                                        <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+                                    <div className="p-5 rounded-xl border border-border bg-white text-center">
+                                        <p className="text-2xl font-bold font-mono-data text-foreground">
                                             {formatCurrency(paymentsList.filter(p => p.status === "CONFIRMED" || p.status === "COMPLETED" || p.status === "SUCCESS").reduce((sum, p) => sum + (Number(p.amount) || 0), 0))}
                                         </p>
-                                        <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Total Spend</p>
+                                        <p className="text-[10px] text-text-light uppercase tracking-wider mt-1">Total Spend</p>
                                     </div>
-                                    <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                                        <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+                                    <div className="p-5 rounded-xl border border-border bg-white text-center">
+                                        <p className="text-2xl font-bold font-mono-data text-foreground">
                                             {orders.length > 0 ? formatCurrency(orders.reduce((sum, o) => sum + (Number(o.totalAgreedFee) || 0), 0) / orders.length) : formatCurrency(0)}
                                         </p>
-                                        <p className="text-[10px] text-[#999] uppercase tracking-wider mt-1">Avg Order Value</p>
+                                        <p className="text-[10px] text-text-light uppercase tracking-wider mt-1">Avg Order Value</p>
                                     </div>
                                 </div>
 
                                 {/* Contact info */}
-                                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                                <div className="p-5 rounded-xl border border-border bg-white">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-sm font-semibold text-[#0D0D0D]">Contact Info</h3>
-                                        <button onClick={() => setEditClientOpen(true)} className="text-[#999] hover:text-[#C2185B] transition-colors" title="Edit Contact Info">
+                                        <h3 className="text-sm font-semibold text-foreground">Contact Info</h3>
+                                        <button onClick={() => setEditClientOpen(true)} className="text-text-light hover:text-primary transition-colors" title="Edit Contact Info">
                                             <Pencil size={14} />
                                         </button>
                                     </div>
@@ -251,18 +252,18 @@ export default function AdminClientDetailPage() {
                                     </div>
                                 </div>
 
-                                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                    <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Recent Orders</h3>
+                                <div className="p-5 rounded-xl border border-border bg-white">
+                                    <h3 className="text-sm font-semibold text-foreground mb-4">Recent Orders</h3>
                                     {orders.length === 0 ? (
-                                        <p className="text-sm text-[#999]">No orders yet.</p>
+                                        <p className="text-sm text-text-light">No orders yet.</p>
                                     ) : (
                                         <div className="space-y-2">
                                             {orders.slice(0, 5).map((order) => (
                                                 <Link key={order.id} href={`/admin/orders/${order.id}`}
-                                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-2 transition-colors">
                                                     <div>
-                                                        <p className="text-xs font-mono text-[#999]">{order.orderNumber}</p>
-                                                        <p className="text-sm font-medium text-[#0D0D0D]">{order.style?.name || ORDER_TYPES[order.orderType]?.label || "Order"}</p>
+                                                        <p className="text-xs font-mono text-text-light">{order.orderNumber}</p>
+                                                        <p className="text-sm font-medium text-foreground">{order.style?.name || ORDER_TYPES[order.orderType]?.label || "Order"}</p>
                                                     </div>
                                                     <StatusPill status={order.status} size="small" />
                                                 </Link>
@@ -272,8 +273,8 @@ export default function AdminClientDetailPage() {
                                 </div>
 
                                 {clientMeasurements && (
-                                    <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Measurements</h3>
+                                    <div className="p-5 rounded-xl border border-border bg-white">
+                                        <h3 className="text-sm font-semibold text-foreground mb-4">Measurements</h3>
                                         <MeasurementGrid items={[...groups.upper.slice(0, 4), ...groups.lower.slice(0, 4)]} />
                                     </div>
                                 )}
@@ -285,28 +286,28 @@ export default function AdminClientDetailPage() {
                             <motion.div key="orders" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-3">
                                 <div className="flex justify-end mb-2">
                                     <Link href={`/admin/orders/new?client=${id}`}
-                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#C2185B] text-white text-xs font-semibold hover:bg-[#A01548] transition-colors">
+                                        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
                                         <Plus size={14} /> Create Order
                                     </Link>
                                 </div>
                                 {orders.length === 0 ? (
-                                    <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                                        <ShoppingBag size={24} className="text-[#999] mx-auto mb-2" />
-                                        <p className="text-sm text-[#555]">No orders from this client.</p>
+                                    <div className="p-8 rounded-xl border border-border bg-white text-center">
+                                        <ShoppingBag size={24} className="text-text-light mx-auto mb-2" />
+                                        <p className="text-sm text-muted-foreground">No orders from this client.</p>
                                     </div>
                                 ) : (
                                     orders.map((order) => (
                                         <Link key={order.id} href={`/admin/orders/${order.id}`}
-                                            className="flex items-center justify-between p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors block">
+                                            className="flex items-center justify-between p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors block">
                                             <div>
-                                                <p className="text-xs font-mono text-[#999]">{order.orderNumber}</p>
-                                                <p className="text-sm font-medium text-[#0D0D0D]">{order.style?.name || ORDER_TYPES[order.orderType]?.label}</p>
-                                                <p className="text-xs text-[#999] mt-1">{new Date(order.createdAt).toLocaleDateString("en-NG")}</p>
+                                                <p className="text-xs font-mono text-text-light">{order.orderNumber}</p>
+                                                <p className="text-sm font-medium text-foreground">{order.style?.name || ORDER_TYPES[order.orderType]?.label}</p>
+                                                <p className="text-xs text-text-light mt-1">{new Date(order.createdAt).toLocaleDateString("en-NG")}</p>
                                             </div>
                                             <div className="text-right">
                                                 <StatusPill status={order.status} size="small" />
                                                 {order.totalAgreedFee && (
-                                                    <p className="text-xs font-mono font-semibold text-[#0D0D0D] mt-1">{formatCurrency(order.totalAgreedFee)}</p>
+                                                    <p className="text-xs font-mono font-semibold text-foreground mt-1">{formatCurrency(order.totalAgreedFee)}</p>
                                                 )}
                                             </div>
                                         </Link>
@@ -320,29 +321,29 @@ export default function AdminClientDetailPage() {
                             <motion.div key="measurements" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }} className="space-y-4">
                                 <div className="flex justify-between items-center mb-4">
                                     <div>
-                                        <h2 className="text-lg font-bold text-[#0D0D0D]">Detailed Measurements</h2>
-                                        <p className="text-sm text-[#555]">All dimensions are in centimeters (cm)</p>
+                                        <h2 className="text-lg font-bold text-foreground">Detailed Measurements</h2>
+                                        <p className="text-sm text-muted-foreground">All dimensions are in centimeters (cm)</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         {clientMeasurements && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[rgba(0,0,0,0.12)] text-[#0D0D0D] text-xs font-semibold hover:bg-[#FAFAFA] transition-colors">
+                                                    <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[rgba(0,0,0,0.12)] text-foreground text-xs font-semibold hover:bg-surface-2 transition-colors">
                                                         <Download size={14} /> Export <ChevronDown size={14} />
                                                     </button>
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="w-40 border-[rgba(0,0,0,0.08)] shadow-lg rounded-xl">
-                                                    <DropdownMenuItem onClick={() => handleExportMeasurements("csv")} className="cursor-pointer gap-2 text-sm focus:bg-[#FAFAFA] text-[#0D0D0D] py-2.5">
-                                                        <FileText size={14} className="text-[#999]" /> Export as CSV
+                                                    <DropdownMenuItem onClick={() => handleExportMeasurements("csv")} className="cursor-pointer gap-2 text-sm focus:bg-surface-2 text-foreground py-2.5">
+                                                        <FileText size={14} className="text-text-light" /> Export as CSV
                                                     </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => handleExportMeasurements("pdf")} className="cursor-pointer gap-2 text-sm focus:bg-[#FAFAFA] text-[#0D0D0D] py-2.5">
-                                                        <FileText size={14} className="text-[#999]" /> Export as PDF
+                                                    <DropdownMenuItem onClick={() => handleExportMeasurements("pdf")} className="cursor-pointer gap-2 text-sm focus:bg-surface-2 text-foreground py-2.5">
+                                                        <FileText size={14} className="text-text-light" /> Export as PDF
                                                     </DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         )}
                                         <button onClick={() => setMeasurementFormOpen(true)}
-                                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#C2185B] text-white text-xs font-semibold hover:bg-[#A01548] transition-colors">
+                                            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
                                             {clientMeasurements ? <><Pencil size={14} /> Edit</> : <><Plus size={14} /> Add Measurements</>}
                                         </button>
                                     </div>
@@ -350,26 +351,26 @@ export default function AdminClientDetailPage() {
                                 {clientMeasurements ? (
                                     <>
                                         {groups.upper.length > 0 && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Upper Body</h3>
+                                            <div className="p-5 rounded-xl border border-border bg-popover">
+                                                <h3 className="text-sm font-semibold text-foreground mb-4">Upper Body</h3>
                                                 <MeasurementGrid items={groups.upper} />
                                             </div>
                                         )}
                                         {groups.lower.length > 0 && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Lower Body</h3>
+                                            <div className="p-5 rounded-xl border border-border bg-popover">
+                                                <h3 className="text-sm font-semibold text-foreground mb-4">Lower Body</h3>
                                                 <MeasurementGrid items={groups.lower} />
                                             </div>
                                         )}
                                         {groups.other.length > 0 && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Other</h3>
+                                            <div className="p-5 rounded-xl border border-border bg-popover">
+                                                <h3 className="text-sm font-semibold text-foreground mb-4">Other</h3>
                                                 <MeasurementGrid items={groups.other} />
                                             </div>
                                         )}
                                         {customParams && typeof customParams === "object" && Object.keys(customParams).length > 0 && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Custom Measurements</h3>
+                                            <div className="p-5 rounded-xl border border-border bg-popover">
+                                                <h3 className="text-sm font-semibold text-foreground mb-4">Custom Measurements</h3>
                                                 <MeasurementGrid
                                                     items={Object.entries(customParams)
                                                         .filter(([, v]) => v !== null && v !== undefined)
@@ -378,17 +379,17 @@ export default function AdminClientDetailPage() {
                                             </div>
                                         )}
                                         {clientMeasurements.notes && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-2">Notes</h3>
-                                                <p className="text-sm text-[#555]">{clientMeasurements.notes}</p>
+                                            <div className="p-5 rounded-xl border border-border bg-popover">
+                                                <h3 className="text-sm font-semibold text-foreground mb-2">Notes</h3>
+                                                <p className="text-sm text-muted-foreground">{clientMeasurements.notes}</p>
                                             </div>
                                         )}
                                         {/* History Accordion */}
                                         {measurementsHistoryList.length > 0 && (
-                                            <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white mt-6">
+                                            <div className="p-5 rounded-xl border border-border bg-popover mt-6">
                                                 <div className="flex items-center gap-2 mb-4">
-                                                    <History size={16} className="text-[#C2185B]" />
-                                                    <h3 className="text-sm font-semibold text-[#0D0D0D]">Measurement History</h3>
+                                                    <History size={16} className="text-primary" />
+                                                    <h3 className="text-sm font-semibold text-foreground">Measurement History</h3>
                                                 </div>
                                                 <div className="space-y-4">
                                                     {measurementsHistoryList.map((hist) => (
@@ -399,9 +400,9 @@ export default function AdminClientDetailPage() {
                                         )}
                                     </>
                                 ) : (
-                                    <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                                        <Ruler size={24} className="text-[#999] mx-auto mb-2" />
-                                        <p className="text-sm text-[#555]">No measurements recorded.</p>
+                                    <div className="p-8 rounded-xl border border-border bg-white text-center">
+                                        <Ruler size={24} className="text-text-light mx-auto mb-2" />
+                                        <p className="text-sm text-muted-foreground">No measurements recorded.</p>
                                     </div>
                                 )}
                             </motion.div>
@@ -434,10 +435,10 @@ function MeasurementGrid({ items }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {items.map(({ key, val }) => (
-                <div key={key} className="p-3 rounded-lg bg-[#F4F0F8]">
-                    <p className="text-xs text-[#999] capitalize mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</p>
-                    <p className="text-lg font-bold text-[#0D0D0D]">
-                        {val} {typeof val === "number" ? <span className="text-xs font-normal text-[#999]">cm</span> : null}
+                <div key={key} className="p-3 rounded-lg bg-muted">
+                    <p className="text-xs text-text-light capitalize mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</p>
+                    <p className="text-lg font-bold text-foreground">
+                        {val} {typeof val === "number" ? <span className="text-xs font-normal text-text-light">cm</span> : null}
                     </p>
                 </div>
             ))}
@@ -462,17 +463,17 @@ function ClientPaymentsTab({ clientId, orders, preFetchedPayments }) {
     return (
         <div className="space-y-3">
             {paymentsList.length === 0 ? (
-                <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                    <CreditCard size={24} className="text-[#999] mx-auto mb-2" />
-                    <p className="text-sm text-[#555]">No payments from this client.</p>
+                <div className="p-8 rounded-xl border border-border bg-white text-center">
+                    <CreditCard size={24} className="text-text-light mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No payments from this client.</p>
                 </div>
             ) : (
                 paymentsList.map((pay) => (
-                    <div key={pay.id} className="flex items-center justify-between p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                    <div key={pay.id} className="flex items-center justify-between p-4 rounded-xl border border-border bg-white">
                         <div>
-                            <p className="text-xs font-mono text-[#999]">{pay.order?.orderNumber}</p>
-                            <p className="text-sm font-semibold text-[#0D0D0D]">{formatCurrency(pay.amount)}</p>
-                            <p className="text-xs text-[#999] mt-0.5">{new Date(pay.createdAt).toLocaleDateString("en-NG")}</p>
+                            <p className="text-xs font-mono text-text-light">{pay.order?.orderNumber}</p>
+                            <p className="text-sm font-semibold text-foreground">{formatCurrency(pay.amount)}</p>
+                            <p className="text-xs text-text-light mt-0.5">{new Date(pay.createdAt).toLocaleDateString("en-NG")}</p>
                         </div>
                         <StatusPill status={pay.status} size="small" />
                     </div>
@@ -485,10 +486,10 @@ function ClientPaymentsTab({ clientId, orders, preFetchedPayments }) {
 function InfoRow({ icon: Icon, label, value }) {
     return (
         <div className="flex items-start gap-2.5">
-            <Icon size={14} className="text-[#999] mt-0.5 shrink-0" />
+            <Icon size={14} className="text-text-light mt-0.5 shrink-0" />
             <div>
-                <p className="text-[10px] uppercase text-[#999]">{label}</p>
-                <p className="text-[#0D0D0D] font-medium break-all">{typeof value === "string" || typeof value === "number" ? value : "—"}</p>
+                <p className="text-[10px] uppercase text-text-light">{label}</p>
+                <p className="text-foreground font-medium break-all">{typeof value === "string" || typeof value === "number" ? value : "—"}</p>
             </div>
         </div>
     );
@@ -523,31 +524,31 @@ function ClientChatHistoryTab({ clientId, orders }) {
     return (
         <div className="space-y-3">
             {threads.length === 0 ? (
-                <div className="p-8 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                    <MessageSquare size={24} className="text-[#999] mx-auto mb-2" />
-                    <p className="text-sm text-[#555]">No chat history.</p>
+                <div className="p-8 rounded-xl border border-border bg-white text-center">
+                    <MessageSquare size={24} className="text-text-light mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No chat history.</p>
                 </div>
             ) : (
                 threads.map((thread) => (
                     <Link key={thread.order.id} href={`/admin/orders/${thread.order.id}`}
-                        className="flex items-center justify-between p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
+                        className="flex items-center justify-between p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
                         <div className="flex items-start gap-3 min-w-0 flex-1">
-                            <div className="w-9 h-9 rounded-full bg-[#C2185B]/10 flex items-center justify-center shrink-0">
-                                <MessageSquare size={16} className="text-[#C2185B]" />
+                            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <MessageSquare size={16} className="text-primary" />
                             </div>
                             <div className="min-w-0 flex-1">
-                                <p className="text-xs font-mono-data text-[#999]">{thread.order.orderNumber}</p>
-                                <p className="text-sm text-[#555] truncate mt-0.5">
+                                <p className="text-xs font-mono-data text-text-light">{thread.order.orderNumber}</p>
+                                <p className="text-sm text-muted-foreground truncate mt-0.5">
                                     {thread.lastMessage.senderRole !== "CLIENT" ? "You: " : ""}
                                     {thread.lastMessage.message || "[Attachment]"}
                                 </p>
                             </div>
                         </div>
                         <div className="text-right shrink-0 ml-3">
-                            <span className="text-[10px] text-[#999]">
+                            <span className="text-[10px] text-text-light">
                                 {new Date(thread.lastMessage.createdAt).toLocaleDateString("en-NG", { month: "short", day: "numeric" })}
                             </span>
-                            <p className="text-[9px] text-[#999] mt-0.5">{thread.messages.length} msgs</p>
+                            <p className="text-[9px] text-text-light mt-0.5">{thread.messages.length} msgs</p>
                         </div>
                     </Link>
                 ))
@@ -559,24 +560,24 @@ function ClientChatHistoryTab({ clientId, orders }) {
 function HistoryAccordionItem({ hist }) {
     const [isOpen, setIsOpen] = useState(false);
     return (
-        <div className="border border-[rgba(0,0,0,0.06)] rounded-lg overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.12)]">
+        <div className="border border-border rounded-lg overflow-hidden transition-colors hover:border-[rgba(0,0,0,0.12)]">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between p-3 bg-[#FAFAFA] hover:bg-[#F4F0F8] transition-colors"
+                className="w-full flex items-center justify-between p-3 bg-surface-2 hover:bg-muted transition-colors"
             >
                 <div>
-                    <p className="text-sm font-medium text-[#0D0D0D] text-left">
+                    <p className="text-sm font-medium text-foreground text-left">
                         Updated by {hist.updatedByName || "Staff"}
                     </p>
                     <div className="flex items-center gap-1 mt-1">
-                        <Clock size={12} className="text-[#999]" />
-                        <p className="text-xs text-[#999]">
+                        <Clock size={12} className="text-text-light" />
+                        <p className="text-xs text-text-light">
                             {new Date(hist.createdAt).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}
                         </p>
                     </div>
                 </div>
                 <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                    <ChevronDown size={16} className="text-[#999]" />
+                    <ChevronDown size={16} className="text-text-light" />
                 </motion.div>
             </button>
             <AnimatePresence initial={false}>
@@ -590,11 +591,11 @@ function HistoryAccordionItem({ hist }) {
                     >
                         <div className="p-3 bg-white grid grid-cols-1 sm:grid-cols-2 gap-2 border-t border-[rgba(0,0,0,0.04)]">
                             {Object.entries(hist.changedFields).map(([field, detail]) => (
-                                <div key={field} className="text-xs bg-[#FAFAFA] p-2 rounded border border-[rgba(0,0,0,0.04)]">
-                                    <span className="font-semibold text-[#0D0D0D] capitalize">{field.replace(/([A-Z])/g, " $1")}</span>:
-                                    <span className="text-[#999] line-through ml-1">{detail.from === null || detail.from === undefined ? '-' : detail.from}</span>
-                                    <span className="text-[#C2185B] mx-1">→</span>
-                                    <span className="text-[#0D0D0D] font-medium">{detail.to === null || detail.to === undefined ? '-' : detail.to}</span>
+                                <div key={field} className="text-xs bg-surface-2 p-2 rounded border border-[rgba(0,0,0,0.04)]">
+                                    <span className="font-semibold text-foreground capitalize">{field.replace(/([A-Z])/g, " $1")}</span>:
+                                    <span className="text-text-light line-through ml-1">{detail.from === null || detail.from === undefined ? '-' : detail.from}</span>
+                                    <span className="text-primary mx-1">→</span>
+                                    <span className="text-foreground font-medium">{detail.to === null || detail.to === undefined ? '-' : detail.to}</span>
                                 </div>
                             ))}
                         </div>

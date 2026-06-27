@@ -59,6 +59,56 @@ export const getStyles = async (req, res) => {
   });
 };
 
+// ─── GET /styles/admin ──────────────────────────────────────────────────────
+export const getAdminStyles = async (req, res) => {
+  const { category, model, featured, page, limit, search, isActive } = req.query;
+
+  const where = {};
+
+  if (isActive === "true") where.isActive = true;
+  if (isActive === "false") where.isActive = false;
+
+  if (category) where.category = { contains: category, mode: "insensitive" };
+  if (model === "1") where.availableForModel1 = true;
+  if (model === "2") where.availableForModel2 = true;
+  if (featured === "true") where.isFeatured = true;
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: "insensitive" } },
+      { description: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  // Pagination
+  const parsedPage = Math.max(parseInt(page) || 1, 1);
+  const parsedLimit = Math.max(parseInt(limit) || 12, 1);
+  const skip = (parsedPage - 1) * parsedLimit;
+
+  const [totalCount, styles] = await prisma.$transaction([
+    prisma.style.count({ where }),
+    prisma.style.findMany({
+      where,
+      orderBy: [
+        { isFeatured: "desc" },
+        { createdAt: "desc" },
+        { id: "asc" },
+      ],
+      skip,
+      take: parsedLimit,
+    }),
+  ]);
+
+  return successResponse(res, 200, "Styles retrieved for admin", {
+    count: styles.length,
+    styles,
+    pagination: {
+      currentPage: parsedPage,
+      totalPages: Math.ceil(totalCount / parsedLimit),
+      totalItems: totalCount,
+    },
+  });
+};
+
 // ─── GET /styles/categories ────────────────────────────────────────────────
 export const getStyleCategories = async (req, res) => {
   const styles = await prisma.style.findMany({
@@ -151,6 +201,8 @@ export const updateStyle = async (req, res) => {
     style: updated,
   });
 };
+
+// 
 
 // ─── DELETE /styles/:id ────────────────────────────────────────────────────
 // Soft delete — sets isActive to false

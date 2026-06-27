@@ -73,21 +73,21 @@ function StatCard({ label, value, icon: Icon, color, isCurrency, subtext, warnin
     return (
         <motion.div ref={ref} initial={{ opacity: 0, y: 12 }} animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: index * 0.06 }}
-            className={`p-5 rounded-xl border bg-white ${warning && num > 0 ? "border-[#E65100]/30 bg-[#FFF3E0]/20" : "border-[rgba(0,0,0,0.06)]"}`}>
+            className={`p-5 rounded-xl border bg-popover ${warning && num > 0 ? "border-status-warning/30 bg-[#FFF3E0]/20" : "border-border"}`}>
             <div className="flex items-center justify-between mb-3">
-                <span className="text-[10px] font-medium text-[#999] uppercase tracking-wider">{label}</span>
+                <span className="text-[10px] font-medium text-text-light uppercase tracking-wider">{label}</span>
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
                     <Icon size={18} style={{ color }} />
                 </div>
             </div>
-            <p className="text-2xl font-bold font-mono-data text-[#0D0D0D] ">
+            <p className="text-2xl font-bold font-mono-data text-foreground ">
                 {isCurrency ? formatCurrency(animatedValue) : animatedValue}
             </p>
-            {subtext && <p className="text-[10px] mt-1 text-[#999]">{subtext}</p>}
+            {subtext && <p className="text-[10px] mt-1 text-text-light">{subtext}</p>}
             {warning && num > 0 && (
                 <div className="flex items-center gap-1 mt-1.5">
-                    <AlertTriangle size={10} className="text-[#E65100]" />
-                    <span className="text-[10px] text-[#E65100] font-medium">Needs attention</span>
+                    <AlertTriangle size={10} className="text-status-warning" />
+                    <span className="text-[10px] text-status-warning font-medium">Needs attention</span>
                 </div>
             )}
         </motion.div>
@@ -113,7 +113,7 @@ function SplitExportButton({ onExport, exporting }) {
             <button
                 onClick={() => setOpen((o) => !o)}
                 disabled={!!exporting}
-                className="flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-white bg-[#C2185B] hover:bg-[#A31545] rounded-l-lg border border-[#C2185B] transition-colors disabled:opacity-60 cursor-pointer"
+                className="flex items-center gap-1.5 h-9 px-3 text-xs font-semibold text-primary-foreground bg-primary hover:bg-[#A31545] rounded-l-lg border border-primary transition-colors disabled:opacity-60 cursor-pointer"
             >
                 <Download size={13} />
                 {exporting ? "Exporting..." : "Export Report"}
@@ -122,7 +122,7 @@ function SplitExportButton({ onExport, exporting }) {
             <button
                 onClick={() => setOpen((o) => !o)}
                 disabled={!!exporting}
-                className="flex items-center justify-center h-9 w-8 text-white bg-[#C2185B] hover:bg-[#A31545] rounded-r-lg border-l border-[#A31545] transition-colors disabled:opacity-60 cursor-pointer"
+                className="flex items-center justify-center h-9 w-8 text-primary-foreground bg-primary hover:bg-[#A31545] rounded-r-lg border-l border-[#A31545] transition-colors disabled:opacity-60 cursor-pointer"
             >
                 <ChevronDown size={13} />
             </button>
@@ -138,16 +138,16 @@ function SplitExportButton({ onExport, exporting }) {
                     >
                         <button
                             onClick={() => { onExport("csv"); setOpen(false); }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#0D0D0D] hover:bg-[#F4F0F8] transition-colors cursor-pointer"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"
                         >
-                            <Download size={14} className="text-[#555]" />
+                            <Download size={14} className="text-muted-foreground" />
                             Download CSV
                         </button>
                         <button
                             onClick={() => { onExport("pdf"); setOpen(false); }}
-                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[#0D0D0D] hover:bg-[#F4F0F8] transition-colors cursor-pointer"
+                            className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted transition-colors cursor-pointer"
                         >
-                            <FileText size={14} className="text-[#555]" />
+                            <FileText size={14} className="text-muted-foreground" />
                             Download PDF
                         </button>
                     </motion.div>
@@ -287,8 +287,8 @@ export default function AdminDashboard() {
     const SortIcon = ({ col }) => {
         if (sortKey !== col) return <ChevronsUpDown size={11} className="text-[#CCC] inline ml-0.5" />;
         return sortDir === "asc"
-            ? <ChevronUp size={11} className="text-[#C2185B] inline ml-0.5" />
-            : <ChevronDown size={11} className="text-[#C2185B] inline ml-0.5" />;
+            ? <ChevronUp size={11} className="text-primary inline ml-0.5" />
+            : <ChevronDown size={11} className="text-primary inline ml-0.5" />;
     };
 
     const rawOrders = Array.isArray(stats.recentOrders) ? stats.recentOrders : [];
@@ -349,18 +349,18 @@ export default function AdminDashboard() {
             <div className="flex flex-col gap-3 mb-6">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D]">Welcome back, {firstName}</h1>
-                        <p className="text-sm text-[#999]">
+                        <h1 className="text-2xl font-bold text-foreground">Welcome back, {firstName}</h1>
+                        <p className="text-sm text-text-light">
                             {stats.periodLabel || "Here's what's happening in your studio today."}
                         </p>
                         {/* Live online indicator */}
                         {onlineClients !== null && (
                             <div className="flex items-center gap-1.5 mt-1.5">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2E7D32] opacity-75" />
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2E7D32]" />
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-status-success" />
                                 </span>
-                                <span className="text-[11px] text-[#555] font-medium">
+                                <span className="text-[11px] text-muted-foreground font-medium">
                                     {onlineClients} client{onlineClients !== 1 ? "s" : ""} online now
                                 </span>
                             </div>
@@ -383,7 +383,7 @@ export default function AdminDashboard() {
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className={`h-9 border-[#E0E0E0] bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange.from && "text-muted-foreground"}`}
+                                    className={`h-9 border-input bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange.from && "text-muted-foreground"}`}
                                 >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {dateRange.from ? (
@@ -438,10 +438,10 @@ export default function AdminDashboard() {
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 {/* Revenue Chart */}
-                <div className="lg:col-span-2 p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                    <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Revenue Over Time</h3>
+                <div className="lg:col-span-2 p-5 rounded-xl border border-border bg-popover">
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Revenue Over Time</h3>
                     {revenueData.length === 0 ? (
-                        <p className="text-xs text-[#999] py-12 text-center">No revenue data for this period.</p>
+                        <p className="text-xs text-text-light py-12 text-center">No revenue data for this period.</p>
                     ) : (
                         <ResponsiveContainer width="100%" height={250}>
                             <AreaChart data={revenueData}>
@@ -452,8 +452,8 @@ export default function AdminDashboard() {
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#F4F0F8" />
-                                <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#999" }} />
-                                <YAxis tick={{ fontSize: 11, fill: "#999" }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                                <XAxis dataKey="label" tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} />
+                                <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
                                 <Tooltip formatter={(v) => formatCurrency(v)} />
                                 <Area type="monotone" dataKey="revenue" stroke="#C2185B" fill="url(#revenueGradient)" strokeWidth={2} />
                             </AreaChart>
@@ -462,10 +462,10 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Orders by Status (Donut) */}
-                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                    <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Orders by Status</h3>
+                <div className="p-5 rounded-xl border border-border bg-white">
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Orders by Status</h3>
                     {ordersByStatus.length === 0 ? (
-                        <p className="text-xs text-[#999] py-12 text-center">No data for this period.</p>
+                        <p className="text-xs text-text-light py-12 text-center">No data for this period.</p>
                     ) : (
                         <>
                             <ResponsiveContainer width="100%" height={200}>
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
                             </ResponsiveContainer>
                             <div className="flex flex-wrap gap-2 mt-2 justify-center">
                                 {ordersByStatus.map((item, i) => (
-                                    <span key={item.name} className="flex items-center gap-1 text-[10px] text-[#555]">
+                                    <span key={item.name} className="flex items-center gap-1 text-[10px] text-muted-foreground">
                                         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />{item.name}
                                     </span>
                                 ))}
@@ -490,16 +490,16 @@ export default function AdminDashboard() {
 
             {/* Orders by Type + Pending Payments */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                    <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Orders by Type</h3>
+                <div className="p-5 rounded-xl border border-border bg-white">
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Orders by Type</h3>
                     {ordersByType.length === 0 ? (
-                        <p className="text-xs text-[#999] py-12 text-center">No data.</p>
+                        <p className="text-xs text-text-light py-12 text-center">No data.</p>
                     ) : (
                         <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={ordersByType}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#F4F0F8" />
-                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#999" }} />
-                                <YAxis tick={{ fontSize: 11, fill: "#999" }} />
+                                <XAxis dataKey="name" tick={{ fontSize: 10, fill: 'var(--color-text-light)' }} />
+                                <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} />
                                 <Tooltip />
                                 <Bar dataKey="value" fill="#C2185B" radius={[4, 4, 0, 0]} />
                             </BarChart>
@@ -508,36 +508,36 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Pending Payments — enriched cards per spec */}
-                <div className="lg:col-span-2 p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                <div className="lg:col-span-2 p-5 rounded-xl border border-border bg-white">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D]">Pending Payments</h3>
-                        <Link href="/admin/payments" className="text-xs text-[#C2185B] font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
+                        <h3 className="text-sm font-semibold text-foreground">Pending Payments</h3>
+                        <Link href="/admin/payments" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
                     </div>
                     {payments.length === 0 ? (
-                        <p className="text-sm text-[#999] py-8 text-center">No pending payments!</p>
+                        <p className="text-sm text-text-light py-8 text-center">No pending payments!</p>
                     ) : (
                         <div className="space-y-3">
                             {payments.slice(0, 5).map((pay) => (
-                                <div key={pay.id} className="flex items-center justify-between p-3.5 rounded-xl bg-[#FAFAFA] border border-[rgba(0,0,0,0.03)] hover:border-[rgba(0,0,0,0.08)] transition-colors">
+                                <div key={pay.id} className="flex items-center justify-between p-3.5 rounded-xl bg-surface-2 border border-[rgba(0,0,0,0.03)] hover:border-[rgba(0,0,0,0.08)] transition-colors">
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2 mb-0.5">
-                                            <p className="text-sm font-bold font-mono-data text-[#0D0D0D]">{formatCurrency(pay.amount)}</p>
+                                            <p className="text-sm font-bold font-mono-data text-foreground">{formatCurrency(pay.amount)}</p>
                                             {pay.paymentType && (
-                                                <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-[#F4F0F8] text-[#555]">
+                                                <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                                                     {pay.paymentType?.replace(/_/g, " ")}
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-xs text-[#555]">
-                                            <span className="font-mono-data text-[#C2185B]">{pay.order?.orderNumber || "—"}</span>
+                                        <p className="text-xs text-muted-foreground">
+                                            <span className="font-mono-data text-primary">{pay.order?.orderNumber || "—"}</span>
                                             <span className="mx-1.5 text-[#E0E0E0]">·</span>
                                             {pay.client?.fullName || "Client"}
                                         </p>
-                                        <p className="text-[10px] text-[#999] mt-0.5">{timeAgo(pay.createdAt)}</p>
+                                        <p className="text-[10px] text-text-light mt-0.5">{timeAgo(pay.createdAt)}</p>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0 ml-3">
                                         {pay.proofUrl && (
-                                            <button onClick={() => setProofPreview(pay.proofUrl)} className="w-7 h-7 rounded-md bg-[#F4F0F8] flex items-center justify-center text-[#555] hover:text-[#C2185B] transition-colors">
+                                            <button onClick={() => setProofPreview(pay.proofUrl)} className="w-7 h-7 rounded-md bg-muted flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
                                                 <Eye size={13} />
                                             </button>
                                         )}
@@ -546,7 +546,7 @@ export default function AdminDashboard() {
                                             <Button
                                                 variant="ghost" size="icon"
                                                 onClick={() => setConfirmPopover(confirmPopover === pay.id ? null : pay.id)}
-                                                className="h-8 w-8 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-[#2E7D32]"
+                                                className="h-8 w-8 bg-[#E8F5E9] hover:bg-[#C8E6C9] text-status-success"
                                             >
                                                 <CheckCircle2 size={14} />
                                             </Button>
@@ -559,10 +559,10 @@ export default function AdminDashboard() {
                                                         transition={{ duration: 0.15 }}
                                                         className="absolute right-0 bottom-full mb-2 z-30 bg-white rounded-lg shadow-lg border border-[rgba(0,0,0,0.08)] p-3 w-48"
                                                     >
-                                                        <p className="text-xs text-[#555] mb-2">Confirm this payment of {formatCurrency(pay.amount)}?</p>
+                                                        <p className="text-xs text-muted-foreground mb-2">Confirm this payment of {formatCurrency(pay.amount)}?</p>
                                                         <div className="flex gap-1.5">
                                                             <Button size="sm" onClick={() => setConfirmPopover(null)} variant="outline" className="h-7 text-[11px] flex-1">Cancel</Button>
-                                                            <Button size="sm" onClick={() => confirmPayment.mutate(pay.id)} disabled={confirmPayment.isPending} className="h-7 text-[11px] bg-[#2E7D32] text-white hover:bg-[#1B5E20] flex-1">
+                                                            <Button size="sm" onClick={() => confirmPayment.mutate(pay.id)} disabled={confirmPayment.isPending} className="h-7 text-[11px] bg-status-success text-white hover:bg-[#1B5E20] flex-1">
                                                                 {confirmPayment.isPending ? "..." : "Confirm"}
                                                             </Button>
                                                         </div>
@@ -570,7 +570,7 @@ export default function AdminDashboard() {
                                                 )}
                                             </AnimatePresence>
                                         </div>
-                                        <Button variant="ghost" size="icon" onClick={() => { setRejectModal(pay.id); setRejectionReason(""); }} className="h-8 w-8 bg-[#FFEBEE] hover:bg-[#FFCDD2] text-[#C62828]">
+                                        <Button variant="ghost" size="icon" onClick={() => { setRejectModal(pay.id); setRejectionReason(""); }} className="h-8 w-8 bg-[#FFEBEE] hover:bg-[#FFCDD2] text-destructive">
                                             <XCircle size={14} />
                                         </Button>
                                     </div>
@@ -584,23 +584,23 @@ export default function AdminDashboard() {
             {/* Recent Orders + Upcoming Appointments side‑by‑side */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 {/* Recent Orders — full-width table with all spec columns */}
-                <div className="lg:col-span-2 p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                <div className="lg:col-span-2 p-5 rounded-xl border border-border bg-white">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D]">Recent Orders</h3>
-                        <Link href="/admin/orders" className="text-xs text-[#C2185B] font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
+                        <h3 className="text-sm font-semibold text-foreground">Recent Orders</h3>
+                        <Link href="/admin/orders" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
                     </div>
                     {recentOrders.length === 0 ? (
-                        <p className="text-sm text-[#999] py-8 text-center">No orders yet.</p>
+                        <p className="text-sm text-text-light py-8 text-center">No orders yet.</p>
                     ) : (
                         <>
                             {/* Mobile: cards */}
                             <div className="space-y-2 lg:hidden">
                                 {recentOrders.map((order) => (
                                     <Link key={order.id} href={`/admin/orders/${order.id}`}
-                                        className="flex items-center justify-between p-3 rounded-lg hover:bg-[#FAFAFA] transition-colors">
+                                        className="flex items-center justify-between p-3 rounded-lg hover:bg-surface-2 transition-colors">
                                         <div>
-                                            <p className="font-mono-data text-xs text-[#C2185B]">{order.orderNumber}</p>
-                                            <p className="text-sm text-[#0D0D0D]">{order.client?.fullName || "—"}</p>
+                                            <p className="font-mono-data text-xs text-primary">{order.orderNumber}</p>
+                                            <p className="text-sm text-foreground">{order.client?.fullName || "—"}</p>
                                         </div>
                                         <div className="text-right">
                                             <StatusPill status={order.status} size="small" />
@@ -613,7 +613,7 @@ export default function AdminDashboard() {
                             <div className="hidden lg:block overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-[rgba(0,0,0,0.06)]">
+                                        <tr className="border-b border-border">
                                             {["Order #", "Client", "Type", "Status", "Agreed Fee", "Paid"].map((label, i) => {
                                                 const keys = ["orderNumber", "client", "type", "status", "fee", "paid"];
                                                 const key = keys[i];
@@ -621,13 +621,13 @@ export default function AdminDashboard() {
                                                 return (
                                                     <th key={key}
                                                         onClick={() => handleSort(key)}
-                                                        className={`text-xs font-medium text-[#999] py-3 pr-4 cursor-pointer select-none whitespace-nowrap hover:text-[#C2185B] transition-colors ${isRight ? "text-right" : "text-left"}`}
+                                                        className={`text-xs font-medium text-text-light py-3 pr-4 cursor-pointer select-none whitespace-nowrap hover:text-primary transition-colors ${isRight ? "text-right" : "text-left"}`}
                                                     >
                                                         {label}<SortIcon col={key} />
                                                     </th>
                                                 );
                                             })}
-                                            <th className="text-right text-xs font-medium text-[#999] py-3">Action</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-3">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -637,20 +637,20 @@ export default function AdminDashboard() {
                                                 <Fragment key={order.id}>
                                                     <tr key={order.id}
                                                         onClick={() => setExpandedRow(isExpanded ? null : order.id)}
-                                                        className={`border-b border-[rgba(0,0,0,0.03)] transition-colors group cursor-pointer ${isExpanded ? "bg-[#F4F0F8]/40" : "hover:bg-[#FAFAFA]"
+                                                        className={`border-b border-[rgba(0,0,0,0.03)] transition-colors group cursor-pointer ${isExpanded ? "bg-muted/40" : "hover:bg-surface-2"
                                                             }`}
                                                     >
                                                         <td className="py-3 pr-4 whitespace-nowrap">
-                                                            <span className="font-mono-data text-xs text-[#C2185B]">{order.orderNumber}</span>
+                                                            <span className="font-mono-data text-xs text-primary">{order.orderNumber}</span>
                                                         </td>
-                                                        <td className="py-3 pr-4 text-[#0D0D0D] whitespace-nowrap">{order.client?.fullName || "—"}</td>
-                                                        <td className="py-3 pr-4 text-[#555] text-xs whitespace-nowrap">{order.orderType?.replace(/_/g, " ") || "—"}</td>
+                                                        <td className="py-3 pr-4 text-foreground whitespace-nowrap">{order.client?.fullName || "—"}</td>
+                                                        <td className="py-3 pr-4 text-muted-foreground text-xs whitespace-nowrap">{order.orderType?.replace(/_/g, " ") || "—"}</td>
                                                         <td className="py-3 pr-4 whitespace-nowrap"><StatusPill status={order.status} size="small" /></td>
-                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#0D0D0D] whitespace-nowrap">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                        <td className="py-3 pr-4 text-right font-mono-data text-[#555] whitespace-nowrap">{formatCurrency(order.totalPaid)}</td>
+                                                        <td className="py-3 pr-4 text-right font-mono-data text-foreground whitespace-nowrap">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
+                                                        <td className="py-3 pr-4 text-right font-mono-data text-muted-foreground whitespace-nowrap">{formatCurrency(order.totalPaid)}</td>
                                                         <td className="py-3 text-right whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                                                             <Link href={`/admin/orders/${order.id}`}
-                                                                className="text-xs text-[#C2185B] font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
+                                                                className="text-xs text-primary font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
                                                                 Manage <ArrowRight size={10} />
                                                             </Link>
                                                         </td>
@@ -667,35 +667,35 @@ export default function AdminDashboard() {
                                                                         transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                                                                         className="overflow-hidden"
                                                                     >
-                                                                        <div className="flex flex-col md:flex-row gap-6 px-4 py-4 bg-[#F4F0F8]/40 border-b border-[rgba(0,0,0,0.04)] items-start">
+                                                                        <div className="flex flex-col md:flex-row gap-6 px-4 py-4 bg-muted/40 border-b border-[rgba(0,0,0,0.04)] items-start">
                                                                             {/* Column 1: Order Info */}
                                                                             <div className="flex-1 min-w-0">
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Order Details</p>
+                                                                                <p className="text-[10px] text-text-light font-medium uppercase tracking-wider mb-1.5">Order Details</p>
                                                                                 {order.orderType === "MODEL_3" ? (
                                                                                     <div className="space-y-1">
                                                                                         {order.items?.length > 0 ? (
                                                                                             order.items.map((item, idx) => (
-                                                                                                <p key={idx} className="text-sm font-medium text-[#0D0D0D] truncate">
+                                                                                                <p key={idx} className="text-sm font-medium text-foreground truncate">
                                                                                                     {item.quantity}x {item.readyToWear?.name || "RTW Item"}
                                                                                                 </p>
                                                                                             ))
                                                                                         ) : (
-                                                                                            <p className="text-sm text-[#555] italic">No items listed</p>
+                                                                                            <p className="text-sm text-muted-foreground italic">No items listed</p>
                                                                                         )}
                                                                                     </div>
                                                                                 ) : (
                                                                                     <div>
                                                                                         {order.style?.name ? (
-                                                                                            <p className="text-sm font-medium text-[#0D0D0D] truncate">Style: {order.style.name}</p>
+                                                                                            <p className="text-sm font-medium text-foreground truncate">Style: {order.style.name}</p>
                                                                                         ) : order.customStyleDescription ? (
-                                                                                            <p className="text-sm font-medium text-[#0D0D0D] line-clamp-2" title={order.customStyleDescription}>
+                                                                                            <p className="text-sm font-medium text-foreground line-clamp-2" title={order.customStyleDescription}>
                                                                                                 Custom: {order.customStyleDescription}
                                                                                             </p>
                                                                                         ) : (
-                                                                                            <p className="text-sm text-[#555] italic">No style specified</p>
+                                                                                            <p className="text-sm text-muted-foreground italic">No style specified</p>
                                                                                         )}
                                                                                         {order.clientProvidesFabric !== undefined && order.clientProvidesFabric !== null && (
-                                                                                            <span className="inline-flex items-center gap-1.5 mt-2 bg-[#F4F0F8] text-[#C2185B] text-[10px] font-medium px-2 py-1 rounded-md border border-[#F4F0F8]">
+                                                                                            <span className="inline-flex items-center gap-1.5 mt-2 bg-muted text-primary text-[10px] font-medium px-2 py-1 rounded-md border border-[#F4F0F8]">
                                                                                                 <Scissors size={10} className="shrink-0" />
                                                                                                 {order.clientProvidesFabric ? "Client provides fabric" : "Studio provides fabric"}
                                                                                             </span>
@@ -705,45 +705,45 @@ export default function AdminDashboard() {
                                                                             </div>
 
                                                                             {/* Column 2: Client Contact */}
-                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-[rgba(0,0,0,0.06)]">
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Client Contact</p>
+                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-border">
+                                                                                <p className="text-[10px] text-text-light font-medium uppercase tracking-wider mb-1.5">Client Contact</p>
                                                                                 <div className="space-y-1.5">
                                                                                     {order.client?.email ? (
-                                                                                        <div className="flex items-center gap-1.5 text-sm text-[#0D0D0D] truncate">
-                                                                                            <Mail size={12} className="text-[#999] shrink-0" />
+                                                                                        <div className="flex items-center gap-1.5 text-sm text-foreground truncate">
+                                                                                            <Mail size={12} className="text-text-light shrink-0" />
                                                                                             <span className="truncate">{order.client.email}</span>
                                                                                         </div>
                                                                                     ) : (
-                                                                                        <p className="text-sm text-[#999] italic">No email</p>
+                                                                                        <p className="text-sm text-text-light italic">No email</p>
                                                                                     )}
                                                                                     {order.client?.phone ? (
-                                                                                        <div className="flex items-center gap-1.5 text-sm text-[#0D0D0D] truncate">
-                                                                                            <Phone size={12} className="text-[#999] shrink-0" />
+                                                                                        <div className="flex items-center gap-1.5 text-sm text-foreground truncate">
+                                                                                            <Phone size={12} className="text-text-light shrink-0" />
                                                                                             <span className="truncate">{order.client.phone}</span>
                                                                                         </div>
                                                                                     ) : (
-                                                                                        <p className="text-sm text-[#999] italic">No phone</p>
+                                                                                        <p className="text-sm text-text-light italic">No phone</p>
                                                                                     )}
                                                                                 </div>
                                                                             </div>
 
                                                                             {/* Column 3: Logistics */}
-                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-[rgba(0,0,0,0.06)]">
-                                                                                <p className="text-[10px] text-[#999] font-medium uppercase tracking-wider mb-1.5">Logistics</p>
+                                                                            <div className="flex-1 min-w-0 md:border-l md:pl-6 border-border">
+                                                                                <p className="text-[10px] text-text-light font-medium uppercase tracking-wider mb-1.5">Logistics</p>
                                                                                 <div className="space-y-1.5 flex flex-col justify-between h-full">
-                                                                                    <div className="flex items-start gap-1.5 text-sm text-[#0D0D0D]">
-                                                                                        <MapPin size={12} className="text-[#C2185B] shrink-0 mt-0.5" />
+                                                                                    <div className="flex items-start gap-1.5 text-sm text-foreground">
+                                                                                        <MapPin size={12} className="text-primary shrink-0 mt-0.5" />
                                                                                         <div className="line-clamp-2">
                                                                                             {order.fulfillmentMethod === "DELIVERY" && order.deliveryAddress ? (
                                                                                                 <span>Delivery: {order.deliveryAddress}</span>
                                                                                             ) : order.fulfillmentMethod === "PICKUP" ? (
                                                                                                 <span>Studio Pickup</span>
                                                                                             ) : (
-                                                                                                <span className="text-[#999] italic">Not specified</span>
+                                                                                                <span className="text-text-light italic">Not specified</span>
                                                                                             )}
                                                                                         </div>
                                                                                     </div>
-                                                                                    <p className="text-[11px] text-[#999] mt-2 font-mono-data">
+                                                                                    <p className="text-[11px] text-text-light mt-2 font-mono-data">
                                                                                         Ordered: {format(new Date(order.createdAt), "MMM d, yyyy")}
                                                                                     </p>
                                                                                 </div>
@@ -752,7 +752,7 @@ export default function AdminDashboard() {
                                                                             {/* Manage Action */}
                                                                             <div className="md:ml-auto md:pl-6 flex items-center mt-4 md:mt-0 pt-2 shrink-0 self-center">
                                                                                 <Link href={`/admin/orders/${order.id}`}
-                                                                                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-white bg-[#C2185B] hover:bg-[#A31545] px-4 py-2 rounded-lg transition-colors shadow-sm w-full md:w-auto"
+                                                                                    className="flex items-center justify-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary hover:bg-[#A31545] px-4 py-2 rounded-lg transition-colors shadow-sm w-full md:w-auto"
                                                                                     onClick={(e) => e.stopPropagation()}
                                                                                 >
                                                                                     Manage <ArrowRight size={11} />
@@ -775,15 +775,15 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Upcoming Appointments — timeline style */}
-                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                <div className="p-5 rounded-xl border border-border bg-white">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D]">Upcoming Appointments</h3>
-                        <Link href="/admin/appointments" className="text-xs text-[#C2185B] font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
+                        <h3 className="text-sm font-semibold text-foreground">Upcoming Appointments</h3>
+                        <Link href="/admin/appointments" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">View all <ArrowRight size={10} /></Link>
                     </div>
                     {appointments.length === 0 ? (
                         <div className="text-center py-8">
                             <CalendarIcon size={24} className="text-[#E0E0E0] mx-auto mb-2" />
-                            <p className="text-sm text-[#999]">No upcoming appointments</p>
+                            <p className="text-sm text-text-light">No upcoming appointments</p>
                         </div>
                     ) : (
                         <div className="space-y-5 mt-10">
@@ -797,20 +797,20 @@ export default function AdminDashboard() {
                                     <div key={apt.id} className="flex gap-3 group">
                                         {/* Timeline line */}
                                         <div className="flex flex-col items-center">
-                                            <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1.5 ${isToday ? "bg-[#C2185B]" : "bg-[#E0E0E0]"}`} />
+                                            <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1.5 ${isToday ? "bg-primary" : "bg-[#E0E0E0]"}`} />
                                             {i < appointments.slice(0, 6).length - 1 && (
-                                                <div className="w-px flex-1 bg-[rgba(0,0,0,0.06)]" />
+                                                <div className="w-px flex-1 bg-border" />
                                             )}
                                         </div>
                                         <div className="pb-4 min-w-0 flex-1">
-                                            <p className={`text-[10px] font-semibold uppercase tracking-wider ${isToday ? "text-[#C2185B]" : "text-[#999]"}`}>
+                                            <p className={`text-[10px] font-semibold uppercase tracking-wider ${isToday ? "text-primary" : "text-text-light"}`}>
                                                 {dayLabel}
                                             </p>
-                                            <p className="text-sm font-medium text-[#0D0D0D] truncate">
+                                            <p className="text-sm font-medium text-foreground truncate">
                                                 {apt.client?.fullName || apt.user?.fullName || "Client"}
                                             </p>
                                             {apt.type && (
-                                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F4F0F8] text-[#555]">{apt.type}</span>
+                                                <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{apt.type}</span>
                                             )}
                                         </div>
                                     </div>
@@ -829,7 +829,7 @@ export default function AdminDashboard() {
                         <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
                             className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
                             <button onClick={() => setProofPreview(null)} className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center">
-                                <X size={16} className="text-[#0D0D0D]" />
+                                <X size={16} className="text-foreground" />
                             </button>
                             <div className="relative aspect-square rounded-xl overflow-hidden bg-white">
                                 <Image src={proofPreview} alt="Payment proof" fill className="object-contain" />
@@ -844,23 +844,23 @@ export default function AdminDashboard() {
                 {rejectModal && (
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[80] bg-black/50 flex items-center justify-center p-4" onClick={() => setRejectModal(null)}>
                         <motion.div initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }} transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }} className="bg-white rounded-xl p-6 w-full max-w-md shadow-xl" onClick={(e) => e.stopPropagation()}>
-                            <h3 className="text-lg font-bold text-[#0D0D0D] mb-1">Reject Payment</h3>
-                            <p className="text-sm text-[#555] mb-4">Please provide a reason for rejecting this payment.</p>
+                            <h3 className="text-lg font-bold text-foreground mb-1">Reject Payment</h3>
+                            <p className="text-sm text-muted-foreground mb-4">Please provide a reason for rejecting this payment.</p>
                             <textarea
                                 value={rejectionReason}
                                 onChange={(e) => setRejectionReason(e.target.value)}
                                 placeholder="e.g. Proof of payment is unclear, amount doesn't match..."
-                                className="w-full h-24 px-3 py-2 text-sm border border-[rgba(0,0,0,0.12)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#C2185B]/30 focus:border-[#C2185B] resize-none transition-all"
+                                className="w-full h-24 px-3 py-2 text-sm border border-[rgba(0,0,0,0.12)] rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring resize-none transition-all"
                             />
                             {rejectionReason.length > 0 && rejectionReason.length < 5 && (
-                                <p className="text-xs text-[#C62828] mt-1">Reason must be at least 5 characters</p>
+                                <p className="text-xs text-destructive mt-1">Reason must be at least 5 characters</p>
                             )}
                             <div className="flex justify-end gap-2 mt-4">
                                 <Button variant="outline" onClick={() => setRejectModal(null)} className="h-9">Cancel</Button>
                                 <Button
                                     onClick={() => rejectPayment.mutate(rejectModal)}
                                     disabled={rejectionReason.length < 5 || rejectPayment.isPending}
-                                    className="h-9 bg-[#C62828] text-white hover:bg-[#B71C1C] gap-1.5"
+                                    className="h-9 bg-destructive text-primary-foreground hover:bg-destructive/90 gap-1.5"
                                 >
                                     <XCircle size={14} />
                                     {rejectPayment.isPending ? "Rejecting..." : "Reject Payment"}

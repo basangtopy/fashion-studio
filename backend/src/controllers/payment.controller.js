@@ -1,4 +1,4 @@
-import prisma from "../config/prisma.js";
+import prisma, { Prisma } from "../config/prisma.js";
 import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/apiResponse.js";
 import { uploadImage } from "../services/cloudinary.service.js";
@@ -192,7 +192,11 @@ export const getAdminPayments = async (req, res) => {
   if (from || to) {
     where.createdAt = {};
     if (from) where.createdAt.gte = new Date(from);
-    if (to) where.createdAt.lte = new Date(to);
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setUTCHours(23, 59, 59, 999);  // include the full end day
+      where.createdAt.lte = toDate;
+    }
   }
 
   const skip = (Math.max(parseInt(page) || 1, 1) - 1) * Math.min(parseInt(limit) || 20, 100);
@@ -398,6 +402,7 @@ export const exportPayments = async (req, res) => {
     if (to) {
       const toDate = new Date(to);
       if (isNaN(toDate.getTime())) throw new AppError("Invalid 'to' date format", 400);
+      toDate.setUTCHours(23, 59, 59, 999);  // include the full end day
       where.createdAt.lte = toDate;
     }
   }
@@ -468,7 +473,12 @@ export const getFinanceSummary = async (req, res) => {
   if (from || to) {
     dateFilter.createdAt = {};
     if (from) dateFilter.createdAt.gte = new Date(from);
-    if (to) dateFilter.createdAt.lte = new Date(to);
+    if (to) {
+      const toDate = new Date(to);
+      if (isNaN(toDate.getTime())) throw new AppError("Invalid 'to' date format", 400);
+      toDate.setUTCHours(23, 59, 59, 999);  // include the full end day
+      dateFilter.createdAt.lte = toDate;
+    }
   }
 
   // Order type filter (applied to the order, not the payment)
@@ -541,33 +551,24 @@ export const getFinanceSummary = async (req, res) => {
     }),
 
     // Orders with outstanding balances (totalPaid < totalAgreedFee and not cancelled/completed)
-    prisma.order
-      .findMany({
-        where: {
-          status: {
-            notIn: [
-              "CANCELLED",
-              "COMPLETED",
-              "PENDING_REVIEW",
-              "AWAITING_CLIENT_RESPONSE",
-            ],
-          },
-          totalAgreedFee: { not: null },
-          ...(type ? { orderType: type } : {}),
-        },
-        select: {
-          id: true,
-          orderNumber: true,
-          orderType: true,
-          totalAgreedFee: true,
-          totalPaid: true,
-          client: { select: { fullName: true } },
-        },
-      })
-      .then((orders) =>
-        // Filter in JS since Prisma can't compare two columns directly
-        orders.filter((o) => Number(o.totalPaid) < Number(o.totalAgreedFee)),
-      ),
+    prisma.$queryRaw`
+      SELECT
+        o.id,
+        o."orderNumber",
+        o."orderType",
+        o."totalAgreedFee",
+        o."totalPaid",
+        u."fullName" AS "clientFullName"
+      FROM "orders" o
+      JOIN "users" u ON u.id = o."clientId"
+      WHERE
+        o.status NOT IN ('CANCELLED', 'COMPLETED', 'PENDING_REVIEW', 'AWAITING_CLIENT_RESPONSE')
+        AND o."totalAgreedFee" IS NOT NULL
+        AND o."totalPaid" < o."totalAgreedFee"
+        ${type ? Prisma.sql`AND o."orderType" = ${type}` : Prisma.empty}
+      ORDER BY (o."totalAgreedFee" - o."totalPaid") DESC
+      LIMIT 20
+    `,
 
     // Revenue time-series: fetch all confirmed payments with their dates
     // for building daily revenue breakdown
@@ -654,7 +655,14 @@ export const getFinanceSummary = async (req, res) => {
     recentPayments,
     outstandingOrders: {
       count: outstandingOrders.length,
-      orders: outstandingOrders,
+      orders: outstandingOrders.map((o) => ({
+        id: o.id,
+        orderNumber: o.orderNumber,
+        orderType: o.orderType,
+        totalAgreedFee: o.totalAgreedFee,
+        totalPaid: o.totalPaid,
+        client: { fullName: o.clientFullName },
+      })),
     },
   });
 };

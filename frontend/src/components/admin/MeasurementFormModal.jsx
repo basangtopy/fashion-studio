@@ -137,9 +137,9 @@ export default function MeasurementFormModal({
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className="max-w-xl p-0 border-0 gap-0 overflow-hidden flex flex-col max-h-[90vh]">
-                <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-[rgba(0,0,0,0.06)] bg-white text-left shrink-0">
-                    <DialogTitle className="flex items-center gap-2 text-sm font-bold text-[#0D0D0D]">
-                        <Ruler size={16} className="text-[#C2185B]" />
+                <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-border bg-popover text-left shrink-0">
+                    <DialogTitle className="flex items-center gap-2 text-sm font-bold text-foreground">
+                        <Ruler size={16} className="text-primary" />
                         {isUpdate ? "Update" : "Submit"} Measurements
                     </DialogTitle>
                     <DialogDescription className="sr-only">
@@ -147,19 +147,19 @@ export default function MeasurementFormModal({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar space-y-5 bg-white">
+                <div className="p-6 overflow-y-auto flex-1 custom-scrollbar space-y-5 bg-popover">
                     {/* Upper Body */}
                     <div>
-                        <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Upper Body</h3>
+                        <h3 className="text-xs font-semibold text-text-light uppercase tracking-wider mb-3">Upper Body</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {UPPER_FIELDS.map(({ key, label }) => (
                                 <div key={key}>
-                                    <label className="block text-[10px] text-[#999] mb-1">{label}</label>
+                                    <label className="block text-[10px] text-text-light mb-1">{label}</label>
                                     <Input
                                         type="number" step="0.1" value={fields[key] || ""}
                                         onChange={(e) => setFields({ ...fields, [key]: e.target.value })}
                                         placeholder="cm"
-                                        className="h-8 font-mono bg-white"
+                                        className="h-8 font-mono bg-popover"
                                     />
                                 </div>
                             ))}
@@ -168,16 +168,16 @@ export default function MeasurementFormModal({
 
                     {/* Lower Body */}
                     <div>
-                        <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Lower Body & Length</h3>
+                        <h3 className="text-xs font-semibold text-text-light uppercase tracking-wider mb-3">Lower Body & Length</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {LOWER_FIELDS.map(({ key, label }) => (
                                 <div key={key}>
-                                    <label className="block text-[10px] text-[#999] mb-1">{label}</label>
+                                    <label className="block text-[10px] text-text-light mb-1">{label}</label>
                                     <Input
                                         type="number" step="0.1" value={fields[key] || ""}
                                         onChange={(e) => setFields({ ...fields, [key]: e.target.value })}
                                         placeholder="cm"
-                                        className="h-8 font-mono bg-white"
+                                        className="h-8 font-mono bg-popover"
                                     />
                                 </div>
                             ))}
@@ -187,11 +187,11 @@ export default function MeasurementFormModal({
                     {/* Custom Params */}
                     <div>
                         <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Custom Measurements</h3>
+                            <h3 className="text-xs font-semibold text-text-light uppercase tracking-wider">Custom Measurements</h3>
                             <button
                                 type="button"
                                 onClick={() => setCustomParams([...customParams, { key: "", value: "" }])}
-                                className="text-[10px] text-[#C2185B] font-semibold flex items-center gap-0.5 hover:underline"
+                                className="text-[10px] text-primary font-semibold flex items-center gap-0.5 hover:underline"
                             >
                                 <Plus size={10} /> Add
                             </button>
@@ -201,16 +201,16 @@ export default function MeasurementFormModal({
                                 <Input
                                     type="text" value={cp.key}
                                     onChange={(e) => { const arr = [...customParams]; arr[i].key = e.target.value; setCustomParams(arr); }}
-                                    placeholder="Name" className="h-8 bg-white"
+                                    placeholder="Name" className="h-8 bg-background"
                                 />
                                 <Input
                                     type="number" step="0.1" value={cp.value}
                                     onChange={(e) => { const arr = [...customParams]; arr[i].value = e.target.value; setCustomParams(arr); }}
-                                    placeholder="cm" className="h-8 font-mono bg-white"
+                                    placeholder="cm" className="h-8 font-mono bg-background"
                                 />
                                 <button
                                     onClick={() => setCustomParams(customParams.filter((_, j) => j !== i))}
-                                    className="p-1 text-[#999] hover:text-[#C62828] shrink-0"
+                                    className="p-1 text-text-light hover:text-destructive shrink-0"
                                 >
                                     <X size={12} />
                                 </button>
@@ -220,41 +220,41 @@ export default function MeasurementFormModal({
 
                     {/* Notes */}
                     <div>
-                        <label className="block text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Notes</label>
+                        <label className="block text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">Notes</label>
                         <Textarea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Additional notes or special fit preferences..."
                             rows={2}
-                            className="resize-none bg-white"
+                            className="resize-none bg-background"
                         />
                     </div>
 
                     {/* Disclaimer — only shown in client mode */}
                     {isClient && (
-                        <div className="mt-2 p-4 rounded-xl border border-[rgba(0,0,0,0.08)] bg-[#FAFAFA]">
-                            <h4 className="text-[13px] font-bold text-[#0D0D0D] mb-1.5 flex items-center gap-1.5">
-                                <Check size={14} className="text-[#2E7D32]" /> Authorization & Disclaimer
+                        <div className="mt-2 p-4 rounded-xl border border-[rgba(0,0,0,0.08)] bg-surface-2">
+                            <h4 className="text-[13px] font-bold text-foreground mb-1.5 flex items-center gap-1.5">
+                                <Check size={14} className="text-status-success" /> Authorization & Disclaimer
                             </h4>
-                            <p className="text-[12px] text-[#555] leading-relaxed mb-4">
+                            <p className="text-[12px] text-muted-foreground leading-relaxed mb-4">
                                 I understand that self-reported measurements will be used directly to construct custom garments.
                                 By submitting, I take responsibility for their accuracy. The studio highly recommends an in-person fitting when possible.
                             </p>
                             <label
                                 className={`flex items-start gap-3 p-3.5 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
                                     disclaimerSigned
-                                        ? "border-[#C2185B]/30 bg-[#C2185B]/5"
-                                        : "border-[rgba(0,0,0,0.06)] hover:border-[#C2185B]/20 hover:bg-white"
+                                        ? "border-primary/30 bg-primary/5"
+                                        : "border-border hover:border-primary/20 hover:bg-white"
                                 }`}
                             >
                                 <div className="mt-0.5 shrink-0">
                                     <Checkbox
                                         checked={disclaimerSigned}
                                         onCheckedChange={setDisclaimerSigned}
-                                        className="w-[18px] h-[18px] rounded-md border-2 border-[#D1D5DB] data-[state=checked]:bg-[#C2185B] data-[state=checked]:border-[#C2185B]"
+                                        className="w-[18px] h-[18px] rounded-md border-2 border-[#D1D5DB] data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                     />
                                 </div>
-                                <span className="text-[12px] font-medium text-[#0D0D0D] select-none leading-relaxed">
+                                <span className="text-[12px] font-medium text-foreground select-none leading-relaxed">
                                     I confirm these measurements are accurate and final. I understand they will be used for my bespoke garment.
                                 </span>
                             </label>
@@ -262,11 +262,11 @@ export default function MeasurementFormModal({
                     )}
                 </div>
 
-                <div className="px-6 py-4 border-t border-[rgba(0,0,0,0.06)] bg-white shrink-0">
+                <div className="px-6 py-4 border-t border-border bg-popover shrink-0">
                     <Button
                         onClick={() => mutation.mutate()}
                         disabled={!canSave}
-                        className="w-full bg-[#C2185B] text-white hover:bg-[#A01548] h-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {mutation.isPending
                             ? <><Loader2 size={14} className="animate-spin mr-2" />Saving...</>

@@ -14,7 +14,7 @@ export default function Footer() {
     };
 
     return (
-        <footer className="bg-[#1A1A2E] text-white">
+        <footer className="bg-secondary text-white">
             <div className="page-container py-16 lg:py-20">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
                     {/* Column 1 — Brand */}
@@ -29,7 +29,7 @@ export default function Footer() {
                                 const Icon = iconMap[platform];
                                 if (!Icon) return null;
                                 return (
-                                    <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-[#C2185B] transition-colors">
+                                    <a key={platform} href={url} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors">
                                         <Icon size={16} />
                                     </a>
                                 );
@@ -55,7 +55,7 @@ export default function Footer() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className="text-sm text-white/60 hover:text-[#C2185B] transition-colors"
+                                    className="text-sm text-white/60 hover:text-primary transition-colors"
                                 >
                                     {link.label}
                                 </Link>
@@ -78,7 +78,7 @@ export default function Footer() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className="text-sm text-white/60 hover:text-[#C2185B] transition-colors"
+                                    className="text-sm text-white/60 hover:text-primary transition-colors"
                                 >
                                     {link.label}
                                 </Link>
@@ -94,14 +94,14 @@ export default function Footer() {
                         <div className="flex flex-col gap-3">
                             <a
                                 href={`mailto:${BRANDING.contact.email}`}
-                                className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C2185B] transition-colors"
+                                className="flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors"
                             >
                                 <Mail size={14} className="shrink-0" />
                                 {BRANDING.contact.email}
                             </a>
                             <a
                                 href={`tel:${BRANDING.contact.phone}`}
-                                className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C2185B] transition-colors"
+                                className="flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors"
                             >
                                 <Phone size={14} className="shrink-0" />
                                 {BRANDING.contact.phone}
@@ -110,7 +110,7 @@ export default function Footer() {
                                 href={`https://wa.me/${BRANDING.contact.whatsapp.replace(/\s/g, "")}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center gap-2 text-sm text-white/60 hover:text-[#C2185B] transition-colors"
+                                className="flex items-center gap-2 text-sm text-white/60 hover:text-primary transition-colors"
                             >
                                 <FaWhatsapp size={14} className="shrink-0" />
                                 WhatsApp

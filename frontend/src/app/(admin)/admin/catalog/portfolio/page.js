@@ -73,6 +73,8 @@ export default function AdminCatalogPortfolioPage() {
         queryFn: async ({ pageParam = 1 }) => {
             const params = { page: pageParam, limit: 12 };
             if (debouncedPortfolioSearch) params.search = debouncedPortfolioSearch;
+            if (filterStatus !== "all") params.status = filterStatus;
+            if (filterCategory) params.category = filterCategory;
             const { data } = await api.get("/portfolio/admin", { params });
             return data.data || {};
         },
@@ -84,23 +86,21 @@ export default function AdminCatalogPortfolioPage() {
         },
     });
 
-
-
+    const totalCount = data?.pages[0]?.pagination?.totalItems || 0;
 
     const allEntries = data?.pages.flatMap((page) => page?.entries || []) || [];
     const uniqueEntries = Array.from(new Map(allEntries.map(e => [e.id, e])).values());
 
     const handleSearchChange = (val) => setSearchQuery(val);
 
-    const categories = [...new Set(uniqueEntries.map(e => e.category).filter(Boolean))];
-
-    // Client-side filters
-    const filteredEntries = uniqueEntries.filter(entry => {
-        if (filterCategory && entry.category !== filterCategory) return false;
-        if (filterStatus === "published" && !entry.isPublished) return false;
-        if (filterStatus === "drafts" && entry.isPublished) return false;
-        return true;
+    const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+        queryKey: ["admin-portfolio", "categories"],
+        queryFn: async () => {
+            const { data } = await api.get("/portfolio/categories");
+            return data.data?.categories || [];
+        },
     });
+
 
     // FormData builder
     const buildFormData = useCallback(() => {
@@ -193,42 +193,42 @@ export default function AdminCatalogPortfolioPage() {
     };
 
     const activeFilters = [filterCategory, filterStatus !== "all" ? filterStatus : ""].filter(Boolean).length;
-    const categoryOptions = categories.map(c => ({ value: c, label: c }));
+    const categoryOptions = categoriesData?.map(c => ({ value: c, label: c })) || [];
 
     return (
         <div className="pb-20 lg:pb-0">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-[#0D0D0D]">Portfolio</h1>
-                    <p className="text-sm text-[#999]">{filteredEntries.length} entries</p>
+                    <h1 className="text-2xl font-bold text-foreground">Portfolio</h1>
+                    <p className="text-sm text-text-light">{totalCount} entries</p>
                 </div>
-                <Button onClick={openCreate} className="bg-[#C2185B] text-white hover:bg-[#A01548] gap-1.5">
+                <Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5">
                     <Plus size={14} /> Add Entry
                 </Button>
             </div>
 
             {/* Search */}
             <div className="relative mb-6">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#999]" />
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light" />
                 <Input type="text" placeholder="Search portfolio..." value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} className="pl-10 h-11 bg-white text-sm" />
             </div>
 
-            <button onClick={() => setShowMobileFilter(!showMobileFilter)} className="lg:hidden mb-4 flex items-center gap-1.5 text-xs font-semibold text-[#C2185B]">
+            <button onClick={() => setShowMobileFilter(!showMobileFilter)} className="lg:hidden mb-4 flex items-center gap-1.5 text-xs font-semibold text-primary">
                 <Filter size={14} /> Filters {activeFilters > 0 && `(${activeFilters})`}
             </button>
 
             <div className="flex gap-6">
                 {/* Filter Sidebar */}
                 <div className={`${showMobileFilter ? "block" : "hidden"} lg:block w-full lg:w-[220px] shrink-0`}>
-                    <div className="p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white space-y-5 lg:sticky lg:top-[72px]">
+                    <div className="p-4 rounded-xl border border-border bg-background space-y-5 lg:sticky lg:top-[72px]">
                         <CustomSelect label="Category" options={categoryOptions} value={filterCategory} onChange={setFilterCategory} placeholder="All categories" />
                         <div>
-                            <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-2">Status</p>
+                            <p className="text-[10px] font-semibold text-text-light uppercase tracking-wider mb-2">Status</p>
                             <div className="flex gap-1">
                                 {[{ v: "all", l: "All" }, { v: "published", l: "Published" }, { v: "drafts", l: "Drafts" }].map(opt => (
                                     <button key={opt.v} onClick={() => setFilterStatus(opt.v)}
-                                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterStatus === opt.v ? "bg-[#C2185B] text-white" : "bg-[#F4F0F8] text-[#555] hover:bg-[#E0E0E0]"}`}>
+                                        className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${filterStatus === opt.v ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-[#E0E0E0]"}`}>
                                         {opt.l}
                                     </button>
                                 ))}
@@ -236,7 +236,7 @@ export default function AdminCatalogPortfolioPage() {
                         </div>
                         {activeFilters > 0 && (
                             <button onClick={() => { setFilterCategory(""); setFilterStatus("all"); }}
-                                className="text-xs text-[#C2185B] font-semibold hover:underline">Clear filters</button>
+                                className="text-xs text-primary font-semibold hover:underline">Clear filters</button>
                         )}
                     </div>
                 </div>
@@ -247,16 +247,16 @@ export default function AdminCatalogPortfolioPage() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                             {[1, 2, 3, 4, 5, 6].map((i) => <SkeletonCard key={i} className="h-[280px]" />)}
                         </div>
-                    ) : filteredEntries.length === 0 ? (
+                    ) : uniqueEntries.length === 0 ? (
                         <EmptyState icon={ImageIcon} title="No entries found" description="Try adjusting your filters or add a new portfolio entry."
-                            action={<Button onClick={openCreate} className="bg-[#C2185B] text-white hover:bg-[#A01548]">Add Entry</Button>} />
+                            action={<Button onClick={openCreate} className="bg-primary text-primary-foreground hover:bg-primary/90">Add Entry</Button>} />
                     ) : (
                         <>
                             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                                {filteredEntries.map((entry) => (
-                                    <div key={entry.id} className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden group relative"
+                                {uniqueEntries.map((entry) => (
+                                    <div key={entry.id} className="rounded-xl border border-border bg-white overflow-hidden group relative"
                                         onClick={(e) => handleCardTap(e, entry.id)}>
-                                        <div className="relative h-52 bg-gradient-to-br from-[#C2185B]/10 to-[#F4F0F8]">
+                                        <div className="relative h-52 bg-gradient-to-br from-primary/10 to-[#F4F0F8]">
                                             {entry.images?.[0] ? (
                                                 <>
                                                     {/* blurred background */}
@@ -264,7 +264,7 @@ export default function AdminCatalogPortfolioPage() {
                                                     <Image src={entry.images[0]} alt={entry.title || "Portfolio"} fill className="object-contain" />
                                                 </>
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center"><ImageIcon size={28} className="text-[#999]" /></div>
+                                                <div className="w-full h-full flex items-center justify-center"><ImageIcon size={28} className="text-text-light" /></div>
                                             )}
 
                                             {/* DRAFT watermark */}
@@ -277,11 +277,11 @@ export default function AdminCatalogPortfolioPage() {
                                             {/* Hover/tap controls */}
                                             <div className={`absolute inset-0 bg-black/50 transition-opacity flex items-center justify-center gap-2 ${tappedCard === entry.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                                                 <button onClick={(e) => { e.stopPropagation(); openEdit(entry); }}
-                                                    className="h-9 px-3 rounded-lg bg-white text-[#0D0D0D] text-xs font-semibold flex items-center gap-1.5 hover:bg-[#F4F0F8] transition-colors">
+                                                    className="h-9 px-3 rounded-lg bg-white text-foreground text-xs font-semibold flex items-center gap-1.5 hover:bg-muted transition-colors">
                                                     <Pencil size={13} /> Edit
                                                 </button>
                                                 <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(entry); }}
-                                                    className="h-9 px-3 rounded-lg bg-[#FFEBEE] text-[#C62828] text-xs font-semibold flex items-center gap-1.5 hover:bg-[#FFCDD2] transition-colors">
+                                                    className="h-9 px-3 rounded-lg bg-[#FFEBEE] text-destructive text-xs font-semibold flex items-center gap-1.5 hover:bg-[#FFCDD2] transition-colors">
                                                     <Trash2 size={13} /> Delete
                                                 </button>
                                             </div>
@@ -292,14 +292,14 @@ export default function AdminCatalogPortfolioPage() {
                                         </div>
 
                                         <div className="p-4">
-                                            <p className="text-sm font-semibold text-[#0D0D0D] truncate mb-1">{entry.title || "Untitled"}</p>
-                                            <p className="text-xs text-[#999] mb-2 line-clamp-1">{entry.description || "No description"}</p>
+                                            <p className="text-sm font-semibold text-foreground truncate mb-1">{entry.title || "Untitled"}</p>
+                                            <p className="text-xs text-text-light mb-2 line-clamp-1">{entry.description || "No description"}</p>
                                             <div className="flex items-center gap-1.5 flex-wrap">
-                                                {entry.category && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4F0F8] text-[#555]">{entry.category}</span>}
-                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${entry.isPublished ? "bg-[#E8F5E9] text-[#2E7D32]" : "bg-[#FFF3E0] text-[#E65100]"}`}>
+                                                {entry.category && <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{entry.category}</span>}
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${entry.isPublished ? "bg-[#E8F5E9] text-status-success" : "bg-[#FFF3E0] text-status-warning"}`}>
                                                     {entry.isPublished ? "Published" : "Draft"}
                                                 </span>
-                                                {entry.clientConsent && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E3F2FD] text-[#1565C0]">Consent ✓</span>}
+                                                {entry.clientConsent && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#E3F2FD] text-status-info">Consent ✓</span>}
                                             </div>
                                         </div>
                                     </div>
@@ -307,7 +307,7 @@ export default function AdminCatalogPortfolioPage() {
                             </div>
                             {hasNextPage && (
                                 <div className="flex justify-center mt-8">
-                                    <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="outline" className="border-[#C2185B] text-[#C2185B] hover:bg-[#C2185B]/5 gap-2">
+                                    <Button onClick={() => fetchNextPage()} disabled={isFetchingNextPage} variant="outline" className="border-primary text-primary hover:bg-primary/5 gap-2">
                                         {isFetchingNextPage ? <Loader2 size={14} className="animate-spin" /> : null}
                                         {isFetchingNextPage ? "Loading…" : "Load More Entries"}
                                     </Button>
@@ -327,19 +327,19 @@ export default function AdminCatalogPortfolioPage() {
                             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                             className="bg-white rounded-xl max-w-[640px] w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar" onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-between mb-5">
-                                <h3 className="text-lg font-bold text-[#0D0D0D]">{editEntry ? "Edit Portfolio Entry" : "Add Portfolio Entry"}</h3>
-                                <button onClick={closeForm} className="p-1 rounded-full hover:bg-[#F4F0F8] transition-colors"><X size={18} className="text-[#999]" /></button>
+                                <h3 className="text-lg font-bold text-foreground">{editEntry ? "Edit Portfolio Entry" : "Add Portfolio Entry"}</h3>
+                                <button onClick={closeForm} className="p-1 rounded-full hover:bg-muted transition-colors"><X size={18} className="text-text-light" /></button>
                             </div>
                             <div className="space-y-5">
                                 {/* Title */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Title</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Title</label>
                                     <Input type="text" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="h-11 bg-white" placeholder="Portfolio entry title" />
                                 </div>
 
                                 {/* Category */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Category *</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Category *</label>
                                     <CustomSelect
                                         options={[...categoryOptions, { value: "__custom__", label: "+ Add custom category" }]}
                                         value={formData.category}
@@ -356,13 +356,13 @@ export default function AdminCatalogPortfolioPage() {
 
                                 {/* Description */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Description</label>
-                                    <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="resize-none bg-white" placeholder="Describe this portfolio piece…" />
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description</label>
+                                    <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="resize-none bg-background" placeholder="Describe this portfolio piece…" />
                                 </div>
 
                                 {/* Order Link */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Linked Order (optional)</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Linked Order (optional)</label>
                                     <CustomSelect
                                         options={orderOptions}
                                         value={formData.orderId}
@@ -371,12 +371,12 @@ export default function AdminCatalogPortfolioPage() {
                                         searchable
                                         onSearchChange={setOrderSearch}
                                     />
-                                    <p className="text-[10px] text-[#999] mt-1">Standalone works can leave this blank. Only completed orders are shown.</p>
+                                    <p className="text-[10px] text-text-light mt-1">Standalone works can leave this blank. Only completed orders are shown.</p>
                                 </div>
 
                                 {/* Images */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Images</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Images</label>
                                     <ImageUpload
                                         existingImages={existingImages}
                                         newFiles={newImageFiles}
@@ -391,10 +391,10 @@ export default function AdminCatalogPortfolioPage() {
 
                                 {/* Toggles */}
                                 <div className="space-y-3">
-                                    <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA] transition-colors">
+                                    <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-border hover:bg-surface-2 transition-colors">
                                         <div>
-                                            <p className="text-sm font-medium text-[#0D0D0D]">Client Consent</p>
-                                            <p className="text-[10px] text-[#999]">Client has given permission to showcase this work</p>
+                                            <p className="text-sm font-medium text-foreground">Client Consent</p>
+                                            <p className="text-[10px] text-text-light">Client has given permission to showcase this work</p>
                                         </div>
                                         <Switch checked={formData.clientConsent} onCheckedChange={(checked) => {
                                             const updates = { clientConsent: checked };
@@ -402,17 +402,17 @@ export default function AdminCatalogPortfolioPage() {
                                             setFormData({ ...formData, ...updates });
                                         }} />
                                     </label>
-                                    <label className={`flex items-center justify-between cursor-pointer p-3 rounded-lg border transition-colors ${formData.clientConsent ? "border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA]" : "border-[rgba(0,0,0,0.04)] bg-[#FAFAFA] opacity-50 cursor-not-allowed"}`}>
+                                    <label className={`flex items-center justify-between cursor-pointer p-3 rounded-lg border transition-colors ${formData.clientConsent ? "border-border hover:bg-surface-2" : "border-[rgba(0,0,0,0.04)] bg-surface-2 opacity-50 cursor-not-allowed"}`}>
                                         <div>
-                                            <p className="text-sm font-medium text-[#0D0D0D]">Published</p>
-                                            <p className="text-[10px] text-[#999]">{formData.clientConsent ? "Visible to the public" : "Requires client consent first"}</p>
+                                            <p className="text-sm font-medium text-foreground">Published</p>
+                                            <p className="text-[10px] text-text-light">{formData.clientConsent ? "Visible to the public" : "Requires client consent first"}</p>
                                         </div>
                                         <Switch checked={formData.isPublished} onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked })} disabled={!formData.clientConsent} />
                                     </label>
-                                    <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA] transition-colors">
+                                    <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-border hover:bg-surface-2 transition-colors">
                                         <div>
-                                            <p className="text-sm font-medium text-[#0D0D0D]">Featured</p>
-                                            <p className="text-[10px] text-[#999]">Highlight in portfolio showcase</p>
+                                            <p className="text-sm font-medium text-foreground">Featured</p>
+                                            <p className="text-[10px] text-text-light">Highlight in portfolio showcase</p>
                                         </div>
                                         <Switch checked={formData.isFeatured} onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })} />
                                     </label>
@@ -421,7 +421,7 @@ export default function AdminCatalogPortfolioPage() {
 
                             <Button onClick={() => saveMutation.mutate()}
                                 disabled={!(formData.category || formData.customCategory) || saveMutation.isPending}
-                                className="w-full mt-5 bg-[#C2185B] text-white hover:bg-[#A01548] h-11 gap-2">
+                                className="w-full mt-5 bg-primary text-primary-foreground hover:bg-primary/90 h-11 gap-2">
                                 {saveMutation.isPending ? (<><Loader2 size={14} className="animate-spin" /> Saving…</>) : (<><Save size={14} /> {editEntry ? "Save Changes" : "Create Entry"}</>)}
                             </Button>
                         </motion.div>

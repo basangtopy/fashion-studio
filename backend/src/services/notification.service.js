@@ -51,6 +51,24 @@ export const notifyOrderPlaced = async ({ order, client }) => {
     relatedOrderId: order.id,
   });
 
+  // Notify all admins so the bell badge rings
+  const admins = await prisma.user.findMany({
+    where: { role: { in: ["SUPER_ADMIN", "STAFF_ADMIN"] } },
+    select: { id: true },
+  });
+
+  await Promise.all(
+    admins.map((admin) =>
+      createNotification({
+        userId: admin.id,
+        type: "ORDER_PLACED",
+        title: "New Order Received",
+        message: `${client.fullName} placed order ${order.orderNumber}.`,
+        relatedOrderId: order.id,
+      }),
+    ),
+  );
+
   await sendEmail({
     to: client.email,
     subject: `Order Received — ${order.orderNumber}`,

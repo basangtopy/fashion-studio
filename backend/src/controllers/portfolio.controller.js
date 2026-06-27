@@ -153,7 +153,7 @@ export const createPortfolioEntry = async (req, res) => {
 // ─── GET /portfolio/admin ────────────────────────────────────────────────────────
 // Admin — all entries
 export const getPortfolioEntriesAdmin = async (req, res) => {
-  const { category, featured, page, limit, search } = req.query;
+  const { category, featured, status, page, limit, search } = req.query;
 
   const where = {};
 
@@ -162,6 +162,10 @@ export const getPortfolioEntriesAdmin = async (req, res) => {
   }
 
   if (featured === "true") where.isFeatured = true;
+
+  if (status === "published") where.isPublished = true;
+
+  if (status === "drafts") where.isPublished = false;
 
   if (search) {
     where.OR = [

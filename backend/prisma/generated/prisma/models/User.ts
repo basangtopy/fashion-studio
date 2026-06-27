@@ -46,6 +46,8 @@ export type UserMinAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   createdById: string | null
+  oauthCode: string | null
+  oauthCodeExpiry: Date | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -70,6 +72,8 @@ export type UserMaxAggregateOutputType = {
   createdAt: Date | null
   updatedAt: Date | null
   createdById: string | null
+  oauthCode: string | null
+  oauthCodeExpiry: Date | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -94,6 +98,8 @@ export type UserCountAggregateOutputType = {
   createdAt: number
   updatedAt: number
   createdById: number
+  oauthCode: number
+  oauthCodeExpiry: number
   _all: number
 }
 
@@ -120,6 +126,8 @@ export type UserMinAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   createdById?: true
+  oauthCode?: true
+  oauthCodeExpiry?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -144,6 +152,8 @@ export type UserMaxAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   createdById?: true
+  oauthCode?: true
+  oauthCodeExpiry?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -168,6 +178,8 @@ export type UserCountAggregateInputType = {
   createdAt?: true
   updatedAt?: true
   createdById?: true
+  oauthCode?: true
+  oauthCodeExpiry?: true
   _all?: true
 }
 
@@ -265,6 +277,8 @@ export type UserGroupByOutputType = {
   createdAt: Date
   updatedAt: Date
   createdById: string | null
+  oauthCode: string | null
+  oauthCodeExpiry: Date | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -310,6 +324,8 @@ export type UserWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdById?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCode?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCodeExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   measurements?: Prisma.MeasurementListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
@@ -347,6 +363,8 @@ export type UserOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
+  oauthCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  oauthCodeExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
   measurements?: Prisma.MeasurementOrderByRelationAggregateInput
   orders?: Prisma.OrderOrderByRelationAggregateInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
@@ -387,6 +405,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdById?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCode?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCodeExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   measurements?: Prisma.MeasurementListRelationFilter
   orders?: Prisma.OrderListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
@@ -424,6 +444,8 @@ export type UserOrderByWithAggregationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrderInput | Prisma.SortOrder
+  oauthCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  oauthCodeExpiry?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -454,6 +476,8 @@ export type UserScalarWhereWithAggregatesInput = {
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   createdById?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  oauthCode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  oauthCodeExpiry?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
 }
 
 export type UserCreateInput = {
@@ -477,6 +501,8 @@ export type UserCreateInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -514,6 +540,8 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -549,6 +577,8 @@ export type UserUpdateInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -586,6 +616,8 @@ export type UserUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -622,6 +654,8 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -645,6 +679,8 @@ export type UserUpdateManyMutationInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -669,6 +705,8 @@ export type UserUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UserListRelationFilter = {
@@ -708,6 +746,8 @@ export type UserCountOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  oauthCode?: Prisma.SortOrder
+  oauthCodeExpiry?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -732,6 +772,8 @@ export type UserMaxOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  oauthCode?: Prisma.SortOrder
+  oauthCodeExpiry?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -756,6 +798,8 @@ export type UserMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   createdById?: Prisma.SortOrder
+  oauthCode?: Prisma.SortOrder
+  oauthCodeExpiry?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1034,6 +1078,8 @@ export type UserCreateWithoutCreatedByInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -1069,6 +1115,8 @@ export type UserUncheckedCreateWithoutCreatedByInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -1114,6 +1162,8 @@ export type UserCreateWithoutCreatedClientsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -1150,6 +1200,8 @@ export type UserUncheckedCreateWithoutCreatedClientsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -1209,6 +1261,8 @@ export type UserScalarWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
   createdById?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCode?: Prisma.StringNullableFilter<"User"> | string | null
+  oauthCodeExpiry?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
 }
 
 export type UserUpsertWithoutCreatedClientsInput = {
@@ -1243,6 +1297,8 @@ export type UserUpdateWithoutCreatedClientsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -1279,6 +1335,8 @@ export type UserUncheckedUpdateWithoutCreatedClientsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -1313,6 +1371,8 @@ export type UserCreateWithoutMeasurementsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentCreateNestedManyWithoutConfirmedByInput
@@ -1349,6 +1409,8 @@ export type UserUncheckedCreateWithoutMeasurementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentUncheckedCreateNestedManyWithoutConfirmedByInput
@@ -1399,6 +1461,8 @@ export type UserUpdateWithoutMeasurementsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUpdateManyWithoutConfirmedByNestedInput
@@ -1435,6 +1499,8 @@ export type UserUncheckedUpdateWithoutMeasurementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUncheckedUpdateManyWithoutConfirmedByNestedInput
@@ -1469,6 +1535,8 @@ export type UserCreateWithoutOrdersInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentCreateNestedManyWithoutConfirmedByInput
@@ -1505,6 +1573,8 @@ export type UserUncheckedCreateWithoutOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentUncheckedCreateNestedManyWithoutConfirmedByInput
@@ -1544,6 +1614,8 @@ export type UserCreateWithoutAdminCreatedOrdersInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -1580,6 +1652,8 @@ export type UserUncheckedCreateWithoutAdminCreatedOrdersInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -1630,6 +1704,8 @@ export type UserUpdateWithoutOrdersInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUpdateManyWithoutConfirmedByNestedInput
@@ -1666,6 +1742,8 @@ export type UserUncheckedUpdateWithoutOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUncheckedUpdateManyWithoutConfirmedByNestedInput
@@ -1711,6 +1789,8 @@ export type UserUpdateWithoutAdminCreatedOrdersInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -1747,6 +1827,8 @@ export type UserUncheckedUpdateWithoutAdminCreatedOrdersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -1781,6 +1863,8 @@ export type UserCreateWithoutStatusChangesInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -1817,6 +1901,8 @@ export type UserUncheckedCreateWithoutStatusChangesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -1867,6 +1953,8 @@ export type UserUpdateWithoutStatusChangesInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -1903,6 +1991,8 @@ export type UserUncheckedUpdateWithoutStatusChangesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -1937,6 +2027,8 @@ export type UserCreateWithoutPaymentsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentCreateNestedManyWithoutConfirmedByInput
@@ -1973,6 +2065,8 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   confirmedPayments?: Prisma.PaymentUncheckedCreateNestedManyWithoutConfirmedByInput
@@ -2012,6 +2106,8 @@ export type UserCreateWithoutConfirmedPaymentsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2048,6 +2144,8 @@ export type UserUncheckedCreateWithoutConfirmedPaymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2098,6 +2196,8 @@ export type UserUpdateWithoutPaymentsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUpdateManyWithoutConfirmedByNestedInput
@@ -2134,6 +2234,8 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   confirmedPayments?: Prisma.PaymentUncheckedUpdateManyWithoutConfirmedByNestedInput
@@ -2179,6 +2281,8 @@ export type UserUpdateWithoutConfirmedPaymentsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2215,6 +2319,8 @@ export type UserUncheckedUpdateWithoutConfirmedPaymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -2249,6 +2355,8 @@ export type UserCreateWithoutChatMessagesInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2285,6 +2393,8 @@ export type UserUncheckedCreateWithoutChatMessagesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2335,6 +2445,8 @@ export type UserUpdateWithoutChatMessagesInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2371,6 +2483,8 @@ export type UserUncheckedUpdateWithoutChatMessagesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -2405,6 +2519,8 @@ export type UserCreateWithoutNotificationsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2441,6 +2557,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2491,6 +2609,8 @@ export type UserUpdateWithoutNotificationsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2527,6 +2647,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -2561,6 +2683,8 @@ export type UserCreateWithoutTestimonialsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2597,6 +2721,8 @@ export type UserUncheckedCreateWithoutTestimonialsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2647,6 +2773,8 @@ export type UserUpdateWithoutTestimonialsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2683,6 +2811,8 @@ export type UserUncheckedUpdateWithoutTestimonialsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -2717,6 +2847,8 @@ export type UserCreateWithoutAppointmentsInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2753,6 +2885,8 @@ export type UserUncheckedCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2803,6 +2937,8 @@ export type UserUpdateWithoutAppointmentsInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2839,6 +2975,8 @@ export type UserUncheckedUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -2873,6 +3011,8 @@ export type UserCreateWithoutCartInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentCreateNestedManyWithoutClientInput
@@ -2909,6 +3049,8 @@ export type UserUncheckedCreateWithoutCartInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   createdById?: string | null
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
   measurements?: Prisma.MeasurementUncheckedCreateNestedManyWithoutClientInput
   orders?: Prisma.OrderUncheckedCreateNestedManyWithoutClientInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutClientInput
@@ -2959,6 +3101,8 @@ export type UserUpdateWithoutCartInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -2995,6 +3139,8 @@ export type UserUncheckedUpdateWithoutCartInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -3029,6 +3175,8 @@ export type UserCreateManyCreatedByInput = {
   refreshTokenExpiry?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  oauthCode?: string | null
+  oauthCodeExpiry?: Date | string | null
 }
 
 export type UserUpdateWithoutCreatedByInput = {
@@ -3052,6 +3200,8 @@ export type UserUpdateWithoutCreatedByInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutClientNestedInput
@@ -3087,6 +3237,8 @@ export type UserUncheckedUpdateWithoutCreatedByInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   measurements?: Prisma.MeasurementUncheckedUpdateManyWithoutClientNestedInput
   orders?: Prisma.OrderUncheckedUpdateManyWithoutClientNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutClientNestedInput
@@ -3122,6 +3274,8 @@ export type UserUncheckedUpdateManyWithoutCreatedByInput = {
   refreshTokenExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  oauthCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  oauthCodeExpiry?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -3267,6 +3421,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   createdAt?: boolean
   updatedAt?: boolean
   createdById?: boolean
+  oauthCode?: boolean
+  oauthCodeExpiry?: boolean
   measurements?: boolean | Prisma.User$measurementsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
   payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>
@@ -3305,6 +3461,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   createdById?: boolean
+  oauthCode?: boolean
+  oauthCodeExpiry?: boolean
   createdBy?: boolean | Prisma.User$createdByArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3330,6 +3488,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   createdAt?: boolean
   updatedAt?: boolean
   createdById?: boolean
+  oauthCode?: boolean
+  oauthCodeExpiry?: boolean
   createdBy?: boolean | Prisma.User$createdByArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3355,9 +3515,11 @@ export type UserSelectScalar = {
   createdAt?: boolean
   updatedAt?: boolean
   createdById?: boolean
+  oauthCode?: boolean
+  oauthCodeExpiry?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "email" | "phone" | "sex" | "dateOfBirth" | "address" | "profilePicture" | "role" | "authProvider" | "providerId" | "passwordHash" | "isEmailVerified" | "emailVerifyToken" | "resetToken" | "resetTokenExpiry" | "refreshToken" | "refreshTokenExpiry" | "createdAt" | "updatedAt" | "createdById", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "email" | "phone" | "sex" | "dateOfBirth" | "address" | "profilePicture" | "role" | "authProvider" | "providerId" | "passwordHash" | "isEmailVerified" | "emailVerifyToken" | "resetToken" | "resetTokenExpiry" | "refreshToken" | "refreshTokenExpiry" | "createdAt" | "updatedAt" | "createdById" | "oauthCode" | "oauthCodeExpiry", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   measurements?: boolean | Prisma.User$measurementsArgs<ExtArgs>
   orders?: boolean | Prisma.User$ordersArgs<ExtArgs>
@@ -3420,6 +3582,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     createdAt: Date
     updatedAt: Date
     createdById: string | null
+    oauthCode: string | null
+    oauthCodeExpiry: Date | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -3877,6 +4041,8 @@ export interface UserFieldRefs {
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly createdById: Prisma.FieldRef<"User", 'String'>
+  readonly oauthCode: Prisma.FieldRef<"User", 'String'>
+  readonly oauthCodeExpiry: Prisma.FieldRef<"User", 'DateTime'>
 }
     
 

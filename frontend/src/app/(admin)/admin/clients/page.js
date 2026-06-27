@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { Search, Users, ChevronRight, ChevronLeft, Plus, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -42,17 +43,17 @@ export default function AdminClientsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-[#0D0D0D]">Clients</h1>
-                    <p className="text-sm text-[#999]">{total} clients</p>
+                    <h1 className="text-2xl font-bold text-foreground">Clients</h1>
+                    <p className="text-sm text-text-light">{total} clients</p>
                 </div>
-                <Button onClick={() => setCreateOpen(true)} className="bg-[#C2185B] text-white hover:bg-[#A01548] gap-1.5 h-9">
+                <Button onClick={() => setCreateOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5 h-9">
                     <Plus size={14} /> Add Client
                 </Button>
             </div>
 
             {/* Search — prominent, full-width */}
             <div className="relative mb-6">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#999]" />
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light" />
                 <Input type="text" placeholder="Search by name, email, phone..." value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                     className="pl-10 h-11 bg-white text-sm" />
@@ -71,7 +72,7 @@ export default function AdminClientsPage() {
                             // Color-code avatar by first letter
                             const hue = ((initial.charCodeAt(0) - 65) * 27) % 360;
                             const avatarColor = `hsl(${hue}, 50%, 40%)`;
-                            const totalPaid = c.totalPaid || c._count?.payments || 0;
+                            const totalPaid = c.totalPaid || 0;
 
                             // Relative time for last active
                             const lastActive = c.updatedAt ? (() => {
@@ -89,44 +90,44 @@ export default function AdminClientsPage() {
                             })() : null;
 
                             return (
-                                <div key={c.id} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-all group">
+                                <div key={c.id} className="p-5 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-all group">
                                     <div className="flex items-start gap-3 mb-3">
                                         <div className="relative shrink-0">
                                             <div className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden"
                                                 style={{ backgroundColor: avatarColor }}>
                                                 {c.profilePicture ? (
-                                                    <img src={c.profilePicture} alt="" className="w-full h-full object-cover" />
+                                                    <Image src={c.profilePicture} alt={c.fullName} fill className="rounded-full object-cover" />
                                                 ) : initial}
                                             </div>
-                                            <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${c.online ? "bg-[#2E7D32]" : "bg-[#E0E0E0]"}`} />
+                                            <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${c.online ? "bg-status-success" : "bg-[#E0E0E0]"}`} />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold text-[#0D0D0D] truncate">{c.fullName}</p>
-                                            <p className="text-xs text-[#555] truncate">{c.email}</p>
-                                            {c.phone && <p className="text-xs text-[#999]">{c.phone}</p>}
+                                            <p className="text-sm font-semibold text-foreground truncate">{c.fullName}</p>
+                                            <p className="text-xs text-muted-foreground truncate">{c.email}</p>
+                                            {c.phone && <p className="text-xs text-text-light">{c.phone}</p>}
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between gap-2 mb-3">
                                         <div className="flex items-center gap-4">
                                             <div>
-                                                <p className="text-lg font-bold font-mono-data text-[#0D0D0D]">{c._count?.orders || 0}</p>
-                                                <p className="text-[9px] text-[#999] uppercase tracking-wider">Orders</p>
+                                                <p className="text-lg font-bold font-mono-data text-foreground">{c._count?.orders || 0}</p>
+                                                <p className="text-[9px] text-text-light uppercase tracking-wider">Orders</p>
                                             </div>
                                             {typeof totalPaid === "number" && totalPaid > 0 && (
                                                 <div>
-                                                    <p className="text-lg font-bold font-mono-data text-[#0D0D0D]">{formatCurrency(totalPaid)}</p>
-                                                    <p className="text-[9px] text-[#999] uppercase tracking-wider">Total Paid</p>
+                                                    <p className="text-lg font-bold font-mono-data text-foreground">{formatCurrency(totalPaid)}</p>
+                                                    <p className="text-[9px] text-text-light uppercase tracking-wider">Total Paid</p>
                                                 </div>
                                             )}
                                         </div>
                                         {c.online ? (
-                                            <span className="text-[10px] text-[#2E7D32] font-medium">Online now</span>
+                                            <span className="text-[10px] text-status-success font-medium">Online now</span>
                                         ) : lastActive ? (
-                                            <span className="text-[10px] text-[#999]">Active {lastActive}</span>
+                                            <span className="text-[10px] text-text-light">Active {lastActive}</span>
                                         ) : null}
                                     </div>
                                     <Link href={`/admin/clients/${c.id}`}
-                                        className="block w-full text-center py-2 rounded-lg bg-[#C2185B]/5 text-[#C2185B] text-xs font-semibold hover:bg-[#C2185B]/10 transition-colors">
+                                        className="block w-full text-center py-2 rounded-lg bg-primary/5 text-primary text-xs font-semibold hover:bg-primary/10 transition-colors">
                                         View Profile
                                     </Link>
                                 </div>
@@ -137,11 +138,11 @@ export default function AdminClientsPage() {
                     {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="flex items-center justify-center gap-2 mt-6">
-                            <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="gap-1 text-[#555]">
+                            <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="gap-1 text-muted-foreground">
                                 <ChevronLeft size={14} /> Prev
                             </Button>
-                            <span className="text-xs text-[#999]">Page {page} of {totalPages}</span>
-                            <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="gap-1 text-[#555]">
+                            <span className="text-xs text-text-light">Page {page} of {totalPages}</span>
+                            <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="gap-1 text-muted-foreground">
                                 Next <ChevronRight size={14} />
                             </Button>
                         </div>

@@ -452,7 +452,11 @@ export const getAdminOrders = async (req, res) => {
   if (from || to) {
     where.createdAt = {};
     if (from) where.createdAt.gte = new Date(from);
-    if (to) where.createdAt.lte = new Date(to);
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setUTCHours(23, 59, 59, 999);  // include the full end day
+      where.createdAt.lte = toDate;
+    }
   }
 
   // Pagination
@@ -487,7 +491,7 @@ export const getAdminOrders = async (req, res) => {
 
   return successResponse(res, 200, "Orders retrieved", {
     total,
-    page: parseInt(page),
+    page: Math.max(parseInt(page) || 1, 1),
     totalPages: Math.ceil(total / take),
     orders,
   });
@@ -658,7 +662,7 @@ export const setAdminNotes = async (req, res) => {
 
   const order = await prisma.order.findUnique({
     where: { id: req.params.id },
-    select: { id: true },
+    select: { id: true, adminNotes: true },
   });
 
   if (!order) throw new AppError("Order not found", 404);
@@ -666,7 +670,7 @@ export const setAdminNotes = async (req, res) => {
   const updated = await prisma.order.update({
     where: { id: req.params.id },
     data: {
-      adminNotes: adminNotes || order.adminNotes || "",
+      adminNotes: adminNotes ?? order.adminNotes ?? "",
     },
   });
 
@@ -722,46 +726,6 @@ export const adminCreateOrder = async (req, res) => {
       throw new AppError("This style is not available for Model 2 orders", 400);
   }
 
-  // Pre-validate items and stock for Model 3
-  const validatedItems = [];
-  let totalAgreedFee = null;
-
-  if (orderType === "MODEL_3" && items && items.length > 0) {
-    totalAgreedFee = 0;
-    for (const reqItem of items) {
-      const dbItem = await prisma.readyToWear.findUnique({
-        where: { id: reqItem.readyToWearId, isActive: true },
-      });
-      if (!dbItem)
-        throw new AppError(
-          "Selected item not found or no longer available",
-          404,
-        );
-
-      if (
-        dbItem.stockStatus === "OUT_OF_STOCK" ||
-        dbItem.stockCount < reqItem.quantity
-      ) {
-        throw new AppError(`Not enough stock for "${dbItem.name}"`, 400);
-      }
-
-      if (!dbItem.availableSizes.includes(reqItem.selectedSize)) {
-        throw new AppError(
-          `Size ${reqItem.selectedSize} is not available for "${dbItem.name}"`,
-          400,
-        );
-      }
-
-      validatedItems.push({
-        readyToWearId: dbItem.id,
-        selectedSize: reqItem.selectedSize,
-        quantity: reqItem.quantity,
-        priceAtPurchase: dbItem.price,
-      });
-
-      totalAgreedFee += Number(dbItem.price) * reqItem.quantity;
-    }
-  }
 
   // Get client's saved measurements
   let measurementId = null;
@@ -777,6 +741,47 @@ export const adminCreateOrder = async (req, res) => {
   // Order number generated INSIDE to prevent race conditions
   const order = await prisma.$transaction(async (tx) => {
     const orderNumber = await generateOrderNumber(tx);
+
+     // Pre-validate items and stock for Model 3
+    const validatedItems = [];
+    let totalAgreedFee = null;
+
+    if (orderType === "MODEL_3" && items && items.length > 0) {
+      totalAgreedFee = 0;
+      for (const reqItem of items) {
+        const dbItem = await tx.readyToWear.findUnique({
+          where: { id: reqItem.readyToWearId, isActive: true },
+        });
+        if (!dbItem)
+          throw new AppError(
+            "Selected item not found or no longer available",
+            404,
+          );
+
+        if (
+          dbItem.stockStatus === "OUT_OF_STOCK" ||
+          dbItem.stockCount < reqItem.quantity
+        ) {
+          throw new AppError(`Not enough stock for "${dbItem.name}"`, 400);
+        }
+
+        if (!dbItem.availableSizes.includes(reqItem.selectedSize)) {
+          throw new AppError(
+            `Size ${reqItem.selectedSize} is not available for "${dbItem.name}"`,
+            400,
+          );
+        }
+
+        validatedItems.push({
+          readyToWearId: dbItem.id,
+          selectedSize: reqItem.selectedSize,
+          quantity: reqItem.quantity,
+          priceAtPurchase: dbItem.price,
+        });
+
+        totalAgreedFee += Number(dbItem.price) * reqItem.quantity;
+      }
+    }
 
     // MODEL_3 (ready-to-wear) has fixed prices — skip PENDING_REVIEW
     const initialStatus = orderType === "MODEL_3" ? "AGREED_AWAITING_PAYMENT" : "PENDING_REVIEW";

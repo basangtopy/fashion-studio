@@ -3,6 +3,7 @@ import {
   getStyles,
   getStyleCategories,
   getStyle,
+  getAdminStyles,
   createStyle,
   updateStyle,
   deleteStyle,
@@ -17,6 +18,14 @@ import {
 import { manageStyleImages } from "../controllers/imageManagement.controller.js";
 
 const router = Router();
+
+// Admin only
+router.get(
+  "/admin",
+  authenticate,
+  authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  getAdminStyles
+);
 
 // Public
 router.get("/", getStyles);

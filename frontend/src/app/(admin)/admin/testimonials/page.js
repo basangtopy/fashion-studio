@@ -113,23 +113,23 @@ export default function AdminTestimonialsPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-[#0D0D0D]">Testimonials</h1>
-                    <p className="text-sm text-[#999]">Review and moderate client testimonials</p>
+                    <h1 className="text-2xl font-bold text-foreground">Testimonials</h1>
+                    <p className="text-sm text-text-light">Review and moderate client testimonials</p>
                 </div>
-                <Button onClick={() => setShowCreateForm(true)} className="bg-[#C2185B] text-white hover:bg-[#A01548] gap-1.5">
+                <Button onClick={() => setShowCreateForm(true)} className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5">
                     <Plus size={14} /> Create Testimonial
                 </Button>
             </div>
 
             {/* Tab bar */}
-            <div className="flex gap-1 mb-6 bg-[#F4F0F8] rounded-lg p-1 max-w-md">
+            <div className="flex gap-1 mb-6 bg-muted rounded-lg p-1 max-w-md">
                 {TABS.map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
                         className={`flex-1 py-2.5 px-3 rounded-md text-sm font-medium capitalize transition-all duration-200 ${activeTab === tab
-                            ? "bg-white text-[#0D0D0D] shadow-sm"
-                            : "text-[#999] hover:text-[#555]"
+                            ? "bg-white text-foreground shadow-sm"
+                            : "text-text-light hover:text-muted-foreground"
                             }`}
                     >
                         {tab.toLowerCase()}
@@ -143,23 +143,23 @@ export default function AdminTestimonialsPage() {
                     {[1, 2, 3].map((i) => <SkeletonCard key={i} className="h-[140px]" />)}
                 </div>
             ) : testimonials.length === 0 ? (
-                <div className="p-12 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
-                    <MessageSquare size={28} className="text-[#999] mx-auto mb-2" />
-                    <p className="text-sm text-[#555]">No {activeTab.toLowerCase()} testimonials.</p>
+                <div className="p-12 rounded-xl border border-border bg-white text-center">
+                    <MessageSquare size={28} className="text-text-light mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">No {activeTab.toLowerCase()} testimonials.</p>
                 </div>
             ) : (
                 <div className="space-y-4">
                     {testimonials.map((t) => (
-                        <div key={t.id} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                        <div key={t.id} className="p-5 rounded-xl border border-border bg-white">
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-3">
 
-                                    <div className="w-9 h-9 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-xs shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs shrink-0">
                                         {t.clientName?.charAt(0) || t.user?.fullName?.charAt(0) || "?"}
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <p className="text-sm font-semibold text-[#0D0D0D]">{t.clientName || t.user?.fullName || "Anonymous"}</p>
+                                            <p className="text-sm font-semibold text-foreground">{t.clientName || t.user?.fullName || "Anonymous"}</p>
                                             {t.isFeatured && (
                                                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FF6F00]/10 text-[#FF6F00] font-bold flex items-center gap-0.5">
                                                     <Star size={8} fill="currentColor" /> FEATURED
@@ -182,15 +182,15 @@ export default function AdminTestimonialsPage() {
                                     >
                                         <Star size={16} fill={t.isFeatured ? "currentColor" : "none"} />
                                     </button>
-                                    <p className="text-xs text-[#999]">{new Date(t.createdAt).toLocaleDateString("en-NG")}</p>
+                                    <p className="text-xs text-text-light">{new Date(t.createdAt).toLocaleDateString("en-NG")}</p>
                                 </div>
                             </div>
 
-                            <p className="text-sm text-[#555] leading-relaxed mb-4">{t.review || t.content}</p>
+                            <p className="text-sm text-muted-foreground leading-relaxed mb-4">{t.review || t.content}</p>
 
                             {/* Optional Garment Image */}
                             {t.photoUrl && (
-                                <div className="relative w-48 h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#F4F0F8]">
+                                <div className="relative w-48 h-48 sm:h-56 mb-4 rounded-lg overflow-hidden border border-border bg-muted">
                                     {/* blurred background */}
                                     <Image src={t.photoUrl} alt={`Attached photo from ${t.clientName || 'Anonymous'}`} fill className="object-cover blur-xl scale-110 opacity-100" />
                                     <Image
@@ -209,12 +209,12 @@ export default function AdminTestimonialsPage() {
                                     <>
                                         <button onClick={() => setConfirmAction({ id: t.id, action: "approve", name: t.clientName || "this testimonial" })}
                                             disabled={updateStatus.isPending}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#E8F5E9] text-[#2E7D32] text-xs font-semibold hover:bg-[#C8E6C9] transition-colors">
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#E8F5E9] text-status-success text-xs font-semibold hover:bg-[#C8E6C9] transition-colors">
                                             <CheckCircle size={14} /> Approve
                                         </button>
                                         <button onClick={() => setConfirmAction({ id: t.id, action: "reject", name: t.clientName || "this testimonial" })}
                                             disabled={updateStatus.isPending}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#FFEBEE] text-[#C62828] text-xs font-semibold hover:bg-[#FFCDD2] transition-colors">
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#FFEBEE] text-destructive text-xs font-semibold hover:bg-[#FFCDD2] transition-colors">
                                             <XCircle size={14} /> Reject
                                         </button>
                                     </>
@@ -223,7 +223,7 @@ export default function AdminTestimonialsPage() {
                                     <div className="flex items-center gap-2">
                                         <StatusPill status="APPROVED" size="small" />
                                         <button onClick={() => setConfirmAction({ id: t.id, action: "reject", name: t.clientName || "this testimonial" })}
-                                            className="text-xs text-[#C62828] font-medium hover:underline">
+                                            className="text-xs text-destructive font-medium hover:underline">
                                             Reject
                                         </button>
                                     </div>
@@ -232,7 +232,7 @@ export default function AdminTestimonialsPage() {
                                     <div className="flex items-center gap-2">
                                         <StatusPill status="REJECTED" size="small" />
                                         <button onClick={() => updateStatus.mutate({ id: t.id, status: "APPROVED" })}
-                                            className="text-xs text-[#C2185B] font-medium hover:underline">
+                                            className="text-xs text-primary font-medium hover:underline">
                                             Approve instead
                                         </button>
                                     </div>
@@ -258,7 +258,7 @@ export default function AdminTestimonialsPage() {
                         onClick={() => fetchNextPage()}
                         disabled={isFetchingNextPage}
                         variant="outline"
-                        className="border-[#C2185B] text-[#C2185B] hover:bg-[#C2185B]/5 gap-2 h-11 px-6 rounded-md"
+                        className="border-primary text-primary hover:bg-primary/5 gap-2 h-11 px-6 rounded-md"
                     >
                         {isFetchingNextPage ? (
                             <><Loader2 size={14} className="animate-spin" /> Loading…</>
@@ -280,36 +280,36 @@ export default function AdminTestimonialsPage() {
                             className="bg-white rounded-xl max-w-[480px] w-full p-6 max-h-[90vh] overflow-y-auto custom-scrollbar"
                             onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-between mb-5">
-                                <h3 className="text-lg font-bold text-[#0D0D0D]">Create Testimonial</h3>
-                                <button onClick={() => setShowCreateForm(false)} className="p-1 rounded-full hover:bg-[#F4F0F8] transition-colors">
-                                    <X size={18} className="text-[#999]" />
+                                <h3 className="text-lg font-bold text-foreground">Create Testimonial</h3>
+                                <button onClick={() => setShowCreateForm(false)} className="p-1 rounded-full hover:bg-muted transition-colors">
+                                    <X size={18} className="text-text-light" />
                                 </button>
                             </div>
-                            <p className="text-xs text-[#999] mb-5">Manually add a testimonial on behalf of a client. It will be auto-approved.</p>
+                            <p className="text-xs text-text-light mb-5">Manually add a testimonial on behalf of a client. It will be auto-approved.</p>
 
                             <div className="space-y-5">
                                 {/* Client Name */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Client Name *</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Client Name *</label>
                                     <Input type="text" value={formData.clientName} onChange={(e) => setFormData({ ...formData, clientName: e.target.value })} className="h-11 bg-white" placeholder="Full name" />
                                 </div>
 
                                 {/* Rating */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Rating *</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Rating *</label>
                                     <StarRatingInput value={formData.rating} onChange={(rating) => setFormData({ ...formData, rating })} size={24} />
                                 </div>
 
                                 {/* Review */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Review *</label>
-                                    <Textarea value={formData.review} onChange={(e) => setFormData({ ...formData, review: e.target.value })} rows={4} className="resize-none bg-white" placeholder="Write the client's testimonial (min 10 characters)…" />
-                                    <p className="text-[10px] text-[#999] mt-1">{formData.review.length}/1000</p>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Review *</label>
+                                    <Textarea value={formData.review} onChange={(e) => setFormData({ ...formData, review: e.target.value })} rows={4} className="resize-none bg-background" placeholder="Write the client's testimonial (min 10 characters)…" />
+                                    <p className="text-[10px] text-text-light mt-1">{formData.review.length}/1000</p>
                                 </div>
 
                                 {/* Photo URL */}
                                 <div>
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Photo (optional)</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Photo (optional)</label>
                                     <ImageUpload
                                         existingImages={[]}
                                         newFiles={newImageFiles}
@@ -321,10 +321,10 @@ export default function AdminTestimonialsPage() {
                                 </div>
 
                                 {/* Featured toggle */}
-                                <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-[rgba(0,0,0,0.06)] hover:bg-[#FAFAFA] transition-colors">
+                                <label className="flex items-center justify-between cursor-pointer p-3 rounded-lg border border-border hover:bg-surface-2 transition-colors">
                                     <div>
-                                        <p className="text-sm font-medium text-[#0D0D0D]">Featured</p>
-                                        <p className="text-[10px] text-[#999]">Show prominently on the website</p>
+                                        <p className="text-sm font-medium text-foreground">Featured</p>
+                                        <p className="text-[10px] text-text-light">Show prominently on the website</p>
                                     </div>
                                     <Switch checked={formData.isFeatured} onCheckedChange={(checked) => setFormData({ ...formData, isFeatured: checked })} />
                                 </label>
@@ -332,7 +332,7 @@ export default function AdminTestimonialsPage() {
 
                             <Button onClick={() => createMutation.mutate()}
                                 disabled={!formData.clientName || formData.rating < 1 || formData.review.length < 10 || createMutation.isPending}
-                                className="w-full mt-5 bg-[#C2185B] text-white hover:bg-[#A01548] h-11 gap-2">
+                                className="w-full mt-5 bg-primary text-primary-foreground hover:bg-primary/90 h-11 gap-2">
                                 {createMutation.isPending ? (<><Loader2 size={14} className="animate-spin" /> Creating…</>) : (<><Save size={14} /> Create Testimonial</>)}
                             </Button>
                         </motion.div>

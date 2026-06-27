@@ -86,29 +86,29 @@ export default function CustomSelect({
     return (
         <div ref={ref} className={`relative ${className}`}>
             {label && (
-                <label className="block text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">{label}</label>
+                <label className="block text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">{label}</label>
             )}
             <button
                 type="button"
                 onClick={() => !disabled && setOpen(!open)}
                 disabled={disabled}
                 className={`w-full h-9 px-3 flex items-center justify-between gap-2 rounded-lg border text-sm transition-all duration-150
-                    ${open ? "border-[#C2185B] ring-2 ring-[#C2185B]/10" : "border-[#E0E0E0] hover:border-[#C2185B]/40"}
-                    ${disabled ? "opacity-50 cursor-not-allowed bg-[#FAFAFA]" : "bg-white cursor-pointer"}
+                    ${open ? "border-primary ring-2 ring-ring/10" : "border-input hover:border-primary/40"}
+                    ${disabled ? "opacity-50 cursor-not-allowed bg-surface-2" : "bg-white cursor-pointer"}
                 `}
             >
-                <span className={`truncate text-left flex-1 ${hasValue ? "text-[#0D0D0D]" : "text-[#999]"}`}>
+                <span className={`truncate text-left flex-1 ${hasValue ? "text-foreground" : "text-text-light"}`}>
                     {multiple && selectedLabels.length > 0
                         ? selectedLabels.length <= 2 ? selectedLabels.join(", ") : `${selectedLabels.length} selected`
                         : selectedLabel || placeholder}
                 </span>
                 <div className="flex items-center gap-1 shrink-0">
                     {hasValue && !disabled && (
-                        <span onClick={handleClear} className="p-0.5 rounded hover:bg-[#F4F0F8] text-[#999] hover:text-[#C2185B]">
+                        <span onClick={handleClear} className="p-0.5 rounded hover:bg-muted text-text-light hover:text-primary">
                             <X size={12} />
                         </span>
                     )}
-                    <ChevronDown size={14} className={`text-[#999] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+                    <ChevronDown size={14} className={`text-text-light transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
                 </div>
             </button>
 
@@ -119,7 +119,7 @@ export default function CustomSelect({
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -4, scale: 0.98 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-[rgba(0,0,0,0.08)] rounded-xl shadow-lg overflow-hidden"
+                        className="absolute z-50 top-full mt-1 left-0 right-0 bg-popover border border-[rgba(0,0,0,0.08)] rounded-xl shadow-lg overflow-hidden"
                     >
                         {searchable && (
                             <div className="px-3 pt-2 pb-1">
@@ -132,13 +132,13 @@ export default function CustomSelect({
                                         if (onSearchChange) onSearchChange(e.target.value);
                                     }}
                                     placeholder="Search..."
-                                    className="w-full h-7 px-2 text-xs border border-[#E0E0E0] rounded-md focus:border-[#C2185B] outline-none"
+                                    className="w-full h-7 px-2 text-xs border border-input rounded-md focus:border-ring outline-none"
                                 />
                             </div>
                         )}
                         <div className="max-h-[200px] overflow-y-auto py-1 custom-scrollbar">
                             {filtered.length === 0 ? (
-                                <div className="px-3 py-2 text-xs text-[#999]">No options</div>
+                                <div className="px-3 py-2 text-xs text-text-light">No options</div>
                             ) : (
                                 filtered.map((opt) => {
                                     const isSelected = multiple
@@ -150,11 +150,11 @@ export default function CustomSelect({
                                             type="button"
                                             onClick={() => handleSelect(opt.value)}
                                             className={`w-full text-left flex items-center gap-2 px-3 py-2 text-sm transition-colors
-                                                ${isSelected ? "bg-[#C2185B]/5 text-[#C2185B] font-medium" : "text-[#0D0D0D] hover:bg-[#F4F0F8]"}`}
+                                                ${isSelected ? "bg-primary/5 text-primary font-medium" : "text-foreground hover:bg-muted"}`}
                                         >
                                             {opt.icon && <opt.icon size={14} className="shrink-0" />}
                                             <span className="flex-1 truncate">{opt.label}</span>
-                                            {isSelected && <Check size={14} className="shrink-0 text-[#C2185B]" />}
+                                            {isSelected && <Check size={14} className="shrink-0 text-primary" />}
                                         </button>
                                     );
                                 })

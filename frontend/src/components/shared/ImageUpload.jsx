@@ -90,19 +90,19 @@ export default function ImageUpload({
                 onDragLeave={() => setDragOver(false)}
                 onClick={() => fileInputRef.current?.click()}
                 className={`relative flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 ${dragOver
-                        ? "border-[#C2185B] bg-[#C2185B]/5"
-                        : "border-[#E0E0E0] hover:border-[#C2185B]/40 bg-[#FAFAFA] hover:bg-[#F4F0F8]/50"
+                        ? "border-primary bg-primary/5"
+                        : "border-input hover:border-primary/40 bg-surface-2 hover:bg-muted/50"
                     }`}
             >
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${dragOver ? "bg-[#C2185B]/10" : "bg-[#F4F0F8]"
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors ${dragOver ? "bg-primary/10" : "bg-muted"
                     }`}>
-                    <ImagePlus size={18} className={dragOver ? "text-[#C2185B]" : "text-[#999]"} />
+                    <ImagePlus size={18} className={dragOver ? "text-primary" : "text-text-light"} />
                 </div>
                 <div className="text-center">
-                    <p className="text-sm font-medium text-[#555]">
+                    <p className="text-sm font-medium text-muted-foreground">
                         {dragOver ? "Drop images here" : "Click or drag images to upload"}
                     </p>
-                    <p className="text-[10px] text-[#999] mt-0.5">
+                    <p className="text-[10px] text-text-light mt-0.5">
                         {totalCount}/{maxFiles} images · PNG, JPG, WebP
                     </p>
                 </div>
@@ -119,7 +119,7 @@ export default function ImageUpload({
             {/* Existing images — reorderable */}
             {existingImages.length > 0 && (
                 <div>
-                    <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-2">
+                    <p className="text-[10px] font-semibold text-text-light uppercase tracking-wider mb-2">
                         Current Images (drag to reorder)
                     </p>
                     <DragDropContext onDragEnd={onDragEnd}>
@@ -136,7 +136,7 @@ export default function ImageUpload({
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
-                                                    className={`relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border group/img ${snapshot.isDragging ? "ring-2 ring-[#C2185B] shadow-lg" : "border-[rgba(0,0,0,0.08)]"
+                                                    className={`relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border group/img ${snapshot.isDragging ? "ring-2 ring-ring shadow-lg" : "border-[rgba(0,0,0,0.08)]"
                                                         }`}
                                                 >
                                                     <Image src={url} alt={`Image ${i + 1}`} fill className="object-cover" />
@@ -151,13 +151,13 @@ export default function ImageUpload({
                                                     <button
                                                         type="button"
                                                         onClick={(e) => { e.stopPropagation(); confirmDeleteExisting(url); }}
-                                                        className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-black/50 text-white opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-[#C62828]"
+                                                        className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-black/50 text-primary-foreground opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
                                                     >
                                                         <X size={10} />
                                                     </button>
                                                     {/* First image indicator */}
                                                     {i === 0 && (
-                                                        <span className="absolute bottom-0.5 left-0.5 text-[8px] bg-[#C2185B] text-white px-1.5 py-0.5 rounded-sm font-bold">
+                                                        <span className="absolute bottom-0.5 left-0.5 text-[8px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-sm font-bold">
                                                             COVER
                                                         </span>
                                                     )}
@@ -176,12 +176,12 @@ export default function ImageUpload({
             {/* New files preview */}
             {newFiles.length > 0 && (
                 <div>
-                    <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-2">
+                    <p className="text-[10px] font-semibold text-text-light uppercase tracking-wider mb-2">
                         New Images (pending upload)
                     </p>
                     <div className="flex gap-2 overflow-x-auto pb-1 custom-scrollbar">
                         {newFiles.map((file, i) => (
-                            <div key={`new-${i}-${file.name}`} className="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-[#C2185B]/20 group/img bg-[#F4F0F8]">
+                            <div key={`new-${i}-${file.name}`} className="relative shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-primary/20 group/img bg-muted">
                                 <Image
                                     src={URL.createObjectURL(file)}
                                     alt={file.name}
@@ -191,11 +191,11 @@ export default function ImageUpload({
                                 <button
                                     type="button"
                                     onClick={(e) => { e.stopPropagation(); confirmDeleteNew(i); }}
-                                    className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-black/50 text-white opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-[#C62828]"
+                                    className="absolute top-0.5 right-0.5 p-0.5 rounded-full bg-black/50 text-primary-foreground opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-destructive"
                                 >
                                     <X size={10} />
                                 </button>
-                                <span className="absolute bottom-0 inset-x-0 text-[8px] bg-[#C2185B]/80 text-white text-center py-0.5 truncate px-1">
+                                <span className="absolute bottom-0 inset-x-0 text-[8px] bg-primary/80 text-primary-foreground text-center py-0.5 truncate px-1">
                                     NEW
                                 </span>
                             </div>

@@ -62,12 +62,35 @@ export function AuthProvider({ children }) {
         }
     }, []);
 
+    // Refresh timer — renew token every 13 minutes (token lasts 15 min)
+    const startRefreshTimer = useCallback(() => {
+        if (refreshTimerRef.current) {
+            clearInterval(refreshTimerRef.current);
+        }
+        refreshTimerRef.current = setInterval(async () => {
+            try {
+            const { data } = await api.post("/auth/refresh");
+            if (data.success && data.data?.accessToken) {
+                setAccessToken(data.data.accessToken);
+                // Timer is already running — no need to restart it here
+            } else {
+                clearAccessToken();
+                setUser(null);
+            }
+            } catch {
+            clearAccessToken();
+            setUser(null);
+            }
+        }, 13 * 60 * 1000);
+    }, []);
+
     // Silent refresh
     const refreshToken = useCallback(async () => {
         try {
             const { data } = await api.post("/auth/refresh");
             if (data.success && data.data?.accessToken) {
                 setAccessToken(data.data.accessToken);
+                startRefreshTimer();
                 return true;
             }
         } catch {
@@ -75,27 +98,17 @@ export function AuthProvider({ children }) {
             setUser(null);
         }
         return false;
-    }, []);
-
-    // Refresh timer — renew token every 13 minutes (token lasts 15 min)
-    const startRefreshTimer = useCallback(() => {
-        if (refreshTimerRef.current) {
-            clearInterval(refreshTimerRef.current);
-        }
-        refreshTimerRef.current = setInterval(
-            () => {
-                refreshToken();
-            },
-            13 * 60 * 1000
-        );
-    }, [refreshToken]);
+    }, [startRefreshTimer]);
 
     // Handle OAuth callback token
     const handleOAuthCallback = useCallback(
-        async (token) => {
-            setAccessToken(token);
-            await fetchUser();
-            startRefreshTimer();
+        async (code) => {
+            const { data } = await api.post("/auth/oauth/exchange", { code });
+            if (data.success && data.data?.accessToken) {
+                setAccessToken(data.data.accessToken);
+                await fetchUser();
+                startRefreshTimer();
+            }
         },
         [fetchUser, startRefreshTimer]
     );

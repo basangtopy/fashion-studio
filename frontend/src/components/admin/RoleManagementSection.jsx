@@ -67,27 +67,27 @@ export default function RoleManagementSection() {
     };
 
     return (
-        <section className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white mb-4">
+        <section className="p-6 rounded-xl border border-border bg-white mb-4">
             <div className="flex items-center gap-2 mb-1">
-                <UserCog size={16} className="text-[#C2185B]" />
-                <h2 className="text-sm font-bold text-[#0D0D0D]">Role Management</h2>
+                <UserCog size={16} className="text-primary" />
+                <h2 className="text-sm font-bold text-foreground">Role Management</h2>
             </div>
-            <p className="text-[10px] text-[#999] mb-4">
+            <p className="text-[10px] text-text-light mb-4">
                 Promote clients to Staff Admin or demote staff back to Client. Password required for all changes.
             </p>
 
             {/* Search bar */}
             <div className="relative">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
                 <Input
                     type="text"
                     placeholder="Search by name or email..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9 bg-[#FAFAFA] h-9 text-sm"
+                    className="pl-9 bg-surface-2 h-9 text-sm"
                 />
                 {isFetching && (
-                    <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] animate-spin" />
+                    <Loader2 size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light animate-spin" />
                 )}
             </div>
 
@@ -97,7 +97,7 @@ export default function RoleManagementSection() {
                     {searchResults.length === 0 && !isFetching ? (
                         <div className="text-center py-6">
                             <Search size={20} className="text-[#DDD] mx-auto mb-2" />
-                            <p className="text-xs text-[#999]">No users found matching &quot;{debouncedQuery}&quot;</p>
+                            <p className="text-xs text-text-light">No users found matching &quot;{debouncedQuery}&quot;</p>
                         </div>
                     ) : (
                         <div className="space-y-1.5 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
@@ -136,7 +136,7 @@ function UserRoleRow({ user, onChangeRole }) {
     const isStaff = user.role === "STAFF_ADMIN";
 
     return (
-        <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border border-[rgba(0,0,0,0.04)] bg-[#FAFAFA] hover:bg-[#F4F0F8]/50 transition-colors">
+        <div className="flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg border border-[rgba(0,0,0,0.04)] bg-surface-2 hover:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3 min-w-0">
                 {/* Avatar */}
                 <div className="relative shrink-0">
@@ -149,7 +149,7 @@ function UserRoleRow({ user, onChangeRole }) {
                             className="w-8 h-8 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="w-8 h-8 rounded-full bg-[#F4F0F8] flex items-center justify-center text-xs font-bold text-[#C2185B]">
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-primary">
                             {user.fullName?.charAt(0)?.toUpperCase()}
                         </div>
                     )}
@@ -166,8 +166,8 @@ function UserRoleRow({ user, onChangeRole }) {
 
                 {/* Info */}
                 <div className="min-w-0">
-                    <p className="text-xs font-semibold text-[#0D0D0D] truncate">{user.fullName}</p>
-                    <p className="text-[10px] text-[#999] truncate">{user.email}</p>
+                    <p className="text-xs font-semibold text-foreground truncate">{user.fullName}</p>
+                    <p className="text-[10px] text-text-light truncate">{user.email}</p>
                 </div>
             </div>
 
@@ -186,7 +186,7 @@ function UserRoleRow({ user, onChangeRole }) {
                 {/* Change role button */}
                 <button
                     onClick={onChangeRole}
-                    className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white hover:bg-[#F4F0F8] hover:border-[rgba(194,24,91,0.2)] text-[#555] hover:text-[#C2185B] transition-all duration-200"
+                    className="flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] bg-white hover:bg-muted hover:border-primary/20 text-muted-foreground hover:text-primary transition-all duration-200"
                     title={isStaff ? "Demote to Client" : "Promote to Staff Admin"}
                 >
                     <ArrowUpDown size={10} />
@@ -256,16 +256,16 @@ function PasswordConfirmModal({ open, onClose, user, targetRole, onSuccess }) {
                             style={{ backgroundColor: isPromoting ? "rgba(194, 24, 91, 0.1)" : "rgba(198, 40, 40, 0.1)" }}
                         >
                             {isPromoting ? (
-                                <ShieldCheck size={18} className="text-[#C2185B]" />
+                                <ShieldCheck size={18} className="text-primary" />
                             ) : (
-                                <ShieldAlert size={18} className="text-[#C62828]" />
+                                <ShieldAlert size={18} className="text-destructive" />
                             )}
                         </div>
                     </div>
-                    <DialogTitle className="text-sm font-bold text-[#0D0D0D]">
+                    <DialogTitle className="text-sm font-bold text-foreground">
                         {isPromoting ? "Promote to Staff Admin" : "Demote to Client"}
                     </DialogTitle>
-                    <DialogDescription className="text-xs text-[#999] mt-1">
+                    <DialogDescription className="text-xs text-text-light mt-1">
                         {isPromoting
                             ? `This will give ${user.fullName} access to the admin dashboard, orders, clients, and messaging.`
                             : `This will remove ${user.fullName}'s admin access. They will only be able to use client features.`
@@ -274,20 +274,20 @@ function PasswordConfirmModal({ open, onClose, user, targetRole, onSuccess }) {
                 </DialogHeader>
 
                 {/* User card */}
-                <div className="mx-6 mb-4 px-3 py-2.5 rounded-lg bg-[#FAFAFA] border border-[rgba(0,0,0,0.04)]">
+                <div className="mx-6 mb-4 px-3 py-2.5 rounded-lg bg-surface-2 border border-[rgba(0,0,0,0.04)]">
                     <div className="flex items-center gap-3">
                         {user.profilePicture ? (
                             <Image src={user.profilePicture} alt={user.fullName} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                         ) : (
-                            <div className="w-8 h-8 rounded-full bg-[#F4F0F8] flex items-center justify-center text-xs font-bold text-[#C2185B]">
+                            <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-primary">
                                 {user.fullName?.charAt(0)?.toUpperCase()}
                             </div>
                         )}
                         <div className="min-w-0">
-                            <p className="text-xs font-semibold text-[#0D0D0D] truncate">{user.fullName}</p>
-                            <p className="text-[10px] text-[#999] truncate">{user.email}</p>
+                            <p className="text-xs font-semibold text-foreground truncate">{user.fullName}</p>
+                            <p className="text-[10px] text-text-light truncate">{user.email}</p>
                         </div>
-                        <div className="ml-auto flex items-center gap-1.5 text-[10px] text-[#999]">
+                        <div className="ml-auto flex items-center gap-1.5 text-[10px] text-text-light">
                             <span className="px-1.5 py-0.5 rounded bg-[rgba(0,0,0,0.05)] font-medium">
                                 {user.role === "STAFF_ADMIN" ? "Staff" : "Client"}
                             </span>
@@ -308,7 +308,7 @@ function PasswordConfirmModal({ open, onClose, user, targetRole, onSuccess }) {
                 {/* Password form */}
                 <form onSubmit={handleSubmit} className="px-6 pb-6">
                     <div className="mb-4">
-                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">
+                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">
                             <Lock size={10} />
                             Enter your password to confirm
                         </label>
@@ -319,14 +319,14 @@ function PasswordConfirmModal({ open, onClose, user, targetRole, onSuccess }) {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Your super admin password"
-                                className="bg-[#FAFAFA] h-10 pr-10"
+                                className="bg-surface-2 h-10 pr-10"
                                 required
                                 autoComplete="current-password"
                             />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#555] transition-colors"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-muted-foreground transition-colors"
                                 tabIndex={-1}
                             >
                                 {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}

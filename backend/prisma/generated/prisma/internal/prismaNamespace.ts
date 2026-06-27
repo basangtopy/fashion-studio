@@ -1663,7 +1663,9 @@ export const UserScalarFieldEnum = {
   refreshTokenExpiry: 'refreshTokenExpiry',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
-  createdById: 'createdById'
+  createdById: 'createdById',
+  oauthCode: 'oauthCode',
+  oauthCodeExpiry: 'oauthCodeExpiry'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]

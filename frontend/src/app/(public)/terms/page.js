@@ -123,9 +123,9 @@ function useScrollSpy(sectionIds) {
 // ============================================================
 function TermsHero() {
     return (
-        <section className="relative bg-[#1A1A2E] pt-[calc(var(--nav-height)_+_40px)] pb-16 sm:pb-20 lg:pb-24 overflow-hidden">
+        <section className="relative bg-secondary pt-[calc(var(--nav-height)_+_40px)] pb-16 sm:pb-20 lg:pb-24 overflow-hidden">
             <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[10%] left-[10%] w-48 h-56 rounded-3xl bg-[#C2185B]/5 -rotate-6" />
+                <div className="absolute top-[10%] left-[10%] w-48 h-56 rounded-3xl bg-primary/5 -rotate-6" />
                 <div className="absolute bottom-[15%] right-[5%] w-32 h-40 rounded-2xl bg-[#F8E8F0]/3 rotate-12" />
             </div>
 
@@ -135,7 +135,7 @@ function TermsHero() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         Legal
                     </span>
                     <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
@@ -163,7 +163,7 @@ function TOCSidebar({ sections, activeId }) {
 
     return (
         <nav className="space-y-1">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-[#999] font-semibold mb-4">
+            <p className="text-[10px] uppercase tracking-[0.3em] text-text-light font-semibold mb-4">
                 Contents
             </p>
             {sections.map((section) => (
@@ -171,8 +171,8 @@ function TOCSidebar({ sections, activeId }) {
                     key={section.id}
                     onClick={() => handleClick(section.id)}
                     className={`block w-full text-left text-sm py-1.5 px-3 rounded-lg transition-all duration-200 ${activeId === section.id
-                        ? "bg-[#C2185B]/10 text-[#C2185B] font-semibold border-l-2 border-[#C2185B]"
-                        : "text-[#555] hover:text-[#0D0D0D] hover:bg-[#F4F0F8]"
+                        ? "bg-primary/10 text-primary font-semibold border-l-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted"
                         }`}
                 >
                     {section.title}
@@ -197,29 +197,29 @@ function MobileTOC({ sections, activeId }) {
     };
 
     return (
-        <div className="lg:hidden mb-8 border border-[rgba(0,0,0,0.06)] rounded-xl bg-white overflow-hidden">
+        <div className="lg:hidden mb-8 border border-border rounded-xl bg-white overflow-hidden">
             <button
                 onClick={() => setOpen(!open)}
-                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-[#0D0D0D]"
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground"
             >
                 <span>Contents</span>
                 <motion.span
                     animate={{ rotate: open ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
-                    className="text-[#999]"
+                    className="text-text-light"
                 >
                     ▾
                 </motion.span>
             </button>
             {open && (
-                <div className="px-4 pb-3 space-y-1 border-t border-[rgba(0,0,0,0.06)]">
+                <div className="px-4 pb-3 space-y-1 border-t border-border">
                     {sections.map((section) => (
                         <button
                             key={section.id}
                             onClick={() => handleClick(section.id)}
                             className={`block w-full text-left text-sm py-1.5 px-3 rounded-lg transition-colors ${activeId === section.id
-                                ? "text-[#C2185B] font-semibold"
-                                : "text-[#555]"
+                                ? "text-primary font-semibold"
+                                : "text-muted-foreground"
                                 }`}
                         >
                             {section.title}
@@ -243,13 +243,13 @@ function ContentSection({ section }) {
 
             const parts = line.split(/\*\*(.*?)\*\*/g);
             const rendered = parts.map((part, j) =>
-                j % 2 === 1 ? <strong key={j} className="font-semibold text-[#0D0D0D]">{part}</strong> : part
+                j % 2 === 1 ? <strong key={j} className="font-semibold text-foreground">{part}</strong> : part
             );
 
             if (line.trim().startsWith("•")) {
                 return (
                     <li key={i} className="flex items-start gap-2 ml-1 mb-2">
-                        <span className="text-[#C2185B] mt-1 shrink-0">•</span>
+                        <span className="text-primary mt-1 shrink-0">•</span>
                         <span>{rendered.map((r, idx) => typeof r === "string" ? r.replace(/^•\s*/, "") : r)}</span>
                     </li>
                 );
@@ -268,10 +268,10 @@ function ContentSection({ section }) {
             transition={{ duration: 0.5 }}
             className="scroll-mt-28 mb-12 last:mb-0"
         >
-            <h2 className="text-xl sm:text-2xl font-bold text-[#0D0D0D] mb-4 pb-3 border-b border-[rgba(0,0,0,0.06)]">
-                <span className="border-l-[3px] border-[#C2185B] pl-3">{section.title}</span>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4 pb-3 border-b border-border">
+                <span className="border-l-[3px] border-primary pl-3">{section.title}</span>
             </h2>
-            <div className="text-[#555] leading-relaxed text-[15px]">
+            <div className="text-muted-foreground leading-relaxed text-[15px]">
                 {renderContent(section.content)}
             </div>
         </motion.div>

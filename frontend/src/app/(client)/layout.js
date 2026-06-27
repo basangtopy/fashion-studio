@@ -98,8 +98,8 @@ export default function ClientLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-                <div className="w-8 h-8 border-3 border-[#C2185B]/30 border-t-[#C2185B] rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-surface-2">
+                <div className="w-8 h-8 border-3 border-primary/30 border-t-[#C2185B] rounded-full animate-spin" />
             </div>
         );
     }
@@ -112,13 +112,13 @@ export default function ClientLayout({ children }) {
         <>
             <CartDrawer />
 
-            <div className="flex min-h-screen bg-[#FAFAFA]">
+            <div className="flex min-h-screen bg-surface-2">
                 {/* ─── Desktop Sidebar (fixed left, 240px, Secondary bg) ─── */}
-                <aside className="hidden lg:flex flex-col w-[240px] bg-[#1A1A2E] fixed top-0 bottom-0 left-0 z-50">
+                <aside className="hidden lg:flex flex-col w-[240px] bg-sidebar fixed top-0 bottom-0 left-0 z-50">
                     {/* Brand */}
                     <div className="h-14 flex items-center px-5 shrink-0">
                         <Link href="/" className="flex items-center gap-2 text-white">
-                            <LogoWithName style={{ fill: "#C2185B" }} className="h-10" />
+                            <LogoWithName style={{ fill: 'var(--color-brand-primary)' }} className="h-10" />
                         </Link>
                     </div>
                     <Separator className="bg-white/8 shrink-0" />
@@ -132,7 +132,7 @@ export default function ClientLayout({ children }) {
                                     key={link.href}
                                     href={link.href}
                                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 ${isActive
-                                        ? "bg-[#C2185B]/10 text-white border-l-[3px] border-[#C2185B] pl-[9px]"
+                                        ? "bg-primary/10 text-primary-foreground border-l-[3px] border-primary pl-[9px]"
                                         : "text-white/50 hover:text-white hover:bg-white/5"
                                         }`}
                                 >
@@ -148,7 +148,7 @@ export default function ClientLayout({ children }) {
                     <div className="px-3 py-4 space-y-3">
                         {/* User info */}
                         <div className="flex items-center gap-3 px-2">
-                            <div className="relative w-9 h-9 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
+                            <div className="relative w-9 h-9 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden">
                                 {(user?.avatarUrl || user?.profilePicture) ? (
                                     <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                                 ) : (
@@ -164,7 +164,7 @@ export default function ClientLayout({ children }) {
                         <Button
                             variant="ghost"
                             onClick={logout}
-                            className="flex items-center justify-start gap-3 px-3 py-2 w-full text-sm text-white/40 hover:text-[#C62828] hover:bg-white/5"
+                            className="flex items-center justify-start gap-3 px-3 py-2 w-full text-sm text-white/40 hover:text-destructive hover:bg-white/5"
                         >
                             <LogOut size={18} />
                             Logout
@@ -175,16 +175,16 @@ export default function ClientLayout({ children }) {
                 {/* ─── Main content area ─── */}
                 <div className="flex-1 w-full max-w-full min-w-0 flex flex-col min-h-screen lg:ml-[240px]">
                     {/* Top bar */}
-                    <header className="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8 bg-white border-b border-[rgba(0,0,0,0.06)] sticky top-0 z-40">
+                    <header className="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8 bg-background border-b border-border sticky top-0 z-40">
                         {/* Left: page title */}
                         <div className="flex items-center gap-3">
                             {/* Mobile brand mark */}
                             <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
                                 <Link href="/">
-                                    <Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />
+                                    <Logo style={{ fill: 'var(--color-brand-primary)' }} className="w-8 h-8" />
                                 </Link>
                             </div>
-                            <h1 className="text-sm font-semibold text-[#0D0D0D]">{pageTitle}</h1>
+                            <h1 className="text-sm font-semibold text-foreground">{pageTitle}</h1>
                         </div>
 
                         {/* Right: cart + notifications + avatar */}
@@ -192,7 +192,7 @@ export default function ClientLayout({ children }) {
                             {/* View Site (desktop) */}
                             <Link
                                 href="/"
-                                className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-[#555] hover:bg-[#F4F0F8] transition-colors"
+                                className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-muted transition-colors"
                             >
                                 <ExternalLink size={14} /> View Site
                             </Link>
@@ -201,11 +201,11 @@ export default function ClientLayout({ children }) {
                                 variant="ghost"
                                 size="icon"
                                 onClick={openCart}
-                                className="relative w-9 h-9 bg-[#F4F0F8] text-[#555] hover:bg-[#E8E4EC]"
+                                className="relative w-9 h-9 bg-muted text-muted-foreground hover:bg-[#E8E4EC]"
                             >
                                 <ShoppingCart size={16} />
                                 {itemCount > 0 && (
-                                    <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-[#C2185B] text-white text-[10px] font-bold flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                                         {itemCount > 9 ? "9+" : itemCount}
                                     </span>
                                 )}
@@ -217,16 +217,16 @@ export default function ClientLayout({ children }) {
                             {/* User avatar */}
                             <Link
                                 href="/client/profile"
-                                className="hidden sm:flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#F4F0F8] transition-colors"
+                                className="hidden sm:flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors"
                             >
-                                <div className="relative w-7 h-7 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-[10px] overflow-hidden">
+                                <div className="relative w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-[10px] overflow-hidden">
                                     {(user?.avatarUrl || user?.profilePicture) ? (
                                         <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                                     ) : (
                                         user?.fullName?.charAt(0) || "U"
                                     )}
                                 </div>
-                                <span className="text-xs font-medium text-[#555] max-w-[100px] truncate">{user?.fullName?.split(" ")[0]}</span>
+                                <span className="text-xs font-medium text-muted-foreground max-w-[100px] truncate">{user?.fullName?.split(" ")[0]}</span>
                             </Link>
                         </div>
                     </header>
@@ -238,14 +238,14 @@ export default function ClientLayout({ children }) {
                 </div>
 
                 {/* ─── Mobile Bottom Nav ─── */}
-                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(0,0,0,0.06)] flex items-center justify-around h-16 px-1">
+                <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border flex items-center justify-around h-16 px-1">
                     {MOBILE_NAV.map((link) => {
                         const isActive = pathname === link.href || pathname.startsWith(link.href + "/");
                         return (
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] ${isActive ? "text-[#C2185B]" : "text-[#999]"}`}
+                                className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] ${isActive ? "text-primary" : "text-text-light"}`}
                             >
                                 <link.icon size={20} />
                                 <span className="text-[10px] font-medium">{link.label}</span>
@@ -256,7 +256,7 @@ export default function ClientLayout({ children }) {
                     <Button
                         variant="ghost"
                         onClick={() => setMoreOpen(true)}
-                        className={`flex flex-col items-center justify-center h-auto gap-0.5 py-1 px-2 min-w-[48px] rounded-none hover:bg-transparent ${moreOpen ? "text-[#C2185B]" : "text-[#999] hover:text-[#999]"}`}
+                        className={`flex flex-col items-center justify-center h-auto gap-0.5 py-1 px-2 min-w-[48px] rounded-none hover:bg-transparent ${moreOpen ? "text-primary" : "text-text-light hover:text-text-light"}`}
                     >
                         <MoreHorizontal size={20} />
                         <span className="text-[10px] font-medium mt-1">More</span>
@@ -279,15 +279,15 @@ export default function ClientLayout({ children }) {
                                 animate={{ y: 0 }}
                                 exit={{ y: "100%" }}
                                 transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                                className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto lg:hidden"
+                                className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl max-h-[70vh] overflow-y-auto lg:hidden"
                             >
                                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                    <h3 className="text-sm font-bold text-[#0D0D0D]">More</h3>
+                                    <h3 className="text-sm font-bold text-foreground">More</h3>
                                     <Button
                                         variant="ghost"
                                         size="icon"
                                         onClick={() => setMoreOpen(false)}
-                                        className="w-8 h-8 text-[#999] hover:bg-[#F4F0F8]"
+                                        className="w-8 h-8 text-text-light hover:bg-muted"
                                     >
                                         <X size={16} />
                                     </Button>
@@ -301,8 +301,8 @@ export default function ClientLayout({ children }) {
                                                 href={item.href}
                                                 onClick={() => setMoreOpen(false)}
                                                 className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-colors ${isActive
-                                                    ? "bg-[#C2185B]/10 text-[#C2185B]"
-                                                    : "text-[#555] hover:bg-[#F4F0F8]"
+                                                    ? "bg-primary/10 text-primary"
+                                                    : "text-muted-foreground hover:bg-muted"
                                                     }`}
                                             >
                                                 <item.icon size={20} />
@@ -313,7 +313,7 @@ export default function ClientLayout({ children }) {
                                     <Link
                                         href="/"
                                         onClick={() => setMoreOpen(false)}
-                                        className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[#555] hover:bg-[#F4F0F8] transition-colors"
+                                        className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-muted-foreground hover:bg-muted transition-colors"
                                     >
                                         <ExternalLink size={20} />
                                         <span className="text-[11px] font-medium text-center leading-tight">View Site</span>
@@ -321,7 +321,7 @@ export default function ClientLayout({ children }) {
                                     <Button
                                         variant="ghost"
                                         onClick={() => { setMoreOpen(false); logout(); }}
-                                        className="h-auto flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-[#C62828] hover:bg-[#FFEBEE] hover:text-[#C62828]"
+                                        className="h-auto flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-destructive hover:bg-[#FFEBEE] hover:text-destructive"
                                     >
                                         <LogOut size={20} />
                                         <span className="text-[11px] font-medium text-center leading-tight">Logout</span>

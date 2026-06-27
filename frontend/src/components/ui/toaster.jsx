@@ -9,22 +9,22 @@ const ToastContext = createContext(null);
 const TOAST_VARIANTS = {
     success: {
         icon: CheckCircle2,
-        borderColor: "#2E7D32",
+        borderColor: 'var(--color-status-success)',
         iconColor: "#2E7D32",
     },
     warning: {
         icon: AlertTriangle,
-        borderColor: "#E65100",
+        borderColor: 'var(--color-status-warning)',
         iconColor: "#E65100",
     },
     error: {
         icon: AlertCircle,
-        borderColor: "#C62828",
+        borderColor: 'var(--color-status-error)',
         iconColor: "#C62828",
     },
     info: {
         icon: Info,
-        borderColor: "#1565C0",
+        borderColor: 'var(--color-status-info)',
         iconColor: "#1565C0",
     },
 };
@@ -54,18 +54,18 @@ function Toast({ id, variant = "info", title, message, onRemove, duration = 4000
                 <Icon size={20} style={{ color: config.iconColor }} className="mt-0.5 shrink-0" />
                 <div className="flex-1 min-w-0">
                     {title && (
-                        <p className="font-semibold text-sm text-[#0D0D0D]">{title}</p>
+                        <p className="font-semibold text-sm text-foreground">{title}</p>
                     )}
                     {message && (
-                        <p className="text-sm text-[#555555] mt-0.5">{message}</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">{message}</p>
                     )}
                 </div>
                 <button
                     onClick={() => onRemove(id)}
-                    className="shrink-0 p-1 rounded-md hover:bg-[#F4F0F8] transition-colors"
+                    className="shrink-0 p-1 rounded-md hover:bg-muted transition-colors"
                     aria-label="Dismiss"
                 >
-                    <X size={14} className="text-[#999999]" />
+                    <X size={14} className="text-text-light" />
                 </button>
             </div>
             {/* Progress bar */}

@@ -89,6 +89,7 @@ export const BRANDING = {
             detailedDescription:
                 "Perhaps you've found the perfect Ankara print at the market, inherited a cherished fabric from a loved one, or brought back a unique textile from your travels. This is where your story begins. You bring the fabric that means something to you, and we transform it into a garment that honours its origin. Browse our curated style catalog for inspiration, or describe your dream design from scratch — either way, we handle everything from precise measurements and pattern drafting to expert cutting, sewing, and finishing. You stay in the loop at every stage, with photo updates and fittings until the final piece is exactly what you envisioned.",
             link: "/catalog/styles",
+            cta: "Browse Styles",
         },
         {
             title: "We Source It for You",
@@ -97,6 +98,7 @@ export const BRANDING = {
             detailedDescription:
                 "Not everyone has the time — or the desire — to hunt for the right fabric. Tell us the occasion, your style preferences, and your budget, and we'll curate a selection of premium fabrics for your approval. Once you pick your favourite, we take it from there: design consultation, measurements, tailoring, and quality checks — a complete end-to-end experience. This model is ideal for busy professionals, event-driven orders, or anyone who wants the luxury of a fully managed process. You make the decisions; we handle the legwork.",
             link: "/catalog/styles",
+            cta: "Find your design",
         },
         {
             title: "Ready to Wear",
@@ -105,6 +107,7 @@ export const BRANDING = {
             detailedDescription:
                 "For those moments when you need something stunning and you need it now. Our Ready-to-Wear collection features handcrafted pieces designed in-house and produced in limited runs — so you get the quality of bespoke without the wait. Each item is available in multiple sizes, and because they're made with the same care as our custom orders, the fit and finish are anything but off-the-rack. Browse online, add to cart, and have your piece delivered — or pick it up at the studio. Perfect for gifting or treating yourself on short notice.",
             link: "/catalog/ready-to-wear",
+            cta: "Shop Ready to Wear",
         },
     ],
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getReadyToWearItems,
+  getReadyToWearItemsAdmin,
   getReadyToWearCategories,
   getReadyToWearItem,
   createReadyToWearItem,
@@ -16,6 +17,13 @@ import {
 import { manageReadyToWearImages } from "../controllers/imageManagement.controller.js";
 
 const router = Router();
+
+router.get(
+  "/admin",
+  authenticate,
+  authorise("STAFF_ADMIN", "SUPER_ADMIN"),
+  getReadyToWearItemsAdmin
+);
 
 router.get("/", getReadyToWearItems);
 router.get("/categories", getReadyToWearCategories);

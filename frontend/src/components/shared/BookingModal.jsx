@@ -26,10 +26,10 @@ import { useToast } from "@/components/ui/toaster";
 import Link from "next/link";
 
 const STATUS_DISPLAY = {
-    REQUESTED: { icon: Clock, color: "#E65100", bg: "rgba(230, 81, 0, 0.08)", title: "Pending Studio Review", desc: "is being reviewed. We'll contact you shortly to confirm." },
-    CONFIRMED: { icon: CheckCircle, color: "#2E7D32", bg: "rgba(46, 125, 50, 0.08)", title: "Appointment Confirmed", desc: "has been confirmed. See you at the studio!" },
-    COMPLETED: { icon: CheckCircle2, color: "#555", bg: "rgba(0, 0, 0, 0.06)", title: "Appointment Completed", desc: "has been completed. You can book a new one." },
-    CANCELLED: { icon: XCircle, color: "#C62828", bg: "rgba(198, 40, 40, 0.08)", title: "Appointment Cancelled", desc: "was cancelled." },
+    REQUESTED: { icon: Clock, color: 'var(--color-status-warning)', bg: "rgba(230, 81, 0, 0.08)", title: "Pending Studio Review", desc: "is being reviewed. We'll contact you shortly to confirm." },
+    CONFIRMED: { icon: CheckCircle, color: 'var(--color-status-success)', bg: "rgba(46, 125, 50, 0.08)", title: "Appointment Confirmed", desc: "has been confirmed. See you at the studio!" },
+    COMPLETED: { icon: CheckCircle2, color: 'var(--color-text-mid)', bg: "rgba(0, 0, 0, 0.06)", title: "Appointment Completed", desc: "has been completed. You can book a new one." },
+    CANCELLED: { icon: XCircle, color: 'var(--color-status-error)', bg: "rgba(198, 40, 40, 0.08)", title: "Appointment Cancelled", desc: "was cancelled." },
 };
 
 export function BookingModal({ isOpen, onOpenChange }) {
@@ -132,7 +132,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-white border-0">
+            <DialogContent className="sm:max-w-[480px] p-0 overflow-hidden bg-popover border-0">
 
                 {/* — Premium Modal Header — */}
                 <div className="relative px-7 pt-7 pb-5">
@@ -148,18 +148,18 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                 className="flex h-7 w-7 items-center justify-center rounded-lg flex-shrink-0"
                                 style={{ background: "rgba(194, 24, 91, 0.08)" }}
                             >
-                                <Sparkles className="h-3.5 w-3.5" style={{ color: "#C2185B" }} />
+                                <Sparkles className="h-3.5 w-3.5" style={{ color: 'var(--color-brand-primary)' }} />
                             </div>
                             <DialogTitle
                                 className="text-[17px] leading-snug font-display font-700"
-                                style={{ fontWeight: 700, color: "#0D0D0D", letterSpacing: "-0.01em" }}
+                                style={{ fontWeight: 700, color: 'var(--color-text-dark)', letterSpacing: "-0.01em" }}
                             >
                                 {showStatus ? statusConfig.title : canBookNew ? "Book a Fitting" : "Appointment Status"}
                             </DialogTitle>
                         </div>
                         <DialogDescription
                             className="text-[13px] leading-relaxed pl-[36px]"
-                            style={{ color: "#999999" }}
+                            style={{ color: 'var(--color-text-light)' }}
                         >
                             {showStatus
                                 ? "Your appointment details at a glance."
@@ -170,18 +170,18 @@ export function BookingModal({ isOpen, onOpenChange }) {
                     </DialogHeader>
                 </div>
 
-                <div className="mx-7" style={{ height: "1px", background: "rgba(0,0,0,0.06)" }} />
+                <div className="mx-7" style={{ height: "1px", background: 'var(--border)' }} />
 
                 {/* — Modal Body — */}
                 <div className="px-7 py-6 min-h-[360px] flex flex-col justify-center">
                     {isLoadingStatus ? (
                         <div className="flex flex-col items-center justify-center gap-4">
                             <div className="relative flex h-14 w-14 items-center justify-center rounded-full" style={{ background: "rgba(194, 24, 91, 0.06)" }}>
-                                <Loader2 className="h-6 w-6 animate-spin" style={{ color: "#C2185B" }} />
+                                <Loader2 className="h-6 w-6 animate-spin" style={{ color: 'var(--color-brand-primary)' }} />
                             </div>
                             <div className="text-center">
-                                <p className="text-[13px] font-medium" style={{ color: "#555555" }}>Checking studio availability</p>
-                                <p className="text-[12px] mt-0.5" style={{ color: "#999999" }}>Just a moment…</p>
+                                <p className="text-[13px] font-medium" style={{ color: 'var(--color-text-mid)' }}>Checking studio availability</p>
+                                <p className="text-[12px] mt-0.5" style={{ color: 'var(--color-text-light)' }}>Just a moment…</p>
                             </div>
                         </div>
 
@@ -197,12 +197,12 @@ export function BookingModal({ isOpen, onOpenChange }) {
                             </div>
 
                             <div className="space-y-2">
-                                <h3 className="text-[15px] font-semibold" style={{ color: "#0D0D0D", letterSpacing: "-0.01em" }}>
+                                <h3 className="text-[15px] font-semibold" style={{ color: 'var(--color-text-dark)', letterSpacing: "-0.01em" }}>
                                     {statusConfig.title}
                                 </h3>
-                                <p className="text-[13px] leading-relaxed max-w-[280px]" style={{ color: "#555555" }}>
+                                <p className="text-[13px] leading-relaxed max-w-[280px]" style={{ color: 'var(--color-text-mid)' }}>
                                     Your request for{" "}
-                                    <span className="font-semibold" style={{ color: "#0D0D0D" }}>
+                                    <span className="font-semibold" style={{ color: 'var(--color-text-dark)' }}>
                                         {activeAppointment.confirmedDate
                                             ? format(new Date(activeAppointment.confirmedDate), "MMMM d, yyyy")
                                             : activeAppointment.requestedDate
@@ -228,8 +228,8 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
                             {/* Client notes */}
                             {activeAppointment.clientNotes && (
-                                <div className="w-full text-left p-3 rounded-lg text-[12px]" style={{ background: "rgba(0,0,0,0.03)", color: "#555" }}>
-                                    <p className="font-medium text-[#0D0D0D] mb-0.5 text-[11px] uppercase tracking-wider">Your notes</p>
+                                <div className="w-full text-left p-3 rounded-lg text-[12px]" style={{ background: "rgba(0,0,0,0.03)", color: 'var(--color-text-mid)' }}>
+                                    <p className="font-medium text-foreground mb-0.5 text-[11px] uppercase tracking-wider">Your notes</p>
                                     <p>{activeAppointment.clientNotes}</p>
                                 </div>
                             )}
@@ -237,10 +237,10 @@ export function BookingModal({ isOpen, onOpenChange }) {
                             {/* Admin notes */}
                             {activeAppointment.adminNotes && (
                                 <div className="w-full text-left p-3 rounded-lg text-[12px] flex items-start gap-2" style={{ background: "rgba(194, 24, 91, 0.05)" }}>
-                                    <MessageSquare size={12} className="text-[#C2185B] shrink-0 mt-0.5" />
+                                    <MessageSquare size={12} className="text-primary shrink-0 mt-0.5" />
                                     <div>
-                                        <p className="font-medium text-[#0D0D0D] mb-0.5 text-[11px] uppercase tracking-wider">Studio note</p>
-                                        <p style={{ color: "#555" }}>{activeAppointment.adminNotes}</p>
+                                        <p className="font-medium text-foreground mb-0.5 text-[11px] uppercase tracking-wider">Studio note</p>
+                                        <p style={{ color: 'var(--color-text-mid)' }}>{activeAppointment.adminNotes}</p>
                                     </div>
                                 </div>
                             )}
@@ -249,7 +249,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
                             <Link
                                 href="/client/appointments"
                                 onClick={() => onOpenChange(false)}
-                                className="flex items-center gap-1 text-[12px] font-medium text-[#C2185B] hover:underline"
+                                className="flex items-center gap-1 text-[12px] font-medium text-primary hover:underline"
                             >
                                 View all appointments <ArrowRight size={12} />
                             </Link>
@@ -257,7 +257,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
                             <Button
                                 variant="outline"
                                 className="w-full mt-1 border-[1.5px] text-[13px] font-medium transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0"
-                                style={{ borderColor: "rgba(0,0,0,0.12)", color: "#555555", height: "42px" }}
+                                style={{ borderColor: "rgba(0,0,0,0.12)", color: 'var(--color-text-mid)', height: "42px" }}
                                 onClick={() => onOpenChange(false)}
                             >
                                 Close
@@ -275,15 +275,15 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                         <span className="font-semibold">{statusConfig.title}</span>
                                     </div>
                                     {activeAppointment.cancelReason && (
-                                        <p className="text-[11px] mt-0.5" style={{ color: "#555" }}>Reason: {activeAppointment.cancelReason}</p>
+                                        <p className="text-[11px] mt-0.5" style={{ color: 'var(--color-text-mid)' }}>Reason: {activeAppointment.cancelReason}</p>
                                     )}
-                                    <p className="text-[11px] mt-1" style={{ color: "#555" }}>You can book a new appointment below.</p>
+                                    <p className="text-[11px] mt-1" style={{ color: 'var(--color-text-mid)' }}>You can book a new appointment below.</p>
                                 </div>
                             )}
 
                             {/* Date Picker */}
                             <div className="space-y-1.5">
-                                <label className="text-[13px] font-medium block" style={{ color: "#0D0D0D" }}>
+                                <label className="text-[13px] font-medium block" style={{ color: 'var(--color-text-dark)' }}>
                                     Preferred Date
                                 </label>
                                 <Popover>
@@ -329,9 +329,9 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
                             {/* Notes */}
                             <div className="space-y-1.5">
-                                <label className="text-[13px] font-medium block" style={{ color: "#0D0D0D" }}>
+                                <label className="text-[13px] font-medium block" style={{ color: 'var(--color-text-dark)' }}>
                                     Additional Notes{" "}
-                                    <span className="font-normal" style={{ color: "#999999" }}>(Optional)</span>
+                                    <span className="font-normal" style={{ color: 'var(--color-text-light)' }}>(Optional)</span>
                                 </label>
                                 <Textarea
                                     placeholder="Share any specific requirements, garment ideas, or questions for your fitting…"
@@ -339,10 +339,10 @@ export function BookingModal({ isOpen, onOpenChange }) {
                                     style={{
                                         minHeight: "96px",
                                         borderWidth: "1.5px",
-                                        borderColor: "#E0E0E0",
+                                        borderColor: 'var(--color-input)',
                                         borderRadius: "6px",
                                         fontSize: "14px",
-                                        color: "#0D0D0D",
+                                        color: 'var(--color-text-dark)',
                                     }}
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
@@ -377,13 +377,13 @@ export function BookingModal({ isOpen, onOpenChange }) {
 
                             {/* Links */}
                             <div className="flex items-center justify-between">
-                                <p className="text-[11px] leading-relaxed" style={{ color: "#999999" }}>
+                                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
                                     This is a request — we'll contact you to confirm.
                                 </p>
                                 <Link
                                     href="/client/appointments"
                                     onClick={() => onOpenChange(false)}
-                                    className="text-[11px] font-medium text-[#C2185B] hover:underline whitespace-nowrap"
+                                    className="text-[11px] font-medium text-primary hover:underline whitespace-nowrap"
                                 >
                                     View all →
                                 </Link>

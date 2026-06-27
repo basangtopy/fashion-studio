@@ -257,32 +257,34 @@ export const checkout = async (req, res) => {
     throw new AppError("Your cart is empty", 400);
   }
 
-  // ── Stock validation (critical checkout check) ───────────────────────────
-  const stockErrors = [];
-
-  for (const item of cart.items) {
-    if (!item.readyToWear.isActive) {
-      stockErrors.push(`"${item.readyToWear.name}" is no longer available`);
-    } else if (item.quantity > item.readyToWear.stockCount) {
-      stockErrors.push(
-        `"${item.readyToWear.name}" (${item.selectedSize}): only ${item.readyToWear.stockCount} left, you requested ${item.quantity}`,
-      );
-    }
-  }
-
-  if (stockErrors.length > 0) {
-    throw new AppError(
-      `Some items in your cart have stock issues: ${stockErrors.join("; ")}`,
-      400,
-    );
-  }
-
   // ── Create single order + decrease stock in a transaction ──────────────────────
   // The cart items are transformed into OrderItems attached to a single new Order.
 
   const result = await prisma.$transaction(async (tx) => {
     // Generate order number INSIDE the transaction to prevent race conditions
     const orderNumber = await generateOrderNumber(tx);
+
+    // ── Re-validate stock inside transaction (prevents overselling race condition) ──
+    const stockErrors = [];
+    for (const item of cart.items) {
+      const fresh = await tx.readyToWear.findUnique({
+        where: { id: item.readyToWearId },
+        select: { stockCount: true, isActive: true, name: true },
+      });
+      if (!fresh || !fresh.isActive) {
+        stockErrors.push(`"${item.readyToWear.name}" is no longer available`);
+      } else if (fresh.stockCount < item.quantity) {
+        stockErrors.push(
+          `"${item.readyToWear.name}" (${item.selectedSize}): only ${fresh.stockCount} left, you requested ${item.quantity}`
+        );
+      }
+    }
+    if (stockErrors.length > 0) {
+      throw new AppError(
+        `Some items in your cart have stock issues: ${stockErrors.join("; ")}`,
+        400,
+      );
+    }
 
     // Calculate total agreed fee from the cart items
     const totalAgreedFee = cart.items.reduce(

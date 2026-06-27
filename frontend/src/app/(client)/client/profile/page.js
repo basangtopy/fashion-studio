@@ -120,15 +120,15 @@ export default function ClientProfilePage() {
 
     return (
         <div className="pb-[80px] lg:pb-[160px] max-w-5xl">
-            <h1 className="text-2xl font-bold text-[#0D0D0D] mb-6">My Profile</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-6">My Profile</h1>
 
             {/* ─── Email Verification Banner ─── */}
             {user && !user.isEmailVerified && (
-                <div className="mb-6 p-4 rounded-xl bg-[#FFF3E0] border border-[#E65100]/20 flex items-start gap-3">
-                    <AlertTriangle size={18} className="text-[#E65100] shrink-0 mt-0.5" />
+                <div className="mb-6 p-4 rounded-xl bg-[#FFF3E0] border border-status-warning/20 flex items-start gap-3">
+                    <AlertTriangle size={18} className="text-status-warning shrink-0 mt-0.5" />
                     <div className="flex-1">
-                        <p className="text-sm font-medium text-[#E65100]">Email not verified</p>
-                        <p className="text-xs text-[#E65100]/80 mt-0.5">
+                        <p className="text-sm font-medium text-status-warning">Email not verified</p>
+                        <p className="text-xs text-status-warning/80 mt-0.5">
                             Please verify your email address to access all features. Check your inbox for the verification link.
                         </p>
                     </div>
@@ -136,7 +136,7 @@ export default function ClientProfilePage() {
                         variant="ghost"
                         onClick={() => resendVerification.mutate()}
                         disabled={resendVerification.isPending}
-                        className="h-auto py-1.5 px-3 rounded-lg bg-[#E65100]/10 text-xs font-semibold text-[#E65100] hover:bg-[#E65100]/20 hover:text-[#E65100] shrink-0"
+                        className="h-auto py-1.5 px-3 rounded-lg bg-status-warning/10 text-xs font-semibold text-status-warning hover:bg-status-warning/20 hover:text-status-warning shrink-0"
                     >
                         {resendVerification.isPending ? "Sending..." : "Resend"}
                     </Button>
@@ -153,12 +153,12 @@ export default function ClientProfilePage() {
             >
                 {/* ─── Left: Profile Card ─── */}
                 <div className="space-y-4">
-                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white text-center">
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-border bg-white text-center">
                         {/* Avatar with upload affordance */}
                         <div className="relative w-20 h-20 mx-auto mb-4">
                             <Avatar className="w-full h-full shadow-sm">
                                 <AvatarImage src={user?.avatarUrl || user?.profilePicture} alt={user?.fullName || "User"} className="object-cover" />
-                                <AvatarFallback className="bg-[#C2185B] text-white text-2xl font-bold">
+                                <AvatarFallback className="bg-primary text-primary-foreground text-2xl font-bold">
                                     {user?.fullName?.charAt(0) || "U"}
                                 </AvatarFallback>
                             </Avatar>
@@ -179,45 +179,45 @@ export default function ClientProfilePage() {
                                 size="icon"
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={uploadingAvatar}
-                                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-[rgba(0,0,0,0.06)] shadow-sm hover:bg-[#F4F0F8]"
+                                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-border shadow-sm hover:bg-muted"
                             >
-                                <Camera size={12} className="text-[#555]" />
+                                <Camera size={12} className="text-muted-foreground" />
                             </Button>
                         </div>
-                        <p className="text-lg font-semibold text-[#0D0D0D] truncate px-2">{user?.fullName}</p>
-                        <p className="text-xs text-[#999] mb-2 truncate px-2">{user?.email}</p>
+                        <p className="text-lg font-semibold text-foreground truncate px-2">{user?.fullName}</p>
+                        <p className="text-xs text-text-light mb-2 truncate px-2">{user?.email}</p>
                         {user?.isEmailVerified && (
-                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[10px] font-semibold text-[#2E7D32]">
+                            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F5E9] text-[10px] font-semibold text-status-success">
                                 <CheckCircle2 size={10} /> Verified
                             </div>
                         )}
                     </motion.div>
 
                     {/* Account Info */}
-                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white space-y-3">
-                        <h3 className="text-xs font-semibold text-[#999] uppercase tracking-wider">Account</h3>
-                        <div className="flex items-center gap-2 text-xs text-[#555] overflow-hidden">
-                            <Shield size={12} className="text-[#999] shrink-0" />
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-border bg-white space-y-3">
+                        <h3 className="text-xs font-semibold text-text-light uppercase tracking-wider">Account</h3>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                            <Shield size={12} className="text-text-light shrink-0" />
                             <span className="truncate">Client Account</span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-[#555] overflow-hidden">
-                            <Mail size={12} className="text-[#999] shrink-0" />
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                            <Mail size={12} className="text-text-light shrink-0" />
                             <span className="truncate">{user?.email}</span>
                         </div>
                         {user?.phone && (
-                            <div className="flex items-center gap-2 text-xs text-[#555] overflow-hidden">
-                                <Phone size={12} className="text-[#999] shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                                <Phone size={12} className="text-text-light shrink-0" />
                                 <span className="truncate">{user?.phone}</span>
                             </div>
                         )}
                         {user?.sex && (
-                            <div className="flex items-center gap-2 text-xs text-[#555] capitalize overflow-hidden">
-                                <User size={12} className="text-[#999] shrink-0" />
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground capitalize overflow-hidden">
+                                <User size={12} className="text-text-light shrink-0" />
                                 <span className="truncate">{user?.sex.toLowerCase()}</span>
                             </div>
                         )}
-                        <div className="flex items-center gap-2 text-xs text-[#555] overflow-hidden">
-                            <Calendar size={12} className="text-[#999] shrink-0" />
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground overflow-hidden">
+                            <Calendar size={12} className="text-text-light shrink-0" />
                             <span className="truncate">Member since {memberSince}</span>
                         </div>
                     </motion.div>
@@ -226,11 +226,11 @@ export default function ClientProfilePage() {
                 {/* ─── Right: Edit Forms ─── */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Personal Info */}
-                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-border bg-white">
                         <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-sm font-semibold text-[#0D0D0D]">Personal Information</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Personal Information</h3>
                             {!isEditing ? (
-                                <Button variant="link" onClick={() => setIsEditing(true)} className="h-auto p-0 text-xs font-semibold text-[#C2185B]">
+                                <Button variant="link" onClick={() => setIsEditing(true)} className="h-auto p-0 text-xs font-semibold text-primary">
                                     Edit
                                 </Button>
                             ) : (
@@ -247,14 +247,14 @@ export default function ClientProfilePage() {
                                                 dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : "",
                                             });
                                         }}
-                                        className="h-auto p-0 text-xs text-[#999] hover:text-[#555]"
+                                        className="h-auto p-0 text-xs text-text-light hover:text-muted-foreground"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         onClick={handleSaveProfile}
                                         disabled={updateProfile.isPending}
-                                        className="h-8 px-3 gap-1 bg-[#2E7D32] text-white text-xs font-semibold hover:bg-[#1B5E20]"
+                                        className="h-8 px-3 gap-1 bg-status-success text-white text-xs font-semibold hover:bg-[#1B5E20]"
                                     >
                                         <Save size={12} /> {updateProfile.isPending ? "Saving..." : "Save"}
                                     </Button>
@@ -264,40 +264,40 @@ export default function ClientProfilePage() {
 
                         <div className="space-y-4">
                             <div>
-                                <Label className="text-xs text-[#999] mb-1.5 block">Full Name</Label>
+                                <Label className="text-xs text-text-light mb-1.5 block">Full Name</Label>
                                 <Input
                                     type="text"
                                     value={formData.fullName}
                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                     disabled={!isEditing}
-                                    className="h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:text-[#555]"
+                                    className="h-10 border-input focus-visible:ring-ring focus-visible:border-ring disabled:bg-surface-2 disabled:text-muted-foreground"
                                 />
                             </div>
                             <div>
-                                <Label className="text-xs text-[#999] mb-1.5 block">Email</Label>
+                                <Label className="text-xs text-text-light mb-1.5 block">Email</Label>
                                 <Input
                                     type="email"
                                     value={user?.email || ""}
                                     disabled
-                                    className="h-10 border-[#E0E0E0] bg-[#FAFAFA] text-[#999]"
+                                    className="h-10 border-input bg-surface-2 text-text-light"
                                 />
-                                <p className="text-[10px] text-[#999] mt-1">Email cannot be changed</p>
+                                <p className="text-[10px] text-text-light mt-1">Email cannot be changed</p>
                             </div>
                             <div>
-                                <Label className="text-xs text-[#999] mb-1.5 block">Phone</Label>
+                                <Label className="text-xs text-text-light mb-1.5 block">Phone</Label>
                                 <Input
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     disabled={!isEditing}
-                                    className="h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:text-[#555]"
+                                    className="h-10 border-input focus-visible:ring-ring focus-visible:border-ring disabled:bg-surface-2 disabled:text-muted-foreground"
                                 />
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-[#999] block">Biological Sex</Label>
+                                    <Label className="text-xs text-text-light block">Biological Sex</Label>
                                     <Select value={formData.sex} onValueChange={(v) => setFormData({ ...formData, sex: v })} disabled={!isEditing}>
-                                        <SelectTrigger className="w-full h-10 px-3 bg-white text-[#0D0D0D] border-[#E0E0E0] rounded-lg focus:ring-[#C2185B] focus:border-[#C2185B] transition-colors disabled:bg-[#FAFAFA] disabled:opacity-100 disabled:text-[#999]">
+                                        <SelectTrigger className="w-full h-10 px-3 bg-background text-foreground border-input rounded-lg focus:ring-ring focus:border-ring transition-colors disabled:bg-surface-2 disabled:opacity-100 disabled:text-text-light">
                                             <SelectValue placeholder="Not Specified" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -308,18 +308,18 @@ export default function ClientProfilePage() {
                                     </Select>
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-[#999] block">Date of Birth</Label>
+                                    <Label className="text-xs text-text-light block">Date of Birth</Label>
                                     <DobPicker value={formData.dateOfBirth} onChange={(v) => setFormData({ ...formData, dateOfBirth: v })} disabled={!isEditing} />
                                 </div>
                             </div>
                             <div>
-                                <Label className="text-xs text-[#999] mb-1.5 block">Delivery Address</Label>
+                                <Label className="text-xs text-text-light mb-1.5 block">Delivery Address</Label>
                                 <Textarea
                                     value={formData.address}
                                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                     disabled={!isEditing}
                                     rows={2}
-                                    className="border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:text-[#555] resize-none"
+                                    className="border-input focus-visible:ring-ring focus-visible:border-ring disabled:bg-surface-2 disabled:text-muted-foreground resize-none"
                                 />
                             </div>
                         </div>
@@ -327,16 +327,16 @@ export default function ClientProfilePage() {
 
                     {/* ─── Security Section ─── */}
                     {user?.authProvider === 'LOCAL' && (
-                        <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                        <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-border bg-white">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
-                                    <Lock size={14} className="text-[#999]" />
-                                    <h3 className="text-sm font-semibold text-[#0D0D0D]">Account Security</h3>
+                                    <Lock size={14} className="text-text-light" />
+                                    <h3 className="text-sm font-semibold text-foreground">Account Security</h3>
                                 </div>
                                 <Button
                                     variant="link"
                                     onClick={() => setShowPasswordForm(!showPasswordForm)}
-                                    className="h-auto p-0 text-xs font-semibold text-[#C2185B]"
+                                    className="h-auto p-0 text-xs font-semibold text-primary"
                                 >
                                     {showPasswordForm ? "Cancel" : "Change Password"}
                                 </Button>
@@ -347,41 +347,41 @@ export default function ClientProfilePage() {
                                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                                         <div className="space-y-4 pt-2">
                                             <div>
-                                                <Label className="text-xs text-[#999] mb-1.5 block">Current Password</Label>
+                                                <Label className="text-xs text-text-light mb-1.5 block">Current Password</Label>
                                                 <div className="relative">
-                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
                                                     <Input
                                                         type={showPassword ? "text" : "password"}
                                                         value={passwordData.currentPassword}
                                                         onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                        className="pl-9 pr-10 h-10 border-input focus-visible:ring-ring focus-visible:border-ring"
                                                     />
-                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] z-10 hover:text-[#555]">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                                                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light z-10 hover:text-muted-foreground">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                                                 </div>
                                             </div>
                                             <div>
-                                                <Label className="text-xs text-[#999] mb-1.5 block">New Password</Label>
+                                                <Label className="text-xs text-text-light mb-1.5 block">New Password</Label>
                                                 <div className="relative">
-                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
                                                     <Input
                                                         type={showNewPassword ? "text" : "password"}
                                                         value={passwordData.newPassword}
                                                         onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                        className="pl-9 pr-10 h-10 border-input focus-visible:ring-ring focus-visible:border-ring"
                                                     />
-                                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] z-10 hover:text-[#555]">{showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
+                                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light z-10 hover:text-muted-foreground">{showNewPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                                                 </div>
-                                                <p className="text-[10px] text-[#999] mt-1">Minimum 8 characters</p>
+                                                <p className="text-[10px] text-text-light mt-1">Minimum 8 characters</p>
                                             </div>
                                             <div>
-                                                <Label className="text-xs text-[#999] mb-1.5 block">Confirm New Password</Label>
+                                                <Label className="text-xs text-text-light mb-1.5 block">Confirm New Password</Label>
                                                 <div className="relative">
-                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                                    <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
                                                     <Input
                                                         type={showNewPassword ? "text" : "password"}
                                                         value={passwordData.confirmPassword}
                                                         onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                                        className="pl-9 pr-10 h-10 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                                        className="pl-9 pr-10 h-10 border-input focus-visible:ring-ring focus-visible:border-ring"
                                                     />
                                                     
                                                 </div>
@@ -389,7 +389,7 @@ export default function ClientProfilePage() {
                                             <Button
                                                 onClick={handleChangePassword}
                                                 disabled={changePassword.isPending}
-                                                className="bg-[#C2185B] text-white font-semibold hover:bg-[#A01548]"
+                                                className="bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
                                             >
                                                 <Lock size={14} /> {changePassword.isPending ? "Saving..." : "Update Password"}
                                             </Button>
@@ -400,7 +400,7 @@ export default function ClientProfilePage() {
 
                             {/* Last login info */}
                             {!showPasswordForm && (
-                                <div className="text-xs text-[#999]">
+                                <div className="text-xs text-text-light">
                                     <p>Password last changed: —</p>
                                 </div>
                             )}
@@ -408,14 +408,14 @@ export default function ClientProfilePage() {
                     )}
 
                     {/* ─── Connected Accounts ─── */}
-                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                    <motion.div variants={{ hidden: { opacity: 0, scale: 0.95 }, visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 30 } } }} className="p-6 rounded-xl border border-border bg-white">
                         <div className="flex items-center gap-2 mb-4">
-                            <Shield size={14} className="text-[#999]" />
-                            <h3 className="text-sm font-semibold text-[#0D0D0D]">Connected Accounts</h3>
+                            <Shield size={14} className="text-text-light" />
+                            <h3 className="text-sm font-semibold text-foreground">Connected Accounts</h3>
                         </div>
-                        <div className="flex items-center justify-between p-3 rounded-lg border border-[#E0E0E0] bg-[#FAFAFA] gap-2 overflow-hidden">
+                        <div className="flex items-center justify-between p-3 rounded-lg border border-input bg-surface-2 gap-2 overflow-hidden">
                             <div className="flex items-center gap-3 min-w-0">
-                                <div className="w-8 h-8 rounded-full bg-white border border-[#E0E0E0] shadow-sm flex items-center justify-center shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-white border border-input shadow-sm flex items-center justify-center shrink-0">
                                     {user?.authProvider === 'GOOGLE' && (
                                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -435,20 +435,20 @@ export default function ClientProfilePage() {
                                         </svg>
                                     )}
                                     {user?.authProvider === 'LOCAL' && (
-                                        <Mail size={14} className="text-[#555]" />
+                                        <Mail size={14} className="text-muted-foreground" />
                                     )}
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-sm font-medium text-[#0D0D0D] truncate">
+                                    <p className="text-sm font-medium text-foreground truncate">
                                         {user?.authProvider === 'GOOGLE' && 'Google'}
                                         {user?.authProvider === 'FACEBOOK' && 'Facebook'}
                                         {user?.authProvider === 'TWITTER' && 'X (Twitter)'}
                                         {user?.authProvider === 'LOCAL' && 'Email Address'}
                                     </p>
-                                    <p className="text-xs text-[#999] truncate">{user?.email}</p>
+                                    <p className="text-xs text-text-light truncate">{user?.email}</p>
                                 </div>
                             </div>
-                            <div className="px-2 py-1 rounded-md bg-[#2E7D32]/10 text-[#2E7D32] text-[10px] font-semibold shrink-0">
+                            <div className="px-2 py-1 rounded-md bg-status-success/10 text-status-success text-[10px] font-semibold shrink-0">
                                 Connected
                             </div>
                         </div>
@@ -499,7 +499,7 @@ function DobPicker({ value, onChange, disabled }) {
     return (
         <div className="grid grid-cols-[1fr_1fr_1.2fr] gap-2">
             <Select value={local.d} onValueChange={(v) => handleChange("d", v)} disabled={disabled}>
-                <SelectTrigger className="h-10 px-2 bg-white text-[#0D0D0D] border-[#E0E0E0] rounded-lg focus:ring-[#C2185B] focus:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:opacity-100 disabled:text-[#999]">
+                <SelectTrigger className="h-10 px-2 bg-background text-foreground border-input rounded-lg focus:ring-ring focus:border-ring disabled:bg-surface-2 disabled:opacity-100 disabled:text-text-light">
                     <SelectValue placeholder="DD" />
                 </SelectTrigger>
                 <SelectContent position="popper" className="max-h-[200px]">
@@ -508,7 +508,7 @@ function DobPicker({ value, onChange, disabled }) {
             </Select>
 
             <Select value={local.m} onValueChange={(v) => handleChange("m", v)} disabled={disabled}>
-                <SelectTrigger className="h-10 px-2 bg-white text-[#0D0D0D] border-[#E0E0E0] rounded-lg focus:ring-[#C2185B] focus:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:opacity-100 disabled:text-[#999]">
+                <SelectTrigger className="h-10 px-2 bg-background text-foreground border-input rounded-lg focus:ring-ring focus:border-ring disabled:bg-surface-2 disabled:opacity-100 disabled:text-text-light">
                     <SelectValue placeholder="MM" />
                 </SelectTrigger>
                 <SelectContent position="popper" className="max-h-[200px]">
@@ -517,7 +517,7 @@ function DobPicker({ value, onChange, disabled }) {
             </Select>
 
             <Select value={local.y} onValueChange={(v) => handleChange("y", v)} disabled={disabled}>
-                <SelectTrigger className="h-10 px-2 bg-white text-[#0D0D0D] border-[#E0E0E0] rounded-lg focus:ring-[#C2185B] focus:border-[#C2185B] disabled:bg-[#FAFAFA] disabled:opacity-100 disabled:text-[#999]">
+                <SelectTrigger className="h-10 px-2 bg-background text-foreground border-input rounded-lg focus:ring-ring focus:border-ring disabled:bg-surface-2 disabled:opacity-100 disabled:text-text-light">
                     <SelectValue placeholder="YYYY" />
                 </SelectTrigger>
                 <SelectContent position="popper" className="max-h-[200px]">

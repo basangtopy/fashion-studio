@@ -24,20 +24,20 @@ function AboutHero() {
     const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
     return (
-        <section ref={sectionRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-[#1A1A2E]">
+        <section ref={sectionRef} className="relative min-h-[100dvh] flex items-center justify-center overflow-hidden bg-secondary">
             {/* Floating geometric shapes */}
             <motion.div style={{ y: shapeY1 }} className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[8%] left-[5%] w-72 h-96 rounded-3xl bg-[#C2185B]/8 rotate-6" />
+                <div className="absolute top-[8%] left-[5%] w-72 h-96 rounded-3xl bg-primary/8 rotate-6" />
                 <div className="absolute bottom-[12%] right-[8%] w-64 h-80 rounded-3xl bg-[#F8E8F0]/5 -rotate-6" />
             </motion.div>
             <motion.div style={{ y: shapeY2 }} className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[20%] right-[15%] w-48 h-56 rounded-2xl bg-[#C2185B]/6 -rotate-3" />
+                <div className="absolute top-[20%] right-[15%] w-48 h-56 rounded-2xl bg-primary/6 -rotate-3" />
                 <div className="absolute bottom-[20%] left-[12%] w-40 h-48 rounded-2xl bg-[#F8E8F0]/4 rotate-4" />
-                <div className="absolute top-[50%] left-[45%] w-20 h-24 rounded-xl bg-[#C2185B]/10 rotate-12" />
+                <div className="absolute top-[50%] left-[45%] w-20 h-24 rounded-xl bg-primary/10 rotate-12" />
             </motion.div>
 
             {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A2E]/60 via-transparent to-[#1A1A2E]/80 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-b from-brand-secondary/60 via-transparent to-brand-secondary/80 pointer-events-none" />
 
             {/* Content */}
             <motion.div
@@ -48,7 +48,7 @@ function AboutHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="inline-block text-[10px] sm:text-xs uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-6"
+                    className="inline-block text-[10px] sm:text-xs uppercase tracking-[0.4em] text-primary font-semibold mb-6"
                 >
                     Our Story
                 </motion.span>
@@ -110,23 +110,23 @@ function OriginSection() {
                         animate={isVisible ? { opacity: 1, x: 0 } : {}}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                     >
-                        <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                        <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                             Where It All Began
                         </span>
 
                         <div className="flex items-baseline gap-4 mb-8">
-                            <span className="text-7xl sm:text-8xl lg:text-9xl font-extralight text-[#C2185B]/15 leading-none font-display">
+                            <span className="text-7xl sm:text-8xl lg:text-9xl font-extralight text-primary/15 leading-none font-display">
                                 {BRANDING.establishedYear}
                             </span>
-                            <span className="text-sm text-[#999] uppercase tracking-widest">Est.</span>
+                            <span className="text-sm text-text-light uppercase tracking-widest">Est.</span>
                         </div>
 
-                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#0D0D0D] mb-6 leading-tight">
+                        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-6 leading-tight">
                             Crafted in Nigeria.{" "}
-                            <span className="text-[#C2185B]">Made for You.</span>
+                            <span className="text-primary">Made for You.</span>
                         </h2>
 
-                        <div className="space-y-4 text-[#555] leading-relaxed">
+                        <div className="space-y-4 text-muted-foreground leading-relaxed">
                             <p>
                                 {BRANDING.businessName} was born from a simple conviction: that everyone deserves
                                 clothes that fit perfectly, reflect their personality, and are made with genuine care.
@@ -151,18 +151,18 @@ function OriginSection() {
                         className="relative h-[400px] lg:h-[500px]"
                     >
                         {/* Abstract layered shapes */}
-                        <div className="absolute top-0 right-0 w-[80%] h-[75%] rounded-2xl bg-[#1A1A2E] z-[1]">
+                        <div className="absolute top-0 right-0 w-[80%] h-[75%] rounded-2xl bg-secondary z-[1]">
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-8">
-                                <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2185B] mb-3">Our Mission</span>
+                                <span className="text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Our Mission</span>
                                 <p className="text-white/80 text-sm sm:text-base text-center leading-relaxed italic font-light">
                                     &ldquo;{BRANDING.mission}&rdquo;
                                 </p>
                             </div>
                         </div>
-                        <div className="absolute bottom-0 left-0 w-[65%] h-[55%] rounded-2xl bg-gradient-to-br from-[#C2185B]/10 to-[#F8E8F0] z-[2] border border-[rgba(0,0,0,0.06)]">
+                        <div className="absolute bottom-0 left-0 w-[65%] h-[55%] rounded-2xl bg-gradient-to-br from-primary/10 to-[#F8E8F0] z-[2] border border-border">
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-6">
-                                <span className="text-[10px] uppercase tracking-[0.3em] text-[#C2185B] mb-3">Our Vision</span>
-                                <p className="text-[#0D0D0D] text-xs sm:text-sm text-center leading-relaxed italic font-light">
+                                <span className="text-[10px] uppercase tracking-[0.3em] text-primary mb-3">Our Vision</span>
+                                <p className="text-foreground text-xs sm:text-sm text-center leading-relaxed italic font-light">
                                     &ldquo;{BRANDING.vision}&rdquo;
                                 </p>
                             </div>
@@ -181,7 +181,7 @@ function ValuesSection() {
     const { ref, isVisible } = useScrollReveal({ threshold: 0.1 });
 
     return (
-        <section ref={ref} className="section-gap bg-[#FAFAFA] overflow-hidden">
+        <section ref={ref} className="section-gap bg-surface-2 overflow-hidden">
             <div className="page-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -189,10 +189,10 @@ function ValuesSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16 lg:mb-24"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         What We Believe
                     </span>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-[#0D0D0D]">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
                         The Principles Behind Every Stitch
                     </h2>
                 </motion.div>
@@ -224,7 +224,7 @@ function ValuePanel({ value, index }) {
                 className="flex-1 relative flex items-center justify-center min-h-[240px] lg:min-h-[320px]"
             >
                 {/* Giant watermark number */}
-                <span className="text-[120px] sm:text-[160px] lg:text-[200px] font-extralight text-[#C2185B]/[0.06] leading-none select-none font-display">
+                <span className="text-[120px] sm:text-[160px] lg:text-[200px] font-extralight text-primary/[0.06] leading-none select-none font-display">
                     {String(index + 1).padStart(2, "0")}
                 </span>
                 {/* Decorative accent line */}
@@ -232,7 +232,7 @@ function ValuePanel({ value, index }) {
                     initial={{ scaleX: 0 }}
                     animate={isVisible ? { scaleX: 1 } : {}}
                     transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    className={`absolute bottom-8 ${isReversed ? "right-0 origin-right" : "left-0 origin-left"} w-24 h-[2px] bg-[#C2185B]/30`}
+                    className={`absolute bottom-8 ${isReversed ? "right-0 origin-right" : "left-0 origin-left"} w-24 h-[2px] bg-primary/30`}
                 />
             </motion.div>
 
@@ -243,15 +243,15 @@ function ValuePanel({ value, index }) {
                 transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
                 className="flex-1"
             >
-                <h3 className="text-xs uppercase tracking-[0.35em] text-[#C2185B] font-semibold mb-4">
+                <h3 className="text-xs uppercase tracking-[0.35em] text-primary font-semibold mb-4">
                     {value.title}
                 </h3>
-                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#0D0D0D] leading-snug mb-6">
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground leading-snug mb-6">
                     {value.title === "Precision" && "Luxury lives in the details."}
                     {value.title === "Identity" && "Your style is yours alone."}
                     {value.title === "Collaboration" && "Great garments are conversations."}
                 </p>
-                <p className="text-[#555] leading-relaxed text-base lg:text-lg">
+                <p className="text-muted-foreground leading-relaxed text-base lg:text-lg">
                     {value.description}
                 </p>
             </motion.div>
@@ -269,7 +269,7 @@ function BusinessModelsSection() {
     const [activeModel, setActiveModel] = useState(0);
 
     return (
-        <section ref={ref} className="section-gap bg-[#1A1A2E] overflow-hidden">
+        <section ref={ref} className="section-gap bg-secondary overflow-hidden">
             <div className="page-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -277,7 +277,7 @@ function BusinessModelsSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-12 lg:mb-16"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         How We Work
                     </span>
                     <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
@@ -304,7 +304,7 @@ function BusinessModelsSection() {
                                 key={model.title}
                                 onClick={() => setActiveModel(i)}
                                 className={`flex-1 flex items-center gap-3 px-5 py-4 rounded-xl border transition-all duration-300 text-left ${isActive
-                                    ? "bg-[#C2185B] border-[#C2185B] text-white shadow-lg shadow-[#C2185B]/20"
+                                    ? "bg-primary border-primary text-white shadow-lg shadow-[#C2185B]/20"
                                     : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:border-white/20"
                                     }`}
                             >
@@ -333,8 +333,8 @@ function BusinessModelsSection() {
                             return (
                                 <div className="bg-white/[0.04] backdrop-blur-sm border border-white/10 rounded-2xl p-8 sm:p-10 lg:p-14">
                                     <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-14 h-14 rounded-xl bg-[#C2185B]/15 flex items-center justify-center">
-                                            <Icon size={24} className="text-[#C2185B]" />
+                                        <div className="w-14 h-14 rounded-xl bg-primary/15 flex items-center justify-center">
+                                            <Icon size={24} className="text-primary" />
                                         </div>
                                         <div>
                                             <h3 className="text-xl sm:text-2xl font-bold text-white">{model.title}</h3>
@@ -348,7 +348,7 @@ function BusinessModelsSection() {
 
                                     <Link
                                         href={model.link}
-                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#C2185B] text-white font-semibold text-sm hover:bg-[#A01548] transition-colors"
+                                        className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-colors"
                                     >
                                         {activeModel === 2 ? "Shop the Collection" : "Explore Our Styles"}
                                         <ArrowRight size={14} />
@@ -378,13 +378,13 @@ function ProcessSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-16 lg:mb-24"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         The Journey
                     </span>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-[#0D0D0D] mb-4">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
                         How a Garment is Born
                     </h2>
-                    <p className="text-[#555] max-w-lg mx-auto">
+                    <p className="text-muted-foreground max-w-lg mx-auto">
                         From the first conversation to the final stitch — every piece follows a process
                         built on care, precision, and collaboration.
                     </p>
@@ -397,7 +397,7 @@ function ProcessSection() {
                         initial={{ scaleY: 0 }}
                         animate={isVisible ? { scaleY: 1 } : {}}
                         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute left-6 sm:left-8 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#C2185B] via-[#C2185B]/40 to-transparent origin-top"
+                        className="absolute left-6 sm:left-8 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary via-primary/40 to-transparent origin-top"
                     />
 
                     <div className="space-y-12 lg:space-y-16">
@@ -427,15 +427,15 @@ function TimelineItem({ step, index }) {
                 initial={{ scale: 0 }}
                 animate={isVisible ? { scale: 1 } : {}}
                 transition={{ duration: 0.4, delay: 0.2 + index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="absolute left-[14px] sm:left-[22px] top-1 w-5 h-5 rounded-full border-[3px] border-[#C2185B] bg-white z-10"
+                className="absolute left-[14px] sm:left-[22px] top-1 w-5 h-5 rounded-full border-[3px] border-primary bg-white z-10"
             />
 
             {/* Step number */}
-            <span className="text-xs text-[#C2185B] font-semibold uppercase tracking-widest mb-2 block">
+            <span className="text-xs text-primary font-semibold uppercase tracking-widest mb-2 block">
                 Step {String(index + 1).padStart(2, "0")}
             </span>
-            <h4 className="text-lg sm:text-xl font-bold text-[#0D0D0D] mb-2">{step.title}</h4>
-            <p className="text-[#555] leading-relaxed">{step.description}</p>
+            <h4 className="text-lg sm:text-xl font-bold text-foreground mb-2">{step.title}</h4>
+            <p className="text-muted-foreground leading-relaxed">{step.description}</p>
         </motion.div>
     );
 }
@@ -447,7 +447,7 @@ function StatsSection() {
     const { ref, isVisible } = useScrollReveal({ threshold: 0.3 });
 
     return (
-        <section ref={ref} className="py-20 lg:py-28 bg-[#FAFAFA]">
+        <section ref={ref} className="py-20 lg:py-28 bg-surface-2">
             <div className="page-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -455,10 +455,10 @@ function StatsSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-12"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         By the Numbers
                     </span>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-[#0D0D0D]">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
                         In Our Studio&apos;s Story So Far
                     </h2>
                 </motion.div>
@@ -483,10 +483,10 @@ function StatCard({ stat, index, isVisible }) {
             transition={{ duration: 0.5, delay: index * 0.1 }}
             className="text-center"
         >
-            <span className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#0D0D0D] font-display leading-none">
+            <span className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-foreground font-display leading-none">
                 {count}{stat.suffix}
             </span>
-            <p className="text-xs sm:text-sm text-[#999] mt-3 uppercase tracking-widest font-medium">
+            <p className="text-xs sm:text-sm text-text-light mt-3 uppercase tracking-widest font-medium">
                 {stat.label}
             </p>
         </motion.div>
@@ -500,7 +500,7 @@ function ManifestoSection() {
     const { ref, isVisible } = useScrollReveal({ threshold: 0.2 });
 
     return (
-        <section ref={ref} className="section-gap bg-[#1A1A2E] overflow-hidden">
+        <section ref={ref} className="section-gap bg-secondary overflow-hidden">
             <div className="page-container">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -508,7 +508,7 @@ function ManifestoSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-12"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         Who Is This Studio For?
                     </span>
                 </motion.div>
@@ -523,7 +523,7 @@ function ManifestoSection() {
                                 animate={isVisible ? { opacity: 1, y: 0 } : {}}
                                 transition={{ duration: 0.5, delay: 0.2 + i * 0.15 }}
                                 className={`text-xl sm:text-2xl lg:text-3xl leading-snug ${isLast
-                                    ? "font-bold text-[#C2185B] mt-2"
+                                    ? "font-bold text-primary mt-2"
                                     : "font-light text-white/70 italic"
                                     }`}
                             >
@@ -555,13 +555,13 @@ function CTASection() {
                     transition={{ duration: 0.6 }}
                     className="max-w-2xl mx-auto"
                 >
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-[#C2185B] font-semibold mb-4 block">
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-primary font-semibold mb-4 block">
                         Ready?
                     </span>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-[#0D0D0D] mb-4">
+                    <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
                         Begin Your Story
                     </h2>
-                    <p className="text-[#555] mb-8 leading-relaxed">
+                    <p className="text-muted-foreground mb-8 leading-relaxed">
                         Whether it&apos;s your first bespoke piece or your fiftieth, every order starts with a conversation.
                         Let&apos;s create something you&apos;ll love.
                     </p>
@@ -569,7 +569,7 @@ function CTASection() {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
                             href="/catalog/styles"
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
                         >
                             Explore Our Styles
                             <ArrowRight size={16} />
@@ -577,7 +577,7 @@ function CTASection() {
                         <Link
                             href={bookUrl}
                             scroll={false}
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-[#0D0D0D]/20 text-[#0D0D0D] font-semibold hover:bg-[#0D0D0D]/5 transition-colors"
+                            className="inline-flex items-center gap-2 px-6 py-3 rounded-md border border-[#0D0D0D]/20 text-foreground font-semibold hover:bg-[#0D0D0D]/5 transition-colors"
                         >
                             <Calendar size={16} />
                             Book a Fitting

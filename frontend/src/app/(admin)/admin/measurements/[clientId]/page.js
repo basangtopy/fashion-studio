@@ -113,14 +113,14 @@ export default function AdminMeasurementDetailPage() {
     return (
         <PageTransition>
             <div className="pb-20 lg:pb-0">
-                <Link href="/admin/measurements" className="inline-flex items-center gap-1 text-sm text-[#999] hover:text-[#C2185B] mb-6 transition-colors">
+                <Link href="/admin/measurements" className="inline-flex items-center gap-1 text-sm text-text-light hover:text-primary mb-6 transition-colors">
                     <ArrowLeft size={14} /> All Measurements
                 </Link>
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                     <div className="flex items-center gap-3">
-                        <div className="relative w-14 h-14 rounded-full bg-[#C2185B] flex items-center justify-center text-white text-xl font-bold shrink-0 overflow-hidden">
+                        <div className="relative w-14 h-14 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xl font-bold shrink-0 overflow-hidden">
                             {client?.profilePicture ? (
                                 <Image
                                     src={client.profilePicture}
@@ -134,15 +134,15 @@ export default function AdminMeasurementDetailPage() {
                             )}
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-[#0D0D0D]">{client?.fullName}</h1>
-                            <p className="text-xs text-[#999]">{client?.email}</p>
+                            <h1 className="text-xl font-bold text-foreground">{client?.fullName}</h1>
+                            <p className="text-xs text-text-light">{client?.email}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         {measurement && (
                             <Button
                                 onClick={() => setShowFormModal(true)}
-                                className="h-9 text-xs gap-1.5 bg-[#C2185B] text-white hover:bg-[#A01548]"
+                                className="h-9 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
                             >
                                 <Edit3 size={14} /> Edit Measurements
                             </Button>
@@ -151,7 +151,7 @@ export default function AdminMeasurementDetailPage() {
                             onClick={() => handleExport("csv")}
                             disabled={!!exporting || !measurement}
                             variant="outline"
-                            className="h-9 text-xs gap-1.5 border-[#E0E0E0] text-[#555] hover:bg-[#FAFAFA]"
+                            className="h-9 text-xs gap-1.5 border-input text-muted-foreground hover:bg-surface-2"
                         >
                             <Download size={14} /> {exporting === "csv" ? "..." : "CSV"}
                         </Button>
@@ -159,7 +159,7 @@ export default function AdminMeasurementDetailPage() {
                             onClick={() => handleExport("pdf")}
                             disabled={!!exporting || !measurement}
                             variant="outline"
-                            className="h-9 text-xs gap-1.5 border-[#E0E0E0] text-[#555] hover:bg-[#FAFAFA]"
+                            className="h-9 text-xs gap-1.5 border-input text-muted-foreground hover:bg-surface-2"
                         >
                             <FileText size={14} /> {exporting === "pdf" ? "..." : "PDF"}
                         </Button>
@@ -174,7 +174,7 @@ export default function AdminMeasurementDetailPage() {
                         action={
                             <Button
                                 onClick={() => setShowFormModal(true)}
-                                className="h-10 px-6 bg-[#C2185B] text-white hover:bg-[#A01548] gap-2"
+                                className="h-10 px-6 bg-primary text-primary-foreground hover:bg-primary/90 gap-2"
                             >
                                 <Plus size={14} /> Create Measurements
                             </Button>
@@ -188,7 +188,7 @@ export default function AdminMeasurementDetailPage() {
                         className="space-y-4"
                     >
                         {/* Last updated */}
-                        <motion.div variants={staggerItem} className="flex items-center gap-2 text-xs text-[#999]">
+                        <motion.div variants={staggerItem} className="flex items-center gap-2 text-xs text-text-light">
                             <span>Last updated: {new Date(measurement.updatedAt).toLocaleDateString("en-NG", { dateStyle: "long" })}</span>
                             {measurement.updatedByRole && <span>• by {measurement.updatedByRole === "CLIENT" ? "Client" : "Admin"}</span>}
                         </motion.div>
@@ -235,9 +235,9 @@ export default function AdminMeasurementDetailPage() {
 
                         {/* Notes */}
                         {measurement.notes && (
-                            <motion.div variants={staggerItem} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                                <h3 className="text-sm font-semibold text-[#0D0D0D] mb-2">Notes</h3>
-                                <p className="text-sm text-[#555] whitespace-pre-wrap">{measurement.notes}</p>
+                            <motion.div variants={staggerItem} className="p-5 rounded-xl border border-border bg-white">
+                                <h3 className="text-sm font-semibold text-foreground mb-2">Notes</h3>
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">{measurement.notes}</p>
                             </motion.div>
                         )}
 
@@ -245,7 +245,7 @@ export default function AdminMeasurementDetailPage() {
                         <motion.div variants={staggerItem}>
                             <button
                                 onClick={() => setShowHistory(!showHistory)}
-                                className="flex items-center gap-2 text-sm font-medium text-[#C2185B] hover:underline transition-colors"
+                                className="flex items-center gap-2 text-sm font-medium text-primary hover:underline transition-colors"
                             >
                                 <History size={14} />
                                 {showHistory ? "Hide" : "Show"} Measurement History
@@ -265,7 +265,7 @@ export default function AdminMeasurementDetailPage() {
                                 >
                                     <div className="space-y-3 pt-1">
                                         {historyList.length === 0 ? (
-                                            <p className="text-sm text-[#999] px-1">No changes recorded.</p>
+                                            <p className="text-sm text-text-light px-1">No changes recorded.</p>
                                         ) : (
                                             historyList.map((entry, idx) => (
                                                 <motion.div
@@ -273,11 +273,11 @@ export default function AdminMeasurementDetailPage() {
                                                     initial={{ opacity: 0, y: 8 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     transition={{ delay: idx * 0.05, duration: 0.25 }}
-                                                    className="p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white"
+                                                    className="p-4 rounded-xl border border-border bg-white"
                                                 >
                                                     <div className="flex items-center justify-between mb-3">
-                                                        <div className="text-xs text-[#999]">
-                                                            <span className="font-medium text-[#555]">{entry.updatedByName || (entry.updatedByRole === "CLIENT" ? "Client" : "Admin")}</span>
+                                                        <div className="text-xs text-text-light">
+                                                            <span className="font-medium text-muted-foreground">{entry.updatedByName || (entry.updatedByRole === "CLIENT" ? "Client" : "Admin")}</span>
                                                             <span> • {new Date(entry.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}</span>
                                                         </div>
                                                     </div>
@@ -287,29 +287,29 @@ export default function AdminMeasurementDetailPage() {
                                                                 // customParams is a nested dict: { rise: { from, to }, calf: { from, to } }
                                                                 if (field === "customParams" && typeof change === "object" && !("from" in change)) {
                                                                     return Object.entries(change).map(([cpKey, cpChange]) => (
-                                                                        <div key={`cp-${cpKey}`} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-[#F4F0F8]">
-                                                                            <span className="text-[#999] capitalize">{cpKey} (custom):</span>
-                                                                            <span className="text-[#C62828] line-through">{cpChange.from ?? "—"}</span>
-                                                                            <span className="text-[#0D0D0D]">→</span>
-                                                                            <span className="text-[#2E7D32] font-medium">{cpChange.to ?? "—"}</span>
+                                                                        <div key={`cp-${cpKey}`} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-muted">
+                                                                            <span className="text-text-light capitalize">{cpKey} (custom):</span>
+                                                                            <span className="text-destructive line-through">{cpChange.from ?? "—"}</span>
+                                                                            <span className="text-foreground">→</span>
+                                                                            <span className="text-status-success font-medium">{cpChange.to ?? "—"}</span>
                                                                         </div>
                                                                     ));
                                                                 }
                                                                 // Standard field: { from, to }
                                                                 if (typeof change !== "object" || !("from" in change)) return [];
                                                                 return [
-                                                                    <div key={field} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-[#F4F0F8]">
-                                                                        <span className="text-[#999] capitalize">{field.replace(/([A-Z])/g, " $1").trim()}:</span>
-                                                                        <span className="text-[#C62828] line-through">{change.from ?? "—"}</span>
-                                                                        <span className="text-[#0D0D0D]">→</span>
-                                                                        <span className="text-[#2E7D32] font-medium">{change.to ?? "—"}</span>
+                                                                    <div key={field} className="flex items-center gap-2 text-xs p-2 rounded-lg bg-muted">
+                                                                        <span className="text-text-light capitalize">{field.replace(/([A-Z])/g, " $1").trim()}:</span>
+                                                                        <span className="text-destructive line-through">{change.from ?? "—"}</span>
+                                                                        <span className="text-foreground">→</span>
+                                                                        <span className="text-status-success font-medium">{change.to ?? "—"}</span>
                                                                     </div>
                                                                 ];
                                                             })}
                                                         </div>
                                                     )}
                                                     {entry.notes && (
-                                                        <p className="text-xs text-[#555] mt-2 italic">&quot;{entry.notes}&quot;</p>
+                                                        <p className="text-xs text-muted-foreground mt-2 italic">&quot;{entry.notes}&quot;</p>
                                                     )}
                                                 </motion.div>
                                             ))
@@ -335,14 +335,14 @@ export default function AdminMeasurementDetailPage() {
 
 function MeasurementSection({ title, items }) {
     return (
-        <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-            <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">{title}</h3>
+        <div className="p-5 rounded-xl border border-border bg-white">
+            <h3 className="text-sm font-semibold text-foreground mb-4">{title}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                 {items.map(({ key, val }) => (
-                    <div key={key} className="p-3 rounded-lg bg-[#F4F0F8] hover:bg-[#EDE7F6] transition-colors duration-200">
-                        <p className="text-xs text-[#999] capitalize mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</p>
-                        <p className="text-lg font-bold text-[#0D0D0D]">
-                            {val} {typeof val === "number" ? <span className="text-xs font-normal text-[#999]">cm</span> : null}
+                    <div key={key} className="p-3 rounded-lg bg-muted hover:bg-[#EDE7F6] transition-colors duration-200">
+                        <p className="text-xs text-text-light capitalize mb-1">{key.replace(/([A-Z])/g, " $1").trim()}</p>
+                        <p className="text-lg font-bold text-foreground">
+                            {val} {typeof val === "number" ? <span className="text-xs font-normal text-text-light">cm</span> : null}
                         </p>
                     </div>
                 ))}

@@ -1,6 +1,6 @@
 export function SkeletonCard({ className = "" }) {
     return (
-        <div className={`rounded-xl border border-[rgba(0,0,0,0.06)] overflow-hidden ${className}`}>
+        <div className={`rounded-xl border border-border overflow-hidden ${className}`}>
             <div className="skeleton h-48 w-full" />
             <div className="p-4 space-y-3">
                 <div className="skeleton h-4 w-3/4" />
@@ -22,7 +22,7 @@ export function SkeletonLine({ width = "100%", height = "16px", className = "" }
 
 export function SkeletonStat({ className = "" }) {
     return (
-        <div className={`p-6 rounded-xl border border-[rgba(0,0,0,0.06)] space-y-3 ${className}`}>
+        <div className={`p-6 rounded-xl border border-border space-y-3 ${className}`}>
             <div className="skeleton h-3 w-20" />
             <div className="skeleton h-8 w-28" />
             <div className="skeleton h-3 w-16" />
@@ -32,8 +32,8 @@ export function SkeletonStat({ className = "" }) {
 
 export function SkeletonTable({ rows = 5, cols = 4 }) {
     return (
-        <div className="rounded-xl border border-[rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="p-4 border-b border-[rgba(0,0,0,0.06)] flex gap-4">
+        <div className="rounded-xl border border-border overflow-hidden">
+            <div className="p-4 border-b border-border flex gap-4">
                 {Array.from({ length: cols }).map((_, i) => (
                     <div key={i} className="skeleton h-4 flex-1" />
                 ))}

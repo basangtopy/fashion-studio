@@ -62,9 +62,9 @@ export default function EditClientModal({ open, onClose, client }) {
     return (
         <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className="max-w-md p-0 overflow-hidden border-0 gap-0">
-                <DialogHeader className="px-6 py-4 border-b border-[rgba(0,0,0,0.06)] bg-white text-left shrink-0">
-                    <DialogTitle className="flex items-center gap-2 text-sm font-bold text-[#0D0D0D]">
-                        <PencilLine size={16} className="text-[#C2185B]" />
+                <DialogHeader className="px-6 py-4 border-b border-border bg-popover text-left shrink-0">
+                    <DialogTitle className="flex items-center gap-2 text-sm font-bold text-foreground">
+                        <PencilLine size={16} className="text-primary" />
                         Edit Contact Info
                     </DialogTitle>
                     <DialogDescription className="sr-only">
@@ -72,16 +72,16 @@ export default function EditClientModal({ open, onClose, client }) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(form); }} className="p-6 space-y-4 bg-white">
+                <form onSubmit={(e) => { e.preventDefault(); mutation.mutate(form); }} className="p-6 space-y-4 bg-popover">
                     <Field label="Full Name *" value={form.fullName} onChange={(v) => setForm({ ...form, fullName: v })} required />
                     <Field label="Email *" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
                     <Field label="Phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} placeholder="+234..." />
 
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Sex</label>
+                            <label className="block text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">Sex</label>
                             <Select value={form.sex} onValueChange={(v) => setForm({ ...form, sex: v })}>
-                                <SelectTrigger className="w-full bg-white h-9">
+                                <SelectTrigger className="w-full bg-background h-9">
                                     <SelectValue placeholder="—" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -99,7 +99,7 @@ export default function EditClientModal({ open, onClose, client }) {
                     <Button
                         type="submit"
                         disabled={mutation.isPending || !form.fullName || !form.email}
-                        className="w-full bg-[#C2185B] text-white hover:bg-[#A01548] h-10"
+                        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10"
                     >
                         {mutation.isPending ? <><Loader2 size={14} className="animate-spin mr-2" /> Saving...</> : "Save Changes"}
                     </Button>
@@ -112,11 +112,11 @@ export default function EditClientModal({ open, onClose, client }) {
 function Field({ label, value, onChange, type = "text", required = false, placeholder = "" }) {
     return (
         <div>
-            <label className="block text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">{label}</label>
+            <label className="block text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">{label}</label>
             <Input
                 type={type} value={value} onChange={(e) => onChange(e.target.value)}
                 required={required} placeholder={placeholder}
-                className="bg-white h-9"
+                className="bg-popover h-9"
             />
         </div>
     );

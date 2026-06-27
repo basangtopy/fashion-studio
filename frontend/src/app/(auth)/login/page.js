@@ -88,15 +88,15 @@ function LoginContent() {
     return (
         <div className="h-screen overflow-hidden flex pt-[var(--nav-height)]">
             {/* Left brand panel — Desktop only */}
-            <div className="hidden lg:flex w-[55%] bg-[#1A1A2E] relative overflow-hidden items-center justify-center sticky top-[var(--nav-height)] h-[calc(100vh-var(--nav-height))]">
+            <div className="hidden lg:flex w-[55%] bg-secondary relative overflow-hidden items-center justify-center sticky top-[var(--nav-height)] h-[calc(100vh-var(--nav-height))]">
                 <div className="relative z-10 px-16 max-w-lg">
                     {/* Geometric decoration */}
-                    <div className="absolute -top-20 -left-10 w-64 h-64 rounded-full bg-[#C2185B]/10 blur-3xl" />
+                    <div className="absolute -top-20 -left-10 w-64 h-64 rounded-full bg-primary/10 blur-3xl" />
                     <div className="absolute -bottom-20 -right-10 w-48 h-48 rounded-full bg-[#F8E8F0]/5 blur-2xl" />
 
                     <h2 className="text-4xl font-extrabold text-white leading-tight mb-6">
                         Your Style,<br />
-                        <span className="text-[#C2185B]">Our Craft</span>
+                        <span className="text-primary">Our Craft</span>
                     </h2>
 
                     {/* Rotating copy */}
@@ -133,27 +133,27 @@ function LoginContent() {
                 >
                     {/* Mobile brand mark */}
                     <div className="lg:hidden text-center mb-8">
-                        <h2 className="text-xl font-bold text-[#C2185B]">{BRANDING.businessName}</h2>
+                        <h2 className="text-xl font-bold text-primary">{BRANDING.businessName}</h2>
                     </div>
 
-                    <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2">Welcome back</h1>
-                    <p className="text-sm text-[#999] mb-8">
+                    <h1 className="text-2xl font-bold text-foreground mb-2">Welcome back</h1>
+                    <p className="text-sm text-text-light mb-8">
                         Sign in to manage your orders and measurements.
                     </p>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Email */}
                         <div>
-                            <Label className="mb-1.5 block text-[#0D0D0D]">Email</Label>
+                            <Label className="mb-1.5 block text-foreground">Email</Label>
                             <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
                                 <Input
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     placeholder="you@example.com"
-                                    className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                    className="pl-9 h-11 border-input focus-visible:ring-ring focus-visible:border-ring"
                                 />
                             </div>
                         </div>
@@ -161,28 +161,28 @@ function LoginContent() {
                         {/* Password */}
                         <div>
                             <div className="flex items-center justify-between mb-1.5">
-                                <Label className="text-[#0D0D0D]">Password</Label>
+                                <Label className="text-foreground">Password</Label>
                                 <Link
                                     href="/forgot-password"
-                                    className="text-xs text-[#C2185B] hover:underline"
+                                    className="text-xs text-primary hover:underline"
                                 >
                                     Forgot password?
                                 </Link>
                             </div>
                             <div className="relative">
-                                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
+                                <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
                                 <Input
                                     type={showPassword ? "text" : "password"}
                                     required
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     placeholder="Enter your password"
-                                    className="pl-9 pr-10 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]"
+                                    className="pl-9 pr-10 h-11 border-input focus-visible:ring-ring focus-visible:border-ring"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#999] hover:text-[#555] z-10"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-light hover:text-muted-foreground z-10"
                                 >
                                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
@@ -193,7 +193,7 @@ function LoginContent() {
                         <Button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full h-11 bg-[#C2185B] hover:bg-[#A01548] text-white font-semibold"
+                            className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold"
                         >
                             {isLoading ? (
                                 <div className="border-[3px] border-white/30 border-t-white rounded-full animate-spin size-5" />
@@ -209,7 +209,7 @@ function LoginContent() {
                     {/* Divider */}
                     <div className="flex items-center gap-3 my-6">
                         <div className="flex-1 h-px bg-[#E0E0E0]" />
-                        <span className="text-xs text-[#999]">or continue with</span>
+                        <span className="text-xs text-text-light">or continue with</span>
                         <div className="flex-1 h-px bg-[#E0E0E0]" />
                     </div>
 
@@ -225,7 +225,7 @@ function LoginContent() {
                                 type="button"
                                 variant="outline"
                                 onClick={() => handleOAuth(provider)}
-                                className="w-full h-11 border-[#E0E0E0] text-[#555] hover:bg-[#F4F0F8]"
+                                className="w-full h-11 border-input text-muted-foreground hover:bg-muted"
                             >
                                 <span className="size-5 rounded-full bg-[#E0E0E0]/30 flex items-center justify-center text-xs font-bold shrink-0">
                                     {icon}
@@ -236,9 +236,9 @@ function LoginContent() {
                     </div>
 
                     {/* Signup link */}
-                    <p className="text-center text-sm text-[#999] mt-6">
+                    <p className="text-center text-sm text-text-light mt-6">
                         Don&apos;t have an account?{" "}
-                        <Link href={`/signup${searchParams.toString() ? `?${searchParams.toString()}` : ''}`} className="text-[#C2185B] font-semibold hover:underline">
+                        <Link href={`/signup${searchParams.toString() ? `?${searchParams.toString()}` : ''}`} className="text-primary font-semibold hover:underline">
                             Sign up
                         </Link>
                     </p>

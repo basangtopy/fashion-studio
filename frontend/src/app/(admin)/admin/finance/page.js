@@ -51,14 +51,14 @@ function AnimatedStat({ label, value, icon: Icon, color, isCurrency, index = 0 }
     return (
         <motion.div ref={ref} initial={{ opacity: 0, y: 12 }} animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1], delay: index * 0.06 }}
-            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+            className="p-5 rounded-xl border border-border bg-popover">
             <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-[#999] uppercase tracking-wider">{label}</span>
+                <span className="text-xs font-medium text-text-light uppercase tracking-wider">{label}</span>
                 <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${color}15` }}>
                     <Icon size={18} style={{ color }} />
                 </div>
             </div>
-            <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+            <p className="text-2xl font-bold font-mono-data text-foreground">
                 {isCurrency ? formatCurrency(animated) : animated}
             </p>
         </motion.div>
@@ -120,8 +120,8 @@ export default function AdminFinancePage() {
                 {/* Header with date range picker */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D]">Finance Summary</h1>
-                        <p className="text-sm text-[#999]">Revenue, payments, and financial insights.</p>
+                        <h1 className="text-2xl font-bold text-foreground">Finance Summary</h1>
+                        <p className="text-sm text-text-light">Revenue, payments, and financial insights.</p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
                         <CustomSelect
@@ -136,7 +136,7 @@ export default function AdminFinancePage() {
                                 <PopoverTrigger asChild>
                                     <Button
                                         variant="outline"
-                                        className={`h-9 border-[#E0E0E0] bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange?.from && "text-muted-foreground"}`}
+                                        className={`h-9 border-input bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange?.from && "text-muted-foreground"}`}
                                     >
                                         <CalendarIcon className="mr-2 h-4 w-4" />
                                         {dateRange?.from ? (
@@ -183,13 +183,13 @@ export default function AdminFinancePage() {
                 {/* Charts Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     {/* Chart 1: Revenue over Time (Area) */}
-                    <div className="lg:col-span-2 p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Revenue Over Time</h3>
+                    <div className="lg:col-span-2 p-5 rounded-xl border border-border bg-popover">
+                        <h3 className="text-sm font-semibold text-foreground mb-4">Revenue Over Time</h3>
                         {isLoading ? (
-                            <div className="h-[280px] rounded-lg bg-[#FAFAFA] animate-pulse" />
+                            <div className="h-[280px] rounded-lg bg-surface-2 animate-pulse" />
                         ) : revenueTimeSeries.length === 0 ? (
                             <div className="flex items-center justify-center h-[280px]">
-                                <p className="text-xs text-[#999]">No revenue data for this period.</p>
+                                <p className="text-xs text-text-light">No revenue data for this period.</p>
                             </div>
                         ) : (
                             <ResponsiveContainer width="100%" height={280}>
@@ -201,8 +201,8 @@ export default function AdminFinancePage() {
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#F4F0F8" />
-                                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: "#999" }} />
-                                    <YAxis tick={{ fontSize: 11, fill: "#999" }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                                    <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} />
+                                    <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
                                     <Tooltip formatter={(v) => formatCurrency(v)} />
                                     <Area type="monotone" dataKey="totalRevenue" stroke="#C2185B" fill="url(#revenueGrad)" strokeWidth={2} name="Revenue" />
                                 </AreaChart>
@@ -211,13 +211,13 @@ export default function AdminFinancePage() {
                     </div>
 
                     {/* Chart 2: Orders by Status (Donut) */}
-                    <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Orders by Status</h3>
+                    <div className="p-5 rounded-xl border border-border bg-popover">
+                        <h3 className="text-sm font-semibold text-foreground mb-4">Orders by Status</h3>
                         {isLoading ? (
-                            <div className="h-[200px] rounded-lg bg-[#FAFAFA] animate-pulse mb-4" />
+                            <div className="h-[200px] rounded-lg bg-surface-2 animate-pulse mb-4" />
                         ) : ordersByStatus.length === 0 ? (
                             <div className="flex items-center justify-center h-[200px]">
-                                <p className="text-xs text-[#999]">No order data for this period.</p>
+                                <p className="text-xs text-text-light">No order data for this period.</p>
                             </div>
                         ) : (
                             <>
@@ -246,20 +246,20 @@ export default function AdminFinancePage() {
                 </div>
 
                 {/* Chart 3: Orders by Type (Bar) */}
-                <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white mb-8 max-w-2xl">
-                    <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Revenue by Order Type</h3>
+                <div className="p-5 rounded-xl border border-border bg-white mb-8 max-w-2xl">
+                    <h3 className="text-sm font-semibold text-foreground mb-4">Revenue by Order Type</h3>
                     {isLoading ? (
-                        <div className="h-[200px] rounded-lg bg-[#FAFAFA] animate-pulse" />
+                        <div className="h-[200px] rounded-lg bg-surface-2 animate-pulse" />
                     ) : ordersByType.length === 0 ? (
                         <div className="flex items-center justify-center h-[200px]">
-                            <p className="text-xs text-[#999]">No revenue by type data for this period.</p>
+                            <p className="text-xs text-text-light">No revenue by type data for this period.</p>
                         </div>
                     ) : (
                         <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={ordersByType}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#F4F0F8" />
-                                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#999" }} />
-                                <YAxis tick={{ fontSize: 11, fill: "#999" }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
+                                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} />
+                                <YAxis tick={{ fontSize: 11, fill: 'var(--color-text-light)' }} tickFormatter={(v) => `₦${(v / 1000).toFixed(0)}k`} />
                                 <Tooltip formatter={(v) => formatCurrency(v)} />
                                 <Bar dataKey="count" radius={[6, 6, 0, 0]} name="Revenue">
                                     {ordersByType.map((entry, i) => (
@@ -274,47 +274,47 @@ export default function AdminFinancePage() {
                 {/* Outstanding Orders */}
                 <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                    className="p-5 rounded-xl border border-border bg-white">
                     <div className="flex items-center gap-2 mb-4">
-                        <AlertTriangle size={16} className="text-[#E65100]" />
-                        <h3 className="text-sm font-semibold text-[#0D0D0D]">Outstanding Orders</h3>
+                        <AlertTriangle size={16} className="text-status-warning" />
+                        <h3 className="text-sm font-semibold text-foreground">Outstanding Orders</h3>
                         {outstandingOrders.length > 0 && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF3E0] text-[#E65100] font-semibold">{outstandingOrders.length}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF3E0] text-status-warning font-semibold">{outstandingOrders.length}</span>
                         )}
                     </div>
                     {isLoading ? (
                         <div className="space-y-3">
-                            {[1, 2, 3].map(i => <div key={i} className="h-10 rounded-lg bg-[#FAFAFA] animate-pulse" />)}
+                            {[1, 2, 3].map(i => <div key={i} className="h-10 rounded-lg bg-surface-2 animate-pulse" />)}
                         </div>
                     ) : outstandingOrders.length === 0 ? (
                         <EmptyState icon={CreditCard} title="No outstanding orders" subtitle="All active orders are fully paid." />
                     ) : (
                         <>
-                            <p className="text-xs text-[#999] mb-4">Orders where total paid is less than the agreed fee.</p>
+                            <p className="text-xs text-text-light mb-4">Orders where total paid is less than the agreed fee.</p>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
-                                            <th className="text-left text-xs font-medium text-[#999] py-2.5 px-3">Order #</th>
-                                            <th className="text-left text-xs font-medium text-[#999] py-2.5 px-3">Client</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-2.5 px-3">Agreed Fee</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-2.5 px-3">Total Paid</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-2.5 px-3">Outstanding</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-2.5 px-3"></th>
+                                        <tr className="border-b border-border bg-surface-2">
+                                            <th className="text-left text-xs font-medium text-text-light py-2.5 px-3">Order #</th>
+                                            <th className="text-left text-xs font-medium text-text-light py-2.5 px-3">Client</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-2.5 px-3">Agreed Fee</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-2.5 px-3">Total Paid</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-2.5 px-3">Outstanding</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-2.5 px-3"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {outstandingOrders.slice(0, outstandingPage * OUTSTANDING_PER_PAGE).map(order => (
-                                            <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors">
+                                            <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-surface-2 transition-colors">
                                                 <td className="py-2.5 px-3 font-mono-data text-xs">{order.orderNumber}</td>
                                                 <td className="py-2.5 px-3 font-medium">{order.client?.fullName || "—"}</td>
                                                 <td className="py-2.5 px-3 text-right font-mono-data">{formatCurrency(order.totalAgreedFee || 0)}</td>
                                                 <td className="py-2.5 px-3 text-right font-mono-data">{formatCurrency(order.totalPaid || 0)}</td>
-                                                <td className="py-2.5 px-3 text-right font-mono-data font-bold text-[#C62828]">
+                                                <td className="py-2.5 px-3 text-right font-mono-data font-bold text-destructive">
                                                     {formatCurrency((order.totalAgreedFee || 0) - (order.totalPaid || 0))}
                                                 </td>
                                                 <td className="py-2.5 px-3 text-right">
-                                                    <Link href={`/admin/orders/${order.id}`} className="text-xs text-[#C2185B] font-semibold hover:underline flex items-center gap-1 justify-end">
+                                                    <Link href={`/admin/orders/${order.id}`} className="text-xs text-primary font-semibold hover:underline flex items-center gap-1 justify-end">
                                                         View <ExternalLink size={10} />
                                                     </Link>
                                                 </td>
@@ -326,7 +326,7 @@ export default function AdminFinancePage() {
                             {outstandingOrders.length > outstandingPage * OUTSTANDING_PER_PAGE && (
                                 <div className="flex justify-center mt-4">
                                     <Button variant="outline" onClick={() => setOutstandingPage(p => p + 1)}
-                                        className="h-9 px-5 text-xs font-semibold text-[#C2185B] border-[#C2185B]/30 hover:bg-[#C2185B]/5">
+                                        className="h-9 px-5 text-xs font-semibold text-primary border-primary/30 hover:bg-primary/5">
                                         Show More ({outstandingOrders.length - outstandingPage * OUTSTANDING_PER_PAGE} remaining)
                                     </Button>
                                 </div>

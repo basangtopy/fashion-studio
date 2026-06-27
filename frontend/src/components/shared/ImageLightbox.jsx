@@ -24,7 +24,7 @@ export default function ImageLightbox({ lightboxImage, setLightboxImage }) {
                                 onClick={() => setLightboxImage(null)}
                                 className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center"
                             >
-                                <X size={16} className="text-[#0D0D0D]" />
+                                <X size={16} className="text-foreground" />
                             </button>
                             <div className="relative w-full h-[70vh] rounded-xl overflow-hidden bg-black">
                                 {/* blurred background */}

@@ -10,6 +10,7 @@ import {
   sendVerificationEmail,
   verifyEmail,
 } from "../controllers/auth.controller.js";
+import { oauthCodeExchange } from "../controllers/oauth.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import validate from "../middleware/validate.js";
 import {
@@ -18,6 +19,7 @@ import {
   forgotPasswordSchema,
   resetPasswordSchema,
   verifyEmailSchema,
+  oauthCodeExchangeSchema,
 } from "../validators/auth.validators.js";
 import {
   loginLimiter,
@@ -51,6 +53,9 @@ router.post(
 
 // Email verification — verify-email is public (token in body from frontend)
 router.post("/verify-email", validate(verifyEmailSchema), verifyEmail);
+
+// OAuth route
+router.post("/oauth/exchange", validate(oauthCodeExchangeSchema), oauthCodeExchange);
 
 // Protected routes — requires valid access token
 router.get("/me", authenticate, getMe);

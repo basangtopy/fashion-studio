@@ -41,9 +41,9 @@ export default function ConfirmDialog({
             <DialogContent className="sm:max-w-[420px] p-6" showCloseButton={false}>
                 <DialogHeader className="items-center text-center sm:text-center">
                     <div className={`mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full ${isDanger ? "bg-[#FFEBEE]" : "bg-[#FFF3E0]"}`}>
-                        <AlertTriangle size={22} className={isDanger ? "text-[#C62828]" : "text-[#E65100]"} />
+                        <AlertTriangle size={22} className={isDanger ? "text-destructive" : "text-status-warning"} />
                     </div>
-                    <DialogTitle className="text-base font-semibold text-[#0D0D0D]">{title}</DialogTitle>
+                    <DialogTitle className="text-base font-semibold text-foreground">{title}</DialogTitle>
                     <DialogDescription className="text-sm text-[#777] leading-relaxed">
                         {description}
                     </DialogDescription>
@@ -53,14 +53,14 @@ export default function ConfirmDialog({
                         variant="outline"
                         onClick={() => onOpenChange(false)}
                         disabled={loading}
-                        className="flex-1 h-10 border-[#E0E0E0] text-[#555] hover:bg-[#F4F0F8]"
+                        className="flex-1 h-10 border-input text-muted-foreground hover:bg-muted"
                     >
                         Cancel
                     </Button>
                     <Button
                         onClick={onConfirm}
                         disabled={loading}
-                        className={`flex-1 h-10 text-white ${isDanger ? "bg-[#C62828] hover:bg-[#B71C1C]" : "bg-[#E65100] hover:bg-[#BF360C]"}`}
+                        className={`flex-1 h-10 text-primary-foreground ${isDanger ? "bg-destructive hover:bg-destructive/90" : "bg-status-warning hover:bg-status-warning/90"}`}
                     >
                         {loading ? (
                             <span className="flex items-center gap-2">

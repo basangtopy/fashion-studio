@@ -121,20 +121,20 @@ export default function AdminAppointmentsPage() {
             <div className="pb-20 lg:pb-0">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D]">Appointments</h1>
-                        <p className="text-sm text-[#999]">Manage fitting and measurement appointments</p>
+                        <h1 className="text-2xl font-bold text-foreground">Appointments</h1>
+                        <p className="text-sm text-text-light">Manage fitting and measurement appointments</p>
                     </div>
                     {/* View toggle */}
-                    <div className="flex items-center gap-1 bg-[#F4F0F8] rounded-lg p-1">
+                    <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
                         <button
                             onClick={() => setViewMode("list")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${viewMode === "list" ? "bg-white text-[#0D0D0D] shadow-sm" : "text-[#999] hover:text-[#555]"}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${viewMode === "list" ? "bg-white text-foreground shadow-sm" : "text-text-light hover:text-muted-foreground"}`}
                         >
                             <List size={14} /> List
                         </button>
                         <button
                             onClick={() => setViewMode("calendar")}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${viewMode === "calendar" ? "bg-white text-[#0D0D0D] shadow-sm" : "text-[#999] hover:text-[#555]"}`}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${viewMode === "calendar" ? "bg-white text-foreground shadow-sm" : "text-text-light hover:text-muted-foreground"}`}
                         >
                             <Grid3X3 size={14} /> Calendar
                         </button>
@@ -148,17 +148,17 @@ export default function AdminAppointmentsPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-6 p-4 rounded-xl border border-[#E3F2FD] bg-[#E3F2FD]/30"
                     >
-                        <p className="text-xs font-semibold text-[#1565C0] uppercase tracking-wider mb-3">
+                        <p className="text-xs font-semibold text-status-info uppercase tracking-wider mb-3">
                             <Clock size={12} className="inline mr-1.5" /> This Week — {thisWeekConfirmed.length} confirmed
                         </p>
                         <div className="flex gap-3 overflow-x-auto pb-1 custom-scrollbar">
                             {thisWeekConfirmed.map(apt => (
-                                <div key={apt.id} className="shrink-0 px-4 py-3 rounded-lg bg-white border border-[rgba(0,0,0,0.06)] min-w-[200px] hover:-translate-y-0.5 transition-all duration-200">
-                                    <p className="text-sm font-semibold text-[#0D0D0D] truncate">{apt.client?.fullName || "Client"}</p>
-                                    <p className="text-xs text-[#1565C0] mt-0.5">
+                                <div key={apt.id} className="shrink-0 px-4 py-3 rounded-lg bg-white border border-border min-w-[200px] hover:-translate-y-0.5 transition-all duration-200">
+                                    <p className="text-sm font-semibold text-foreground truncate">{apt.client?.fullName || "Client"}</p>
+                                    <p className="text-xs text-status-info mt-0.5">
                                         {new Date(apt.confirmedDate || apt.requestedDate).toLocaleDateString("en-NG", { weekday: "short", month: "short", day: "numeric" })}
                                     </p>
-                                    {apt.type && <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F4F0F8] text-[#555] mt-1 inline-block">{apt.type}</span>}
+                                    {apt.type && <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground mt-1 inline-block">{apt.type}</span>}
                                 </div>
                             ))}
                         </div>
@@ -175,17 +175,17 @@ export default function AdminAppointmentsPage() {
                             transition={{ duration: 0.2 }}
                         >
                             {/* Status tabs */}
-                            <div className="flex gap-1 mb-6 bg-[#F4F0F8] rounded-lg p-1 overflow-x-auto">
+                            <div className="flex gap-1 mb-6 bg-muted rounded-lg p-1 overflow-x-auto">
                                 {STATUS_TABS.map((tab) => {
                                     const count = allAppointments.filter(a => a.status === tab).length;
                                     return (
                                         <button
                                             key={tab}
                                             onClick={() => setActiveTab(tab)}
-                                            className={`relative flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center justify-center gap-1.5 ${activeTab === tab ? "bg-white text-[#0D0D0D] shadow-sm" : "text-[#999] hover:text-[#555]"}`}
+                                            className={`relative flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center justify-center gap-1.5 ${activeTab === tab ? "bg-white text-foreground shadow-sm" : "text-text-light hover:text-muted-foreground"}`}
                                         >
                                             <span className="capitalize">{tab.toLowerCase()}</span>
-                                            {count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === tab ? "bg-[#F4F0F8] text-[#555]" : "bg-[rgba(0,0,0,0.05)] text-[#999]"}`}>{count}</span>}
+                                            {count > 0 && <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${activeTab === tab ? "bg-muted text-muted-foreground" : "bg-[rgba(0,0,0,0.05)] text-text-light"}`}>{count}</span>}
                                         </button>
                                     );
                                 })}
@@ -193,7 +193,7 @@ export default function AdminAppointmentsPage() {
 
                             {isLoading ? (
                                 <div className="space-y-4">{[1, 2, 3].map((i) => (
-                                    <div key={i} className="rounded-xl border border-[rgba(0,0,0,0.06)] overflow-hidden">
+                                    <div key={i} className="rounded-xl border border-border overflow-hidden">
                                         <div className="p-5 space-y-3">
                                             <div className="flex items-center gap-3">
                                                 <div className="skeleton w-10 h-10 rounded-full" />
@@ -229,24 +229,24 @@ export default function AdminAppointmentsPage() {
                                     className="space-y-4"
                                 >
                                     {filteredAppointments.map((apt) => (
-                                        <motion.div key={apt.id} variants={staggerItem} className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-all duration-200">
+                                        <motion.div key={apt.id} variants={staggerItem} className="p-5 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-all duration-200">
                                             <div className="flex items-start justify-between flex-wrap gap-3 mb-3">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
                                                         {apt.client?.fullName?.charAt(0) || apt.user?.fullName?.charAt(0) || "?"}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold text-[#0D0D0D]">{apt.client?.fullName || apt.user?.fullName || "Client"}</p>
-                                                        <p className="text-xs text-[#999]">{apt.client?.email || apt.user?.email}</p>
+                                                        <p className="text-sm font-semibold text-foreground">{apt.client?.fullName || apt.user?.fullName || "Client"}</p>
+                                                        <p className="text-xs text-text-light">{apt.client?.email || apt.user?.email}</p>
                                                     </div>
                                                 </div>
                                                 <StatusPill status={apt.status} />
                                             </div>
 
                                             {/* Date info */}
-                                            <div className="flex flex-wrap gap-4 text-sm text-[#555] mb-3">
+                                            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-3">
                                                 <div className="flex items-center gap-1.5">
-                                                    <CalendarIcon size={14} className="text-[#999]" />
+                                                    <CalendarIcon size={14} className="text-text-light" />
                                                     <span>
                                                         Requested: {apt.requestedDate
                                                             ? new Date(apt.requestedDate).toLocaleDateString("en-NG", { dateStyle: "medium" })
@@ -255,8 +255,8 @@ export default function AdminAppointmentsPage() {
                                                 </div>
                                                 {apt.confirmedDate && (
                                                     <div className="flex items-center gap-1.5">
-                                                        <CheckCircle size={14} className="text-[#2E7D32]" />
-                                                        <span className="text-[#2E7D32] font-medium">
+                                                        <CheckCircle size={14} className="text-status-success" />
+                                                        <span className="text-status-success font-medium">
                                                             Confirmed: {new Date(apt.confirmedDate).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                                         </span>
                                                     </div>
@@ -264,16 +264,16 @@ export default function AdminAppointmentsPage() {
                                             </div>
 
                                             {apt.clientNotes && (
-                                                <p className="text-xs text-[#999] mb-3 italic bg-[#FAFAFA] p-2.5 rounded-lg border border-[rgba(0,0,0,0.04)]">Client note: {apt.clientNotes}</p>
+                                                <p className="text-xs text-text-light mb-3 italic bg-surface-2 p-2.5 rounded-lg border border-[rgba(0,0,0,0.04)]">Client note: {apt.clientNotes}</p>
                                             )}
 
                                             {/* Admin notes display + inline edit */}
                                             {apt.adminNotes && editingNotes[apt.id] === undefined && (
-                                                <p className="text-xs text-[#555] mb-3 bg-[#F4F0F8] p-2.5 rounded-lg">Admin: {apt.adminNotes}</p>
+                                                <p className="text-xs text-muted-foreground mb-3 bg-muted p-2.5 rounded-lg">Admin: {apt.adminNotes}</p>
                                             )}
 
                                             {apt.cancelReason && (
-                                                <p className="text-xs text-[#C62828] mb-3 bg-[#FFEBEE] p-2.5 rounded-lg border border-[#FFCDD2]">Reason: {apt.cancelReason}</p>
+                                                <p className="text-xs text-destructive mb-3 bg-[#FFEBEE] p-2.5 rounded-lg border border-[#FFCDD2]">Reason: {apt.cancelReason}</p>
                                             )}
 
                                             {/* Inline admin notes editor */}
@@ -284,13 +284,13 @@ export default function AdminAppointmentsPage() {
                                                         onChange={(e) => setEditingNotes(prev => ({ ...prev, [apt.id]: e.target.value }))}
                                                         placeholder="Add admin notes..."
                                                         rows={2}
-                                                        className="resize-none bg-white text-xs"
+                                                        className="resize-none bg-background text-xs"
                                                     />
                                                     <div className="flex gap-2">
                                                         <Button
                                                             onClick={() => handleSaveNotes(apt.id)}
                                                             disabled={savingNotes === apt.id}
-                                                            className="h-7 text-[11px] px-3 gap-1 bg-[#C2185B] text-white hover:bg-[#A01548]"
+                                                            className="h-7 text-[11px] px-3 gap-1 bg-primary text-primary-foreground hover:bg-primary/90"
                                                         >
                                                             {savingNotes === apt.id ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
                                                             {savingNotes === apt.id ? "Saving..." : "Save"}
@@ -312,14 +312,14 @@ export default function AdminAppointmentsPage() {
                                                     <>
                                                         <Button
                                                             onClick={() => { setConfirmModal(apt); setConfirmedDate(apt.requestedDate ? new Date(apt.requestedDate) : null); }}
-                                                            className="h-8 text-xs gap-1.5 bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#C8E6C9] border-0"
+                                                            className="h-8 text-xs gap-1.5 bg-[#E8F5E9] text-status-success hover:bg-[#C8E6C9] border-0"
                                                             variant="outline"
                                                         >
                                                             <CheckCircle size={14} /> Confirm
                                                         </Button>
                                                         <Button
                                                             onClick={() => { setCancelModal(apt); setCancelReason(""); }}
-                                                            className="h-8 text-xs gap-1.5 bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFCDD2] border-0"
+                                                            className="h-8 text-xs gap-1.5 bg-[#FFEBEE] text-destructive hover:bg-[#FFCDD2] border-0"
                                                             variant="outline"
                                                         >
                                                             <XCircle size={14} /> Cancel
@@ -332,14 +332,14 @@ export default function AdminAppointmentsPage() {
                                                         <Button
                                                             onClick={() => updateAppointment.mutate({ id: apt.id, status: "COMPLETED" })}
                                                             disabled={updateAppointment.isPending}
-                                                            className="h-8 text-xs gap-1.5 bg-[#E8F5E9] text-[#2E7D32] hover:bg-[#C8E6C9] border-0"
+                                                            className="h-8 text-xs gap-1.5 bg-[#E8F5E9] text-status-success hover:bg-[#C8E6C9] border-0"
                                                             variant="outline"
                                                         >
                                                             <CheckCircle size={14} /> Mark Complete
                                                         </Button>
                                                         <Button
                                                             onClick={() => { setCancelModal(apt); setCancelReason(""); }}
-                                                            className="h-8 text-xs gap-1.5 bg-[#FFEBEE] text-[#C62828] hover:bg-[#FFCDD2] border-0"
+                                                            className="h-8 text-xs gap-1.5 bg-[#FFEBEE] text-destructive hover:bg-[#FFCDD2] border-0"
                                                             variant="outline"
                                                         >
                                                             <XCircle size={14} /> Cancel
@@ -352,7 +352,7 @@ export default function AdminAppointmentsPage() {
                                                     <Button
                                                         onClick={() => setEditingNotes(prev => ({ ...prev, [apt.id]: apt.adminNotes || "" }))}
                                                         variant="outline"
-                                                        className="h-8 text-xs gap-1.5 border-[#E0E0E0] text-[#555] hover:border-[#C2185B] hover:text-[#C2185B]"
+                                                        className="h-8 text-xs gap-1.5 border-input text-muted-foreground hover:border-primary hover:text-primary"
                                                     >
                                                         <MessageSquare size={12} /> {apt.adminNotes ? "Edit Notes" : "Add Notes"}
                                                     </Button>
@@ -372,30 +372,30 @@ export default function AdminAppointmentsPage() {
                             exit={{ opacity: 0, x: -12 }}
                             transition={{ duration: 0.2 }}
                         >
-                            <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden">
+                            <div className="rounded-xl border border-border bg-white overflow-hidden">
                                 {/* Calendar header */}
-                                <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
+                                <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                                     <button
                                         onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))}
-                                        className="p-1.5 rounded-lg hover:bg-[#F4F0F8] text-[#999] hover:text-[#C2185B] transition-colors"
+                                        className="p-1.5 rounded-lg hover:bg-muted text-text-light hover:text-primary transition-colors"
                                     >
                                         <ChevronLeft size={18} />
                                     </button>
-                                    <h3 className="text-sm font-bold text-[#0D0D0D]">
+                                    <h3 className="text-sm font-bold text-foreground">
                                         {format(calendarMonth, "MMMM yyyy")}
                                     </h3>
                                     <button
                                         onClick={() => setCalendarMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))}
-                                        className="p-1.5 rounded-lg hover:bg-[#F4F0F8] text-[#999] hover:text-[#C2185B] transition-colors"
+                                        className="p-1.5 rounded-lg hover:bg-muted text-text-light hover:text-primary transition-colors"
                                     >
                                         <ChevronRight size={18} />
                                     </button>
                                 </div>
 
                                 {/* Weekday headers */}
-                                <div className="grid grid-cols-7 border-b border-[rgba(0,0,0,0.06)]">
+                                <div className="grid grid-cols-7 border-b border-border">
                                     {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-                                        <div key={day} className="py-2 text-center text-[10px] font-semibold text-[#999] uppercase tracking-wider">
+                                        <div key={day} className="py-2 text-center text-[10px] font-semibold text-text-light uppercase tracking-wider">
                                             {day}
                                         </div>
                                     ))}
@@ -414,9 +414,9 @@ export default function AdminAppointmentsPage() {
                                         return (
                                             <div
                                                 key={idx}
-                                                className={`min-h-[80px] sm:min-h-[100px] p-1.5 border-b border-r border-[rgba(0,0,0,0.04)] transition-colors ${isCurrentMonth ? "bg-white" : "bg-[#FAFAFA]"} ${isTodayDate ? "bg-[#FFF8E1]" : ""}`}
+                                                className={`min-h-[80px] sm:min-h-[100px] p-1.5 border-b border-r border-[rgba(0,0,0,0.04)] transition-colors ${isCurrentMonth ? "bg-white" : "bg-surface-2"} ${isTodayDate ? "bg-[#FFF8E1]" : ""}`}
                                             >
-                                                <div className={`text-xs font-medium mb-1 ${isTodayDate ? "text-[#C2185B] font-bold" : isCurrentMonth ? "text-[#0D0D0D]" : "text-[#D0D0D0]"}`}>
+                                                <div className={`text-xs font-medium mb-1 ${isTodayDate ? "text-primary font-bold" : isCurrentMonth ? "text-foreground" : "text-[#D0D0D0]"}`}>
                                                     {format(day, "d")}
                                                 </div>
                                                 {dayAppointments.length > 0 && (
@@ -425,22 +425,22 @@ export default function AdminAppointmentsPage() {
                                                             dayAppointments.map(apt => (
                                                                 <div
                                                                     key={apt.id}
-                                                                    className={`text-[9px] sm:text-[10px] px-1 py-0.5 rounded truncate font-medium ${apt.status === "CONFIRMED" ? "bg-[#E3F2FD] text-[#1565C0]" : apt.status === "REQUESTED" ? "bg-[#FFF3E0] text-[#E65100]" : apt.status === "COMPLETED" ? "bg-[#E8F5E9] text-[#2E7D32]" : "bg-[#FFEBEE] text-[#C62828]"}`}
+                                                                    className={`text-[9px] sm:text-[10px] px-1 py-0.5 rounded truncate font-medium ${apt.status === "CONFIRMED" ? "bg-[#E3F2FD] text-status-info" : apt.status === "REQUESTED" ? "bg-[#FFF3E0] text-status-warning" : apt.status === "COMPLETED" ? "bg-[#E8F5E9] text-status-success" : "bg-[#FFEBEE] text-destructive"}`}
                                                                 >
                                                                     {apt.client?.fullName?.split(" ")[0] || "Client"}
                                                                 </div>
                                                             ))
                                                         ) : (
                                                             <>
-                                                                <div className={`text-[9px] sm:text-[10px] px-1 py-0.5 rounded truncate font-medium ${dayAppointments[0].status === "CONFIRMED" ? "bg-[#E3F2FD] text-[#1565C0]" : dayAppointments[0].status === "REQUESTED" ? "bg-[#FFF3E0] text-[#E65100]" : "bg-[#E8F5E9] text-[#2E7D32]"}`}>
+                                                                <div className={`text-[9px] sm:text-[10px] px-1 py-0.5 rounded truncate font-medium ${dayAppointments[0].status === "CONFIRMED" ? "bg-[#E3F2FD] text-status-info" : dayAppointments[0].status === "REQUESTED" ? "bg-[#FFF3E0] text-status-warning" : "bg-[#E8F5E9] text-status-success"}`}>
                                                                     {dayAppointments[0].client?.fullName?.split(" ")[0] || "Client"}
                                                                 </div>
-                                                                <div className="text-[9px] text-[#C2185B] font-semibold px-1">
+                                                                <div className="text-[9px] text-primary font-semibold px-1">
                                                                     +{dayAppointments.length - 1} more
                                                                 </div>
                                                             </>
                                                         )}
-                                                        <div className="text-[8px] text-[#999] font-semibold px-0.5 pt-0.5">
+                                                        <div className="text-[8px] text-text-light font-semibold px-0.5 pt-0.5">
                                                             {dayAppointments.length} apt{dayAppointments.length > 1 ? "s" : ""}
                                                         </div>
                                                     </div>
@@ -464,19 +464,19 @@ export default function AdminAppointmentsPage() {
                                 transition={{ type: "spring", duration: 0.3 }}
                                 className="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-bold text-[#0D0D0D]">Confirm Appointment</h3>
-                                    <button onClick={() => setConfirmModal(null)} className="p-1 rounded-lg hover:bg-[#F4F0F8] transition-colors"><X size={18} className="text-[#999]" /></button>
+                                    <h3 className="text-lg font-bold text-foreground">Confirm Appointment</h3>
+                                    <button onClick={() => setConfirmModal(null)} className="p-1 rounded-lg hover:bg-muted transition-colors"><X size={18} className="text-text-light" /></button>
                                 </div>
-                                <p className="text-sm text-[#555] mb-4">
+                                <p className="text-sm text-muted-foreground mb-4">
                                     Confirm appointment for <strong>{confirmModal.client?.fullName || confirmModal.user?.fullName || "Client"}</strong>
                                 </p>
                                 <div className="mb-4">
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Confirmed Date *</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Confirmed Date *</label>
                                     <Popover>
                                         <PopoverTrigger asChild>
                                             <Button
                                                 variant="outline"
-                                                className={`w-full justify-start text-left h-10 border-[1.5px] transition-all duration-200 hover:border-[#C2185B]/60 ${confirmedDate ? "text-[#0D0D0D] border-[#C2185B]" : "text-[#999] border-[#E0E0E0]"}`}
+                                                className={`w-full justify-start text-left h-10 border-[1.5px] transition-all duration-200 hover:border-primary/60 ${confirmedDate ? "text-foreground border-primary" : "text-text-light border-input"}`}
                                             >
                                                 <CalendarIcon className="mr-2.5 h-4 w-4 flex-shrink-0" style={{ color: confirmedDate ? "#C2185B" : "#999" }} />
                                                 {confirmedDate ? format(confirmedDate, "PPP") : "Pick a date"}
@@ -498,7 +498,7 @@ export default function AdminAppointmentsPage() {
                                     <Button
                                         onClick={() => updateAppointment.mutate({ id: confirmModal.id, status: "CONFIRMED", confirmedDate: confirmedDate?.toISOString() })}
                                         disabled={!confirmedDate || updateAppointment.isPending}
-                                        className="flex-1 h-10 bg-[#2E7D32] text-white hover:bg-[#1B5E20] gap-1.5"
+                                        className="flex-1 h-10 bg-status-success text-white hover:bg-[#1B5E20] gap-1.5"
                                     >
                                         <CheckCircle size={14} /> {updateAppointment.isPending ? "..." : "Confirm"}
                                     </Button>
@@ -516,23 +516,23 @@ export default function AdminAppointmentsPage() {
                             onClick={() => setCancelModal(null)}>
                             <motion.div initial={{ scale: 0.97, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.97, opacity: 0 }}
                                 transition={{ type: "spring", duration: 0.3 }}
-                                className="bg-white rounded-xl max-w-sm w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                                className="bg-popover rounded-xl max-w-sm w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-lg font-bold text-[#C62828] flex items-center gap-2">
+                                    <h3 className="text-lg font-bold text-destructive flex items-center gap-2">
                                         <AlertTriangle size={18} /> Cancel Appointment
                                     </h3>
-                                    <button onClick={() => setCancelModal(null)} className="p-1 rounded-lg hover:bg-[#F4F0F8] transition-colors"><X size={18} className="text-[#999]" /></button>
+                                    <button onClick={() => setCancelModal(null)} className="p-1 rounded-lg hover:bg-muted transition-colors"><X size={18} className="text-text-light" /></button>
                                 </div>
                                 <div className="mb-4">
-                                    <label className="text-xs font-medium text-[#555] mb-1.5 block">Reason for cancellation *</label>
+                                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Reason for cancellation *</label>
                                     <Textarea value={cancelReason} onChange={(e) => setCancelReason(e.target.value)}
-                                        placeholder="Enter the reason..." rows={3} className="resize-none bg-white" />
+                                        placeholder="Enter the reason..." rows={3} className="resize-none bg-popover" />
                                 </div>
                                 <div className="flex gap-2">
                                     <Button variant="outline" onClick={() => setCancelModal(null)} className="flex-1 h-10 border-[1.5px]">Back</Button>
                                     <Button onClick={() => updateAppointment.mutate({ id: cancelModal.id, status: "CANCELLED", cancelReason })}
                                         disabled={cancelReason.length < 3 || updateAppointment.isPending}
-                                        className="flex-1 h-10 bg-[#C62828] text-white hover:bg-[#B71C1C] gap-1.5">
+                                        className="flex-1 h-10 bg-destructive text-primary-foreground hover:bg-destructive/90 gap-1.5">
                                         <XCircle size={14} /> {updateAppointment.isPending ? "..." : "Cancel Appointment"}
                                     </Button>
                                 </div>

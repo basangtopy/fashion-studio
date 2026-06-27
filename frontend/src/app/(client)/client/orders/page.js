@@ -29,14 +29,14 @@ const FAB_OPTIONS = [
         label: "Browse Styles",
         icon: Shirt,
         href: "/catalog/styles",
-        color: "#C2185B",
+        color: 'var(--color-brand-primary)',
         bg: "#FFF5F8",
     },
     {
         label: "Custom Style",
         icon: Sparkles,
         href: "/client/orders/new?mode=custom",
-        color: "#1565C0",
+        color: 'var(--color-status-info)',
         bg: "#EFF6FF",
     },
 ];
@@ -65,7 +65,7 @@ function SpeedDial() {
                                 className="flex items-center gap-2"
                             >
                                 {/* Label chip */}
-                                <div className="bg-white text-[#0D0D0D] text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-[rgba(0,0,0,0.08)]">
+                                <div className="bg-white text-foreground text-xs font-semibold px-3 py-1.5 rounded-full shadow-md border border-[rgba(0,0,0,0.08)]">
                                     {opt.label}
                                 </div>
                                 {/* Icon button */}
@@ -85,7 +85,7 @@ function SpeedDial() {
             {/* Main FAB */}
             <button
                 onClick={() => setOpen((v) => !v)}
-                className="w-14 h-14 rounded-full bg-[#C2185B] text-white shadow-lg flex items-center justify-center hover:bg-[#A01548] transition-all duration-200 active:scale-95"
+                className="w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:bg-primary/90 transition-all duration-200 active:scale-95"
                 aria-label="New order"
             >
                 <motion.div
@@ -156,10 +156,10 @@ function ClientOrdersContent() {
         <div className="pb-[80px] lg:pb-[160px] overflow-x-hidden">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-[#0D0D0D]">My Orders</h1>
+                <h1 className="text-2xl font-bold text-foreground">My Orders</h1>
                 <Button
                     onClick={() => setDialogOpen(true)}
-                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 h-auto rounded-md bg-[#C2185B] text-white text-sm font-semibold hover:bg-[#A01548] transition-colors"
+                    className="hidden sm:flex items-center gap-1.5 px-4 py-2 h-auto rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
                 >
                     <Plus size={15} />
                     New Order
@@ -176,14 +176,14 @@ function ClientOrdersContent() {
                                 variant="ghost"
                                 onClick={() => setTab(t.value)}
                                 className={`relative h-auto px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors hover:bg-[#E0E0E0] ${tab === t.value
-                                    ? "bg-[#1A1A2E] text-white hover:text-white hover:bg-[#1A1A2E]"
-                                    : "bg-[#F4F0F8] text-[#555] hover:text-[#555]"
+                                    ? "bg-secondary text-white hover:text-white hover:bg-secondary"
+                                    : "bg-muted text-muted-foreground hover:text-muted-foreground"
                                     }`}
                             >
                                 {t.label}
                                 <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${tab === t.value
                                     ? "bg-white/20 text-white"
-                                    : "bg-[#E0E0E0] text-[#555]"
+                                    : "bg-[#E0E0E0] text-muted-foreground"
                                     }`}>
                                     {counts[t.value]}
                                 </span>
@@ -196,7 +196,7 @@ function ClientOrdersContent() {
                 <Button
                     variant="ghost"
                     onClick={() => setSortNewest(!sortNewest)}
-                    className="flex items-center gap-1 h-auto px-3 py-2 rounded-lg text-xs font-medium text-[#555] bg-[#F4F0F8] hover:bg-[#E0E0E0] transition-colors shrink-0"
+                    className="flex items-center gap-1 h-auto px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground bg-muted hover:bg-[#E0E0E0] transition-colors shrink-0"
                 >
                     <ArrowUpDown size={12} />
                     <span>{sortNewest ? "Newest" : "Oldest"}</span>
@@ -216,7 +216,7 @@ function ClientOrdersContent() {
                     action={
                         <button
                             onClick={() => setDialogOpen(true)}
-                            className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-[#C2185B] text-white text-sm font-semibold hover:bg-[#A01548] transition-colors"
+                            className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
                         >
                             Place New Order <ArrowRight size={14} />
                         </button>

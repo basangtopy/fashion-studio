@@ -53,3 +53,8 @@ export const resetPasswordSchema = z.object({
 export const verifyEmailSchema = z.object({
   token: z.string({ required_error: "Verification token is required" }),
 });
+
+export const oauthCodeExchangeSchema = z.object({
+  code: z.string({ required_error: "Code is required" })
+    .regex(/^[0-9a-fA-F]{48}$/, "Invalid code format"),
+});

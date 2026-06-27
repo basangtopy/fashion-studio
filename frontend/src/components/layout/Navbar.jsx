@@ -107,8 +107,8 @@ export default function Navbar() {
                                         onClick={() => setMegaMenuOpen(!megaMenuOpen)}
                                         className={`flex items-center gap-1 text-sm font-medium transition-colors ${isHeroPage && !isScrolled
                                             ? "text-white/80 hover:text-white"
-                                            : "text-[#555] hover:text-[#0D0D0D]"
-                                            } ${pathname.startsWith("/catalog") ? "!text-[#C2185B]" : ""}`}
+                                            : "text-muted-foreground hover:text-foreground"
+                                            } ${pathname.startsWith("/catalog") ? "!text-primary" : ""}`}
                                     >
                                         {link.label}
                                         <ChevronDown
@@ -125,19 +125,19 @@ export default function Navbar() {
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: 8, scale: 0.97 }}
                                                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                                                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[400px] bg-white rounded-xl shadow-xl border border-[rgba(0,0,0,0.06)] overflow-hidden"
+                                                className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[400px] bg-white rounded-xl shadow-xl border border-border overflow-hidden"
                                             >
                                                 <div className="p-4 grid grid-cols-1 gap-1">
                                                     {link.children.map((child) => (
                                                         <Link
                                                             key={child.href}
                                                             href={child.href}
-                                                            className="flex flex-col gap-1 p-3 rounded-lg hover:bg-[#F4F0F8] transition-colors"
+                                                            className="flex flex-col gap-1 p-3 rounded-lg hover:bg-muted transition-colors"
                                                         >
-                                                            <span className="text-sm font-semibold text-[#0D0D0D]">
+                                                            <span className="text-sm font-semibold text-foreground">
                                                                 {child.label}
                                                             </span>
-                                                            <span className="text-xs text-[#999]">{child.description}</span>
+                                                            <span className="text-xs text-text-light">{child.description}</span>
                                                         </Link>
                                                     ))}
                                                 </div>
@@ -151,8 +151,8 @@ export default function Navbar() {
                                     href={link.href}
                                     className={`text-sm font-medium transition-colors ${isHeroPage && !isScrolled
                                         ? "text-white/80 hover:text-white"
-                                        : "text-[#555] hover:text-[#0D0D0D]"
-                                        } ${pathname === link.href ? "!text-[#C2185B]" : ""}`}
+                                        : "text-muted-foreground hover:text-foreground"
+                                        } ${pathname === link.href ? "!text-primary" : ""}`}
                                 >
                                     {link.label}
                                 </Link>
@@ -167,7 +167,7 @@ export default function Navbar() {
                             onClick={openCart}
                             className={`relative p-2 rounded-lg transition-colors ${isHeroPage && !isScrolled
                                 ? "text-white/80 hover:text-white"
-                                : "text-[#555] hover:text-[#0D0D0D]"
+                                : "text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             <ShoppingBag size={20} />
@@ -175,7 +175,7 @@ export default function Navbar() {
                                 <motion.span
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-[#C2185B] text-white text-[10px] font-bold flex items-center justify-center"
+                                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center"
                                 >
                                     {itemCount}
                                 </motion.span>
@@ -186,7 +186,7 @@ export default function Navbar() {
                         <Link
                             href={isAuthenticated ? "?action=book_appointment" : `/login?redirectURL=${pathname}&action=book_appointment`}
                             scroll={false}
-                            className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-md bg-[#C2185B] text-white text-sm font-semibold hover:bg-[#A01548] transition-colors"
+                            className="hidden xl:flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
                         >
                             <Calendar size={14} />
                             Book Appointment
@@ -197,14 +197,14 @@ export default function Navbar() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button
-                                        className={`p-2 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#C2185B] ring-offset-1 ${isHeroPage && !isScrolled
+                                        className={`p-2 rounded-lg transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring ring-offset-1 ${isHeroPage && !isScrolled
                                             ? "text-white/80 hover:text-white"
-                                            : "text-[#555] hover:text-[#0D0D0D]"
+                                            : "text-muted-foreground hover:text-foreground"
                                             }`}
                                     >
                                         <Avatar className="w-8 h-8 hover:opacity-90 transition-opacity">
                                             <AvatarImage src={user?.avatarUrl || user?.profilePicture} alt={user?.fullName || "User"} />
-                                            <AvatarFallback className="bg-[#C2185B] text-white text-xs font-bold">
+                                            <AvatarFallback className="bg-primary text-white text-xs font-bold">
                                                 {user?.fullName?.charAt(0) || "U"}
                                             </AvatarFallback>
                                         </Avatar>
@@ -212,21 +212,21 @@ export default function Navbar() {
                                 </DropdownMenuTrigger>
 
                                 {/* User Dropdown */}
-                                <DropdownMenuContent align="end" className="w-48 bg-white rounded-xl shadow-xl border border-[rgba(0,0,0,0.06)] p-1">
+                                <DropdownMenuContent align="end" className="w-48 bg-popover rounded-xl shadow-xl border border-border p-1">
                                     <div className="px-2 py-2">
-                                        <p className="text-sm font-semibold text-[#0D0D0D] truncate">
+                                        <p className="text-sm font-semibold text-foreground truncate">
                                             {user?.fullName}
                                         </p>
-                                        <p className="text-xs text-[#999] truncate">{user?.email}</p>
+                                        <p className="text-xs text-text-light truncate">{user?.email}</p>
                                     </div>
-                                    <DropdownMenuSeparator className="bg-[rgba(0,0,0,0.06)] mx-1" />
-                                    <DropdownMenuItem asChild className="flex items-center gap-2 px-2 py-2 text-sm text-[#555] hover:bg-[#F4F0F8] rounded-lg cursor-pointer transition-colors outline-none focus:bg-[#F4F0F8] focus:text-[#0D0D0D]">
+                                    <DropdownMenuSeparator className="bg-border mx-1" />
+                                    <DropdownMenuItem asChild className="flex items-center gap-2 px-2 py-2 text-sm text-muted-foreground hover:bg-muted rounded-lg cursor-pointer transition-colors outline-none focus:bg-muted focus:text-foreground">
                                         <Link href={isAdmin ? "/admin/dashboard" : "/client/dashboard"}>
                                             <LayoutDashboard size={14} />
                                             <span>Dashboard</span>
                                         </Link>
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={logout} className="flex items-center gap-2 px-2 py-2 text-sm text-[#C62828] hover:bg-[#FFEBEE] rounded-lg cursor-pointer transition-colors outline-none focus:bg-[#FFEBEE] focus:text-[#C62828] w-full mt-1">
+                                    <DropdownMenuItem onClick={logout} className="flex items-center gap-2 px-2 py-2 text-sm text-destructive hover:bg-[#FFEBEE] rounded-lg cursor-pointer transition-colors outline-none focus:bg-[#FFEBEE] focus:text-destructive w-full mt-1">
                                         <LogOut size={14} />
                                         <span>Logout</span>
                                     </DropdownMenuItem>
@@ -237,7 +237,7 @@ export default function Navbar() {
                                 href="/login"
                                 className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isHeroPage && !isScrolled
                                     ? "text-white/80 hover:text-white border border-white/20"
-                                    : "text-[#555] hover:text-[#0D0D0D] border border-[#E0E0E0]"
+                                    : "text-muted-foreground hover:text-foreground border border-input"
                                     }`}
                             >
                                 <User size={14} />
@@ -250,7 +250,7 @@ export default function Navbar() {
                             onClick={() => setMobileMenuOpen(true)}
                             className={`lg:hidden p-2 ${isHeroPage && !isScrolled
                                 ? "text-white/80 hover:text-white"
-                                : "text-[#555] hover:text-[#0D0D0D]"
+                                : "text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             <Menu size={22} />
@@ -266,7 +266,7 @@ export default function Navbar() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[60] bg-[#1A1A2E]"
+                        className="fixed inset-0 z-[60] bg-secondary"
                     >
                         <div className="flex items-center justify-between p-4">
                             {/* Logo */}
@@ -301,7 +301,7 @@ export default function Navbar() {
                                                     <Link
                                                         href={child.href}
                                                         onClick={() => setMobileMenuOpen(false)}
-                                                        className="block text-lg text-white/80 hover:text-[#C2185B] pl-4 py-2 border-l-2 border-transparent hover:border-[#C2185B] transition-all"
+                                                        className="block text-lg text-white/80 hover:text-primary pl-4 py-2 border-l-2 border-transparent hover:border-primary transition-all"
                                                     >
                                                         {child.label}
                                                     </Link>
@@ -318,8 +318,8 @@ export default function Navbar() {
                                                 href={link.href}
                                                 onClick={() => setMobileMenuOpen(false)}
                                                 className={`text-[32px] font-bold py-3 block transition-colors ${pathname === link.href
-                                                    ? "text-[#C2185B]"
-                                                    : "text-white hover:text-[#C2185B]"
+                                                    ? "text-primary"
+                                                    : "text-white hover:text-primary"
                                                     }`}
                                             >
                                                 {link.label}
@@ -342,7 +342,7 @@ export default function Navbar() {
                                         </Link>
                                         <button
                                             onClick={() => { logout(); setMobileMenuOpen(false); }}
-                                            className="block text-lg text-[#C62828] py-2"
+                                            className="block text-lg text-destructive py-2"
                                         >
                                             Logout
                                         </button>
@@ -351,7 +351,7 @@ export default function Navbar() {
                                     <Link
                                         href="/login"
                                         onClick={() => setMobileMenuOpen(false)}
-                                        className="block text-lg text-white hover:text-[#C2185B] py-2"
+                                        className="block text-lg text-white hover:text-primary py-2"
                                     >
                                         Login / Sign Up
                                     </Link>
@@ -364,7 +364,7 @@ export default function Navbar() {
                                     href={isAuthenticated ? "?action=book_appointment" : `/login?redirectURL=${pathname}&action=book_appointment`}
                                     scroll={false}
                                     onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors"
+                                    className="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-md bg-primary text-white font-semibold hover:bg-primary/90 transition-colors"
                                 >
                                     <Calendar size={16} />
                                     Book a Fitting

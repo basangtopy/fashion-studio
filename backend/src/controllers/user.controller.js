@@ -167,6 +167,10 @@ export const getAllClients = async (req, res) => {
         _count: {
           select: { orders: true },
         },
+        payments: {
+          where: { status: "CONFIRMED" },
+          select: { amount: true },
+        },
       },
       orderBy: [{ createdAt: "desc" }, { id: "asc" }],
       skip,
@@ -174,10 +178,14 @@ export const getAllClients = async (req, res) => {
     }),
   ]);
 
-  const clientsWithStatus = clients.map((c) => ({
-    ...c,
-    online: isUserOnline(c.id),
-  }));
+  const clientsWithStatus = clients.map((c) => {
+    const totalPaid = (c.payments || []).reduce(
+      (sum, p) => sum + Number(p.amount),
+      0,
+    );
+    const { payments, ...rest } = c;
+    return { ...rest, totalPaid, online: isUserOnline(c.id) };
+  });
 
   return successResponse(res, 200, "Clients retrieved", {
     total,

@@ -61,7 +61,7 @@ export default function ClientPaymentsPage() {
 
     return (
         <div className="pb-20 lg:pb-0">
-            <h1 className="text-2xl font-bold text-[#0D0D0D] mb-6">Payments</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-6">Payments</h1>
 
             {/* ─── Summary Strip (3 stat cards) ─── */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -79,40 +79,40 @@ export default function ClientPaymentsPage() {
                     >
                         <motion.div
                             variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}
-                            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white"
+                            className="p-5 rounded-xl border border-border bg-white"
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Total Paid</span>
-                                <div className="w-9 h-9 rounded-lg bg-[#2E7D32]/10 flex items-center justify-center">
-                                    <CreditCard size={18} className="text-[#2E7D32]" />
+                                <span className="text-xs font-medium text-text-light uppercase tracking-wider">Total Paid</span>
+                                <div className="w-9 h-9 rounded-lg bg-status-success/10 flex items-center justify-center">
+                                    <CreditCard size={18} className="text-status-success" />
                                 </div>
                             </div>
-                            <p className="text-2xl font-bold font-mono-data text-[#2E7D32]">{formatCurrency(totalPaid)}</p>
+                            <p className="text-2xl font-bold font-mono-data text-status-success">{formatCurrency(totalPaid)}</p>
                         </motion.div>
                         <motion.div
                             variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}
-                            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white"
+                            className="p-5 rounded-xl border border-border bg-white"
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Pending Confirmation</span>
+                                <span className="text-xs font-medium text-text-light uppercase tracking-wider">Pending Confirmation</span>
                                 <div className="w-9 h-9 rounded-lg bg-[#F9A825]/10 flex items-center justify-center">
                                     <CreditCard size={18} className="text-[#F9A825]" />
                                 </div>
                             </div>
                             <p className="text-2xl font-bold font-mono-data text-[#F9A825]">{formatCurrency(totalPending)}</p>
-                            <p className="text-[11px] text-[#999] mt-1">{pending.length} awaiting admin confirmation</p>
+                            <p className="text-[11px] text-text-light mt-1">{pending.length} awaiting admin confirmation</p>
                         </motion.div>
                         <motion.div
                             variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}
-                            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white"
+                            className="p-5 rounded-xl border border-border bg-white"
                         >
                             <div className="flex items-center justify-between mb-3">
-                                <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Outstanding Balance</span>
-                                <div className="w-9 h-9 rounded-lg bg-[#E65100]/10 flex items-center justify-center">
-                                    <CreditCard size={18} className="text-[#E65100]" />
+                                <span className="text-xs font-medium text-text-light uppercase tracking-wider">Outstanding Balance</span>
+                                <div className="w-9 h-9 rounded-lg bg-status-warning/10 flex items-center justify-center">
+                                    <CreditCard size={18} className="text-status-warning" />
                                 </div>
                             </div>
-                            <p className="text-2xl font-bold font-mono-data text-[#E65100]">{formatCurrency(outstandingBalance)}</p>
+                            <p className="text-2xl font-bold font-mono-data text-status-warning">{formatCurrency(outstandingBalance)}</p>
                         </motion.div>
                     </motion.div>
                 )}
@@ -155,7 +155,7 @@ export default function ClientPaymentsPage() {
                                 <div
                                     className={`rounded-xl border bg-white overflow-hidden card-hover shadow-sm transition-all flex flex-col ${isRejected
                                         ? "border-[#C62828]/20 hover:border-[#C62828]/50"
-                                        : "border-[rgba(0,0,0,0.06)] hover:border-[rgba(194,24,91,0.3)]"
+                                        : "border-border hover:border-primary/30"
                                         }`}
                                 >
                                     <Button
@@ -169,11 +169,11 @@ export default function ClientPaymentsPage() {
                                                 <Link
                                                     href={`/client/orders/${payment.order?.id}`}
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="text-xs font-mono-data text-[#C2185B] hover:underline"
+                                                    className="text-xs font-mono-data text-primary hover:underline"
                                                 >
                                                     {payment.order?.orderNumber || "—"}
                                                 </Link>
-                                                <p className="text-[10px] text-[#999] mt-0.5">
+                                                <p className="text-[10px] text-text-light mt-0.5">
                                                     {payment.paymentType === "FULL" ? "Full Payment" : "Installment"}
                                                 </p>
                                             </div>
@@ -181,7 +181,7 @@ export default function ClientPaymentsPage() {
 
                                         <div className="flex items-center gap-4">
                                             {/* Amount (mono, prominent) */}
-                                            <span className="text-sm font-bold font-mono-data text-[#0D0D0D]">
+                                            <span className="text-sm font-bold font-mono-data text-foreground">
                                                 {formatCurrency(payment.amount)}
                                             </span>
 
@@ -194,13 +194,13 @@ export default function ClientPaymentsPage() {
                                             </span>
 
                                             {/* Date */}
-                                            <span className="text-[10px] text-[#999] hidden sm:block whitespace-nowrap">
+                                            <span className="text-[10px] text-text-light hidden sm:block whitespace-nowrap">
                                                 {new Date(payment.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                             </span>
 
                                             <ChevronDown
                                                 size={16}
-                                                className={`text-[#999] transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                                                className={`text-text-light transition-transform ${isExpanded ? "rotate-180" : ""}`}
                                             />
                                         </div>
                                     </Button>
@@ -208,8 +208,8 @@ export default function ClientPaymentsPage() {
                                     {/* Rejection reason inline (Warning tint) */}
                                     {isRejected && payment.adminNote && !isExpanded && (
                                         <div className="px-5 pb-3 flex items-start gap-2">
-                                            <AlertTriangle size={12} className="text-[#C62828] shrink-0 mt-0.5" />
-                                            <p className="text-xs text-[#C62828]">{payment.adminNote}</p>
+                                            <AlertTriangle size={12} className="text-destructive shrink-0 mt-0.5" />
+                                            <p className="text-xs text-destructive">{payment.adminNote}</p>
                                         </div>
                                     )}
 
@@ -223,31 +223,31 @@ export default function ClientPaymentsPage() {
                                                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                                                 className="overflow-hidden"
                                             >
-                                                <div className="px-5 pb-5 pt-2 border-t border-[rgba(0,0,0,0.06)]">
+                                                <div className="px-5 pb-5 pt-2 border-t border-border">
                                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mb-4">
                                                         <div>
-                                                            <span className="text-[#999] text-xs">Order</span>
+                                                            <span className="text-text-light text-xs">Order</span>
                                                             <Link
                                                                 href={`/client/orders/${payment.order?.id}`}
-                                                                className="font-mono-data text-[#C2185B] hover:underline block"
+                                                                className="font-mono-data text-primary hover:underline block"
                                                             >
                                                                 {payment.order?.orderNumber || "—"}
                                                             </Link>
                                                         </div>
                                                         <div>
-                                                            <span className="text-[#999] text-xs">Type</span>
-                                                            <p className="text-[#0D0D0D]">
+                                                            <span className="text-text-light text-xs">Type</span>
+                                                            <p className="text-foreground">
                                                                 {payment.paymentType === "FULL" ? "Full Payment" : "Installment"}
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <span className="text-[#999] text-xs">Submitted</span>
-                                                            <p className="text-[#0D0D0D]">{new Date(payment.createdAt).toLocaleDateString("en-NG", { dateStyle: "long" })}</p>
+                                                            <span className="text-text-light text-xs">Submitted</span>
+                                                            <p className="text-foreground">{new Date(payment.createdAt).toLocaleDateString("en-NG", { dateStyle: "long" })}</p>
                                                         </div>
                                                         {payment.confirmedAt && (
                                                             <div>
-                                                                <span className="text-[#999] text-xs">Confirmed</span>
-                                                                <p className="text-[#0D0D0D]">{new Date(payment.confirmedAt).toLocaleDateString("en-NG", { dateStyle: "long" })}</p>
+                                                                <span className="text-text-light text-xs">Confirmed</span>
+                                                                <p className="text-foreground">{new Date(payment.confirmedAt).toLocaleDateString("en-NG", { dateStyle: "long" })}</p>
                                                             </div>
                                                         )}
                                                     </div>
@@ -255,25 +255,25 @@ export default function ClientPaymentsPage() {
                                                     {/* Rejection reason (expanded view) */}
                                                     {isRejected && payment.adminNote && (
                                                         <div className="mb-4 p-3 rounded-lg bg-[#FFEBEE] border border-[#C62828]/10 flex items-start gap-2">
-                                                            <AlertTriangle size={14} className="text-[#C62828] shrink-0 mt-0.5" />
+                                                            <AlertTriangle size={14} className="text-destructive shrink-0 mt-0.5" />
                                                             <div>
-                                                                <p className="text-xs font-semibold text-[#C62828]">Rejection Reason</p>
-                                                                <p className="text-xs text-[#C62828]/80 mt-0.5">{payment.adminNote}</p>
+                                                                <p className="text-xs font-semibold text-destructive">Rejection Reason</p>
+                                                                <p className="text-xs text-destructive/80 mt-0.5">{payment.adminNote}</p>
                                                             </div>
                                                         </div>
                                                     )}
 
                                                     {/* Admin note for non-rejected */}
                                                     {!isRejected && payment.adminNote && (
-                                                        <p className="text-xs text-[#555] italic mb-3">&ldquo;{payment.adminNote}&rdquo;</p>
+                                                        <p className="text-xs text-muted-foreground italic mb-3">&ldquo;{payment.adminNote}&rdquo;</p>
                                                     )}
 
                                                     {payment.proofUrl && (
-                                                        <div className="mt-4 border-t border-[rgba(0,0,0,0.06)] pt-4">
-                                                            <p className="text-xs font-semibold text-[#0D0D0D] mb-3 flex items-center gap-1.5">
+                                                        <div className="mt-4 border-t border-border pt-4">
+                                                            <p className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
                                                                 Payment Proof
                                                             </p>
-                                                            <div onClick={() => { setLightboxImage(payment.proofUrl) }} className="cursor-pointer relative w-full max-w-[280px] aspect-[4/3] rounded-lg overflow-hidden border border-[rgba(0,0,0,0.06)] bg-[#FAFAFA] hover:opacity-80 transition-opacity">
+                                                            <div onClick={() => { setLightboxImage(payment.proofUrl) }} className="cursor-pointer relative w-full max-w-[280px] aspect-[4/3] rounded-lg overflow-hidden border border-border bg-surface-2 hover:opacity-80 transition-opacity">
                                                                 <Image src={payment.proofUrl} alt="Payment proof" fill className="object-contain" />
                                                             </div>
                                                         </div>

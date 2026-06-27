@@ -19,7 +19,7 @@ export default function StatusPill({ status, size = "default" }) {
         return (
             <Badge
                 variant="outline"
-                className={`font-semibold bg-[#F4F0F8] text-[#555] border-transparent ${size === "small" ? "px-2 py-0 text-[10px]" : "px-3 py-0.5 text-xs"}`}
+                className={`font-semibold bg-muted text-muted-foreground border-transparent ${size === "small" ? "px-2 py-0 text-[10px]" : "px-3 py-0.5 text-xs"}`}
             >
                 {status?.replace(/_/g, " ") || "Unknown"}
             </Badge>

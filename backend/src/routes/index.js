@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 
 import authRoutes from "./auth.routes.js";
 import oauthRoutes from "./oauth.routes.js";
@@ -20,6 +21,25 @@ import cartRoutes from "./cart.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 
 const router = Router();
+
+// ─── Global API rate limiter ───────────────────────────────────────────────
+// Applies to every /api/* route as a catch-all.
+// Per-route limiters (login, register) are stricter and take precedence
+// because they're mounted on specific routes before this runs.
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300,                  // 300 requests per IP per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests. Please slow down.",
+  },
+  // Skip the SSE endpoint — it's a long-lived connection, not a request-per-call pattern
+  skip: (req) => req.path === "/sse",
+});
+
+router.use(globalLimiter);
 
 // API status check
 router.get("/", (req, res) => {

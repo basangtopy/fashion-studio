@@ -33,29 +33,29 @@ export default function ForgotPasswordPage() {
     return (
         <div className="min-h-screen flex items-center justify-center px-6 py-12 pt-[var(--nav-height)] bg-white">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-[400px]">
-                <Link href="/login" className="inline-flex items-center gap-1 text-sm text-[#999] hover:text-[#C2185B] mb-8 transition-colors">
+                <Link href="/login" className="inline-flex items-center gap-1 text-sm text-text-light hover:text-primary mb-8 transition-colors">
                     <ArrowLeft size={14} /> Back to Login
                 </Link>
 
                 {isSent ? (
                     <div className="text-center">
                         <div className="w-16 h-16 rounded-full bg-[#E8F5E9] flex items-center justify-center mx-auto mb-4">
-                            <Mail size={28} className="text-[#2E7D32]" />
+                            <Mail size={28} className="text-status-success" />
                         </div>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2">Check your email</h1>
-                        <p className="text-sm text-[#999] mb-6">We sent a password reset link to <strong className="text-[#0D0D0D]">{email}</strong>.</p>
-                        <Link href="/login" className="text-sm text-[#C2185B] font-semibold hover:underline">Back to Login</Link>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">Check your email</h1>
+                        <p className="text-sm text-text-light mb-6">We sent a password reset link to <strong className="text-foreground">{email}</strong>.</p>
+                        <Link href="/login" className="text-sm text-primary font-semibold hover:underline">Back to Login</Link>
                     </div>
                 ) : (
                     <>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D] mb-2">Forgot your password?</h1>
-                        <p className="text-sm text-[#999] mb-6">Enter your email and we&apos;ll send you a reset link.</p>
+                        <h1 className="text-2xl font-bold text-foreground mb-2">Forgot your password?</h1>
+                        <p className="text-sm text-text-light mb-6">Enter your email and we&apos;ll send you a reset link.</p>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="relative">
-                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999] z-10" />
-                                <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="pl-9 h-11 border-[#E0E0E0] focus-visible:ring-[#C2185B] focus-visible:border-[#C2185B]" />
+                                <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light z-10" />
+                                <Input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="pl-9 h-11 border-input focus-visible:ring-ring focus-visible:border-ring" />
                             </div>
-                            <Button type="submit" disabled={isLoading} className="w-full h-11 bg-[#C2185B] hover:bg-[#A01548] text-white font-semibold">
+                            <Button type="submit" disabled={isLoading} className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-semibold">
                                 {isLoading ? <div className="border-[3px] border-white/30 border-t-white rounded-full animate-spin size-5" /> : <><Send size={16} />Send Reset Link</>}
                             </Button>
                         </form>

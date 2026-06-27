@@ -61,10 +61,10 @@ function StatCard({ label, value, icon: Icon, color, isCurrency, contextLine, de
             initial={{ opacity: 0, y: 12 }}
             animate={isVisible ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4, delay }}
-            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white"
+            className="p-5 rounded-xl border border-border bg-white"
         >
             <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-[#999] uppercase tracking-wider">{label}</span>
+                <span className="text-xs font-medium text-text-light uppercase tracking-wider">{label}</span>
                 <div
                     className="w-9 h-9 rounded-lg flex items-center justify-center"
                     style={{ backgroundColor: `${color}15` }}
@@ -72,11 +72,11 @@ function StatCard({ label, value, icon: Icon, color, isCurrency, contextLine, de
                     <Icon size={18} style={{ color }} />
                 </div>
             </div>
-            <p className="text-2xl font-bold font-mono-data text-[#0D0D0D]">
+            <p className="text-2xl font-bold font-mono-data text-foreground">
                 {isCurrency ? formatCurrency(animatedValue) : (typeof value === "string" ? value : animatedValue)}
             </p>
             {contextLine && (
-                <p className="text-[11px] text-[#999] mt-1">{contextLine}</p>
+                <p className="text-[11px] text-text-light mt-1">{contextLine}</p>
             )}
         </motion.div>
     );
@@ -96,15 +96,15 @@ function ProgressSteps({ status }) {
                     <div key={step.label} className="flex items-center gap-1">
                         <div
                             className={`w-2 h-2 rounded-full transition-colors ${isCompleted
-                                ? "bg-[#2E7D32]"
+                                ? "bg-status-success"
                                 : isActive
-                                    ? "bg-[#C2185B]"
+                                    ? "bg-primary"
                                     : "bg-[#E0E0E0]"
                                 }`}
                             title={step.label}
                         />
                         {i < LIFECYCLE_STEPS.length - 1 && (
-                            <div className={`w-3 h-[1.5px] ${isCompleted ? "bg-[#2E7D32]" : "bg-[#E0E0E0]"}`} />
+                            <div className={`w-3 h-[1.5px] ${isCompleted ? "bg-status-success" : "bg-[#E0E0E0]"}`} />
                         )}
                     </div>
                 );
@@ -206,10 +206,10 @@ export default function ClientDashboard() {
         <div className="pb-20 lg:pb-0">
             {/* ─── Welcome Header ─── */}
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-[#0D0D0D] mb-1">
+                <h1 className="text-2xl font-bold text-foreground mb-1">
                     {getGreeting()}, {user?.fullName?.split(" ")[0] || "there"}
                 </h1>
-                <p className="text-sm text-[#999]">{today}</p>
+                <p className="text-sm text-text-light">{today}</p>
             </div>
 
             {/* ─── Stat Cards (4) ─── */}
@@ -248,17 +248,17 @@ export default function ClientDashboard() {
                                 initial={{ opacity: 0, y: 12 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.4, delay: 0.18 }}
-                                className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] hover:-translate-y-0.5 transition-all duration-200"
+                                className="p-5 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] hover:-translate-y-0.5 transition-all duration-200"
                             >
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-xs font-medium text-[#999] uppercase tracking-wider">Appointment</span>
+                                    <span className="text-xs font-medium text-text-light uppercase tracking-wider">Appointment</span>
                                     <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1565C015" }}>
-                                        <Calendar size={18} style={{ color: "#1565C0" }} />
+                                        <Calendar size={18} style={{ color: 'var(--color-status-info)' }} />
                                     </div>
                                 </div>
                                 {pendingAppointment ? (
                                     <>
-                                        <p className="text-sm font-bold text-[#0D0D0D] mb-1">
+                                        <p className="text-sm font-bold text-foreground mb-1">
                                             {new Date(pendingAppointment.confirmedDate || pendingAppointment.requestedDate).toLocaleDateString("en-NG", {
                                                 weekday: "short", month: "short", day: "numeric",
                                             })}
@@ -267,13 +267,13 @@ export default function ClientDashboard() {
                                             <StatusPill status={pendingAppointment.status} size="small" />
                                         </div>
                                         {pendingAppointment.adminNotes && (
-                                            <p className="text-[10px] text-[#999] mt-1 truncate">💬 {pendingAppointment.adminNotes}</p>
+                                            <p className="text-[10px] text-text-light mt-1 truncate">💬 {pendingAppointment.adminNotes}</p>
                                         )}
                                     </>
                                 ) : (
                                     <>
-                                        <p className="text-lg font-bold text-[#0D0D0D]">None booked</p>
-                                        <p className="text-[11px] text-[#C2185B] font-medium mt-1">Book an appointment →</p>
+                                        <p className="text-lg font-bold text-foreground">None booked</p>
+                                        <p className="text-[11px] text-primary font-medium mt-1">Book an appointment →</p>
                                     </>
                                 )}
                             </motion.div>
@@ -285,10 +285,10 @@ export default function ClientDashboard() {
             {/* ─── Active Orders ─── */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-[#0D0D0D]">Active Orders</h2>
+                    <h2 className="text-lg font-semibold text-foreground">Active Orders</h2>
                     <Link
                         href="/client/orders"
-                        className="text-xs font-semibold text-[#C2185B] hover:underline flex items-center gap-1"
+                        className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
                     >
                         View all <ArrowRight size={12} />
                     </Link>
@@ -306,7 +306,7 @@ export default function ClientDashboard() {
                         action={
                             <Link
                                 href="/catalog/styles"
-                                className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-[#C2185B] text-white text-sm font-semibold hover:bg-[#A01548] transition-colors"
+                                className="inline-flex items-center gap-1 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
                             >
                                 Explore Styles <ArrowRight size={14} />
                             </Link>
@@ -337,7 +337,7 @@ export default function ClientDashboard() {
 
             {/* ─── Quick Actions ─── */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-[#0D0D0D] mb-4">Quick Actions</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
                 <motion.div
                     initial="hidden"
                     animate="visible"
@@ -351,22 +351,22 @@ export default function ClientDashboard() {
                     <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
                         <button
                             onClick={() => setDialogOpen(true)}
-                            className="w-full h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                            className="w-full h-full p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
                         >
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#C2185B15" }}>
-                                <ShoppingBag size={18} style={{ color: "#C2185B" }} />
+                                <ShoppingBag size={18} style={{ color: 'var(--color-brand-primary)' }} />
                             </div>
-                            <span className="text-xs font-medium text-[#555]">Place New Order</span>
+                            <span className="text-xs font-medium text-muted-foreground">Place New Order</span>
                         </button>
                     </motion.div>
 
                     {/* Update Measurements */}
                     <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
-                        <Link href="/client/measurements" className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#6A1B9A15" }}>
-                                <Ruler size={18} style={{ color: "#6A1B9A" }} />
+                        <Link href="/client/measurements" className="h-full p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'color-mix(in srgb, var(--color-accent-purple) 8%, transparent)' }}>
+                                <Ruler size={18} style={{ color: 'var(--color-accent-purple)' }} />
                             </div>
-                            <span className="text-xs font-medium text-[#555]">Update Measurements</span>
+                            <span className="text-xs font-medium text-muted-foreground">Update Measurements</span>
                         </Link>
                     </motion.div>
 
@@ -375,12 +375,12 @@ export default function ClientDashboard() {
                         <Link
                             href={user ? `${pathname}?action=book_appointment` : `/login?redirectURL=${encodeURIComponent(pathname)}&action=book_appointment`}
                             scroll={false}
-                            className="h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                            className="h-full p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
                         >
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#1565C015" }}>
-                                <Calendar size={18} style={{ color: "#1565C0" }} />
+                                <Calendar size={18} style={{ color: 'var(--color-status-info)' }} />
                             </div>
-                            <span className="text-xs font-medium text-[#555]">Book Appointment</span>
+                            <span className="text-xs font-medium text-muted-foreground">Book Appointment</span>
                         </Link>
                     </motion.div>
 
@@ -388,12 +388,12 @@ export default function ClientDashboard() {
                     <motion.div variants={{ hidden: { opacity: 0, scale: 0.97 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } } }}>
                         <button
                             onClick={() => setShowReviewForm(true)}
-                            className="w-full h-full p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
+                            className="w-full h-full p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors flex flex-col items-center text-center gap-2"
                         >
                             <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#2E7D3215" }}>
-                                <Star size={18} style={{ color: "#2E7D32" }} />
+                                <Star size={18} style={{ color: 'var(--color-status-success)' }} />
                             </div>
-                            <span className="text-xs font-medium text-[#555]">Write a Review</span>
+                            <span className="text-xs font-medium text-muted-foreground">Write a Review</span>
                         </button>
                     </motion.div>
                 </motion.div>
@@ -404,10 +404,10 @@ export default function ClientDashboard() {
                 recentNotifs.length > 0 && (
                     <div>
                         <div className="flex items-center justify-between mb-3">
-                            <h2 className="text-lg font-semibold text-[#0D0D0D]">Recent Notifications</h2>
+                            <h2 className="text-lg font-semibold text-foreground">Recent Notifications</h2>
                             <Button
                                 variant="link"
-                                className="h-auto p-0 text-xs font-semibold text-[#C2185B]"
+                                className="h-auto p-0 text-xs font-semibold text-primary"
                             >
                                 View all
                             </Button>
@@ -417,16 +417,16 @@ export default function ClientDashboard() {
                                 <div
                                     key={n.id}
                                     className={`flex items-start gap-3 p-3 rounded-xl border transition-colors ${n.isRead
-                                        ? "border-[rgba(0,0,0,0.06)] bg-white"
-                                        : "border-[#C2185B]/20 bg-[#FFF5F8]"
+                                        ? "border-border bg-white"
+                                        : "border-primary/20 bg-[#FFF5F8]"
                                         }`}
                                 >
-                                    <div className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${n.isRead ? "bg-transparent" : "bg-[#C2185B]"}`} />
+                                    <div className={`w-2 h-2 rounded-full shrink-0 mt-1.5 ${n.isRead ? "bg-transparent" : "bg-primary"}`} />
                                     <div className="flex-1 min-w-0">
-                                        <p className={`text-sm ${n.isRead ? "text-[#555]" : "text-[#0D0D0D] font-medium"}`}>
+                                        <p className={`text-sm ${n.isRead ? "text-muted-foreground" : "text-foreground font-medium"}`}>
                                             {n.title || n.message}
                                         </p>
-                                        <p className="text-[10px] text-[#999] mt-0.5">
+                                        <p className="text-[10px] text-text-light mt-0.5">
                                             {new Date(n.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                         </p>
                                     </div>
@@ -456,15 +456,15 @@ export default function ClientDashboard() {
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-lg font-semibold text-[#0D0D0D]">Share Your Review</h3>
-                                <Button variant="ghost" size="icon" onClick={() => setShowReviewForm(false)} className="w-8 h-8 rounded-md hover:bg-[#F4F0F8]">
-                                    <X size={18} className="text-[#999]" />
+                                <h3 className="text-lg font-semibold text-foreground">Share Your Review</h3>
+                                <Button variant="ghost" size="icon" onClick={() => setShowReviewForm(false)} className="w-8 h-8 rounded-md hover:bg-muted">
+                                    <X size={18} className="text-text-light" />
                                 </Button>
                             </div>
 
                             {/* Star Rating */}
                             <div className="mb-4">
-                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Rating</label>
+                                <label className="text-sm font-medium text-foreground mb-2 block">Rating</label>
                                 <div className="flex gap-1">
                                     {Array.from({ length: 5 }).map((_, i) => (
                                         <button
@@ -487,7 +487,7 @@ export default function ClientDashboard() {
 
                             {/* Review Text */}
                             <div className="mb-6">
-                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Your Review</label>
+                                <label className="text-sm font-medium text-foreground mb-2 block">Your Review</label>
                                 <Textarea
                                     value={reviewFormData.review}
                                     onChange={(e) =>
@@ -501,7 +501,7 @@ export default function ClientDashboard() {
 
                             {/* Image Upload */}
                             <div className="mb-6">
-                                <label className="text-sm font-medium text-[#0D0D0D] mb-2 block">Add a Photo (Optional)</label>
+                                <label className="text-sm font-medium text-foreground mb-2 block">Add a Photo (Optional)</label>
                                 <ImageUpload
                                     existingImages={[]}
                                     newFiles={reviewNewImageFiles}
@@ -515,7 +515,7 @@ export default function ClientDashboard() {
                             <Button
                                 onClick={() => reviewSubmitMutation.mutate(reviewFormData)}
                                 disabled={!reviewFormData.review.trim() || reviewSubmitMutation.isPending}
-                                className="w-full flex h-auto items-center justify-center gap-2 py-3 rounded-md bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors disabled:opacity-50"
+                                className="w-full flex h-auto items-center justify-center gap-2 py-3 rounded-md bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
                             >
                                 <Send size={16} />
                                 {reviewSubmitMutation.isPending ? "Submitting..." : "Submit Review"}

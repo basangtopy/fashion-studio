@@ -14,7 +14,7 @@ import useDebounce from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const STOCK_STATUS = { IN_STOCK: { label: "In Stock", color: "#2E7D32", bg: "#E8F5E9" }, LOW_STOCK: { label: "Low Stock", color: "#E65100", bg: "#FFF3E0" }, OUT_OF_STOCK: { label: "Sold Out", color: "#B71C1C", bg: "#FFEBEE" } };
+const STOCK_STATUS = { IN_STOCK: { label: "In Stock", color: 'var(--color-status-success)', bg: "#E8F5E9" }, LOW_STOCK: { label: "Low Stock", color: 'var(--color-status-warning)', bg: "#FFF3E0" }, OUT_OF_STOCK: { label: "Sold Out", color: "#B71C1C", bg: "#FFEBEE" } };
 
 export default function ReadyToWearPage() {
     const [category, setCategory] = useState("All");
@@ -59,7 +59,7 @@ export default function ReadyToWearPage() {
     return (
         <div className="pt-[var(--nav-height)]">
             {/* Header */}
-            <div className="bg-[#1A1A2E] py-12 lg:py-16">
+            <div className="bg-secondary py-12 lg:py-16">
                 <div className="page-container">
                     <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Ready-to-Wear</h1>
                     <p className="text-white/60">Pre-made garments crafted with care, ready for you.</p>
@@ -67,14 +67,14 @@ export default function ReadyToWearPage() {
             </div>
 
             {/* Filter Bar */}
-            <div className="sticky top-[var(--nav-height)] z-30 bg-white border-b border-[rgba(0,0,0,0.06)] py-3">
+            <div className="sticky top-[var(--nav-height)] z-30 bg-background border-b border-border py-3">
                 <div className="page-container flex flex-col sm:flex-row items-start sm:items-center gap-3">
                     <div className="flex gap-2 overflow-x-auto no-scrollbar flex-1 min-w-0 w-full">
                         {isLoadingCategories ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className="animate-pulse bg-[#F4F0F8] rounded-full h-[32px] w-[80px] sm:w-[100px] shrink-0"
+                                    className="animate-pulse bg-muted rounded-full h-[32px] w-[80px] sm:w-[100px] shrink-0"
                                 />
                             ))
                         ) : (
@@ -83,9 +83,9 @@ export default function ReadyToWearPage() {
                                     variant="ghost"
                                     key={cat}
                                     onClick={() => setCategory(cat)}
-                                    className={`px-4 py-1.5 h-auto rounded-full text-sm font-medium whitespace-nowrap transition-colors hover:bg-[#E0E0E0] hover:text-[#555] ${category === cat
-                                        ? "bg-[#C2185B] text-white hover:bg-[#C2185B] hover:text-white"
-                                        : "bg-[#F4F0F8] text-[#555] hover:bg-[#F8E8F0]"
+                                    className={`px-4 py-1.5 h-auto rounded-full text-sm font-medium whitespace-nowrap transition-colors hover:bg-[#E0E0E0] hover:text-muted-foreground ${category === cat
+                                        ? "bg-primary text-white hover:bg-primary hover:text-white"
+                                        : "bg-muted text-muted-foreground hover:bg-[#F8E8F0]"
                                         }`}
                                 >
                                     {cat}
@@ -94,13 +94,13 @@ export default function ReadyToWearPage() {
                         )}
                     </div>
                     <div className="relative">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
                         <Input
                             type="text"
                             placeholder="Search..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-8 pr-3 h-[32px] text-sm border-[#E0E0E0] w-40 focus-visible:w-56 transition-all bg-white"
+                            className="pl-8 pr-3 h-[32px] text-sm border-input w-40 focus-visible:w-56 transition-all bg-white"
                         />
                     </div>
                 </div>
@@ -126,10 +126,10 @@ export default function ReadyToWearPage() {
                                     initial={{ opacity: 0, scale: 0.97 }}
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.3, delay: i * 0.05 }}
-                                    className="group rounded-xl overflow-hidden border border-[rgba(0,0,0,0.06)] card-hover bg-white"
+                                    className="group rounded-xl overflow-hidden border border-border card-hover bg-white"
                                 >
                                     <Link href={`/catalog/ready-to-wear/${item.id}`}>
-                                        <div className="relative aspect-[4/5] bg-[#F4F0F8] overflow-hidden">
+                                        <div className="relative aspect-[4/5] bg-muted overflow-hidden">
                                             {item.images?.[0] ? (
                                                 <>
                                                     {/* blurred background */}
@@ -153,13 +153,13 @@ export default function ReadyToWearPage() {
                                             </span>
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="text-sm font-semibold text-[#0D0D0D] mb-1">{item.name}</h3>
-                                            <p className="text-lg font-bold font-mono-data text-[#C2185B] mb-2">
+                                            <h3 className="text-sm font-semibold text-foreground mb-1">{item.name}</h3>
+                                            <p className="text-lg font-bold font-mono-data text-primary mb-2">
                                                 {formatCurrency(item.price)}
                                             </p>
                                             <div className="flex gap-1 flex-wrap">
                                                 {(item.availableSizes || []).map((size) => (
-                                                    <span key={size} className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4F0F8] text-[#555]">
+                                                    <span key={size} className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
                                                         {size}
                                                     </span>
                                                 ))}
@@ -187,7 +187,7 @@ export default function ReadyToWearPage() {
                         <Button
                             onClick={() => fetchNextPage()}
                             disabled={isFetchingNextPage}
-                            className="px-8 py-3 h-auto rounded-full bg-[#1A1A2E] text-white text-sm font-medium hover:bg-[#0D0D0D] transition-colors disabled:opacity-70 flex items-center gap-2"
+                            className="px-8 py-3 h-auto rounded-full bg-secondary text-white text-sm font-medium hover:bg-[#0D0D0D] transition-colors disabled:opacity-70 flex items-center gap-2"
                         >
                             {isFetchingNextPage ? (
                                 <>

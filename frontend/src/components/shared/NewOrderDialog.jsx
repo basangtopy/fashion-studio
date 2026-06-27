@@ -17,7 +17,7 @@ const OPTIONS = [
         description:
             "Browse our curated style catalog and pick a design to bring to life — bespoke-fitted to you.",
         href: "/catalog/styles",
-        color: "#C2185B",
+        color: 'var(--color-brand-primary)',
         bg: "#FFF5F8",
         border: "#C2185B",
     },
@@ -27,7 +27,7 @@ const OPTIONS = [
         description:
             "Have your own design in mind? Share your vision — images, descriptions, references — and we'll craft it exactly.",
         href: "/client/orders/new?mode=custom",
-        color: "#1565C0",
+        color: 'var(--color-status-info)',
         bg: "#EFF6FF",
         border: "#1565C0",
     },
@@ -47,7 +47,7 @@ export default function NewOrderDialog({ open, onOpenChange }) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden border-0 shadow-2xl rounded-2xl">
                 {/* Dark header */}
-                <div className="bg-[#1A1A2E] px-6 pt-6 pb-5 relative">
+                <div className="bg-secondary px-6 pt-6 pb-5 relative">
                     <DialogHeader>
                         <DialogTitle className="text-white text-lg font-bold leading-snug">
                             Start a New Order
@@ -57,11 +57,11 @@ export default function NewOrderDialog({ open, onOpenChange }) {
                         </p>
                     </DialogHeader>
                     {/* Decorative glow */}
-                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-[#C2185B]/10 blur-3xl pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
                 </div>
 
                 {/* Options */}
-                <div className="p-5 space-y-3 bg-[#FAFAFA]">
+                <div className="p-5 space-y-3 bg-surface-2">
                     {OPTIONS.map((opt, i) => {
                         const Icon = opt.icon;
                         return (
@@ -75,7 +75,7 @@ export default function NewOrderDialog({ open, onOpenChange }) {
                                 <Link
                                     href={opt.href}
                                     onClick={() => onOpenChange(false)}
-                                    className="group flex items-start gap-4 p-4 rounded-xl border-2 border-transparent bg-white hover:border-[var(--opt-border)] transition-all duration-200 shadow-sm hover:shadow-md"
+                                    className="group flex items-start gap-4 p-4 rounded-xl border-2 border-transparent bg-popover hover:border-[var(--opt-border)] transition-all duration-200 shadow-sm hover:shadow-md"
                                     style={{ "--opt-border": opt.border + "33" }}
                                 >
                                     <div
@@ -85,16 +85,16 @@ export default function NewOrderDialog({ open, onOpenChange }) {
                                         <Icon size={18} style={{ color: opt.color }} />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-[#0D0D0D] mb-0.5">
+                                        <p className="text-sm font-semibold text-foreground mb-0.5">
                                             {opt.label}
                                         </p>
-                                        <p className="text-xs text-[#999] leading-relaxed">
+                                        <p className="text-xs text-text-light leading-relaxed">
                                             {opt.description}
                                         </p>
                                     </div>
                                     <ArrowRight
                                         size={15}
-                                        className="shrink-0 text-[#CCC] group-hover:text-[#555] group-hover:translate-x-0.5 transition-all duration-200 mt-1.5"
+                                        className="shrink-0 text-[#CCC] group-hover:text-muted-foreground group-hover:translate-x-0.5 transition-all duration-200 mt-1.5"
                                     />
                                 </Link>
                             </motion.div>
@@ -103,10 +103,10 @@ export default function NewOrderDialog({ open, onOpenChange }) {
                 </div>
 
                 {/* Footer note */}
-                <div className="px-5 pb-5 pt-0 bg-[#FAFAFA]">
+                <div className="px-5 pb-5 pt-0 bg-surface-2">
                     <p className="text-[10px] text-center text-[#BDBDBD] leading-relaxed">
                         All bespoke orders start at{" "}
-                        <span className="text-[#999] font-semibold">Pending Review</span>{" "}
+                        <span className="text-text-light font-semibold">Pending Review</span>{" "}
                         — our studio will contact you with a quote within 24 hours.
                     </p>
                 </div>

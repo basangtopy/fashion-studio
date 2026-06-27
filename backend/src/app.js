@@ -38,6 +38,8 @@ app.use(passport.initialize());
 // ─── Logging Middleware ────────────────────────────────────────────────────
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
+} else {
+  app.use(morgan("combined"));
 }
 
 // ─── Health Check ─────────────────────────────────────────────────────────

@@ -38,6 +38,7 @@
   --color-status-warning: #E65100;
   --color-status-error: #C62828;
   --color-status-info: #1565C0;
+  --color-accent-purple: #6A1B9A;
 
   /* Font Families */
   --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
@@ -120,6 +121,11 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: rgba(255, 255, 255, 0.1);
   --sidebar-ring: #C2185B;
+  --surface-1: #FFFFFF;
+  --surface-2: #FAFAFA;
+  --surface-3: #F4F0F8;
+  --shimmer: #E8E8E8;
+
 
   /* ---- Fluid Typography ---- */
   --fs-xs: clamp(0.6875rem, 0.65rem + 0.1vw, 0.75rem);
@@ -178,6 +184,7 @@
   --border: rgba(255, 255, 255, 0.1);
   --input: rgba(255, 255, 255, 0.15);
   --ring: #E91E6B;
+  --color-accent-purple: #AB47BC;
 }
 
 /* ============================================

@@ -101,7 +101,7 @@ export default function AdminOrdersPage() {
 
     const SortIcon = ({ field }) => {
         if (sortBy !== field) return <ArrowUpDown size={12} className="text-[#BDBDBD]" />;
-        return sortDir === "asc" ? <ArrowUp size={12} className="text-[#C2185B]" /> : <ArrowDown size={12} className="text-[#C2185B]" />;
+        return sortDir === "asc" ? <ArrowUp size={12} className="text-primary" /> : <ArrowDown size={12} className="text-primary" />;
     };
 
     const toggleStatus = (val) => {
@@ -183,11 +183,11 @@ export default function AdminOrdersPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-[#0D0D0D]">Orders</h1>
-                    <p className="text-sm text-[#999]">{total} total orders</p>
+                    <h1 className="text-2xl font-bold text-foreground">Orders</h1>
+                    <p className="text-sm text-text-light">{total} total orders</p>
                 </div>
                 <Link href="/admin/orders/new">
-                    <Button className="bg-[#C2185B] text-white hover:bg-[#A01548] gap-1.5 h-9">
+                    <Button className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5 h-9">
                         <Plus size={14} /> New Order
                     </Button>
                 </Link>
@@ -196,7 +196,7 @@ export default function AdminOrdersPage() {
             {/* Filters */}
             <div className="flex flex-wrap items-end gap-3 mb-6">
                 <div className="relative flex-1 min-w-[200px] max-w-sm">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#999]" />
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" />
                     <Input type="text" placeholder="Search orders..." value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
                         className="pl-8 h-9 bg-white" />
                 </div>
@@ -204,11 +204,11 @@ export default function AdminOrdersPage() {
                 {/* Multi-select status filter */}
                 <Popover open={statusPopoverOpen} onOpenChange={setStatusPopoverOpen}>
                     <PopoverTrigger asChild>
-                        <button className={`h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors flex items-center justify-between gap-2 bg-white w-[160px] ${statusFilter.length > 0 ? "border-[#C2185B]/30 text-[#C2185B] shadow-sm" : statusPopoverOpen ? "border-[#C2185B] ring-2 ring-[#C2185B]/10" : "border-[#E0E0E0] text-[#555] hover:border-[#C2185B]/40 hover:bg-[#FAFAFA]"}`}>
+                        <button className={`h-9 px-3 rounded-lg border text-[13px] font-medium transition-colors flex items-center justify-between gap-2 bg-white w-[160px] ${statusFilter.length > 0 ? "border-primary/30 text-primary shadow-sm" : statusPopoverOpen ? "border-primary ring-2 ring-ring/10" : "border-input text-muted-foreground hover:border-primary/40 hover:bg-surface-2"}`}>
                             <span className="truncate">{statusFilter.length > 0 ? `${statusFilter.length} Selected` : "Status"}</span>
                             <div className="flex items-center gap-1">
                                 {statusFilter.length > 0 && (
-                                    <span className="bg-[#C2185B] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center shrink-0">{statusFilter.length}</span>
+                                    <span className="bg-primary text-primary-foreground text-[10px] rounded-full w-4 h-4 flex items-center justify-center shrink-0">{statusFilter.length}</span>
                                 )}
                                 <svg width="10" height="6" viewBox="0 0 10 6" fill="none" className={`transition-transform opacity-50 ${statusPopoverOpen ? "rotate-180" : ""}`}><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                             </div>
@@ -218,8 +218,8 @@ export default function AdminOrdersPage() {
                         <div className="max-h-[280px] overflow-y-auto custom-scrollbar space-y-0.5">
                             {Object.entries(ORDER_STATUS).map(([key, val]) => (
                                 <button key={key} onClick={() => toggleStatus(key)}
-                                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs transition-colors ${statusFilter.includes(key) ? "bg-[#C2185B]/8 text-[#C2185B] font-medium" : "text-[#0D0D0D] hover:bg-[#FAFAFA]"}`}>
-                                    <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 ${statusFilter.includes(key) ? "bg-[#C2185B] border-[#C2185B]" : "border-[#D0D0D0] bg-white"} transition-colors`}>
+                                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs transition-colors ${statusFilter.includes(key) ? "bg-primary/8 text-primary font-medium" : "text-foreground hover:bg-surface-2"}`}>
+                                    <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 ${statusFilter.includes(key) ? "bg-primary border-primary" : "border-[#D0D0D0] bg-popover"} transition-colors`}>
                                         {statusFilter.includes(key) && <Check size={10} className="text-white" />}
                                     </div>
                                     {val.label}
@@ -227,7 +227,7 @@ export default function AdminOrdersPage() {
                             ))}
                         </div>
                         {statusFilter.length > 0 && (
-                            <button onClick={() => { setStatusFilter([]); setPage(1); }} className="w-full mt-1.5 pt-1.5 border-t border-[#F0F0F0] text-[11px] font-medium text-[#999] hover:text-[#C2185B] text-center py-1 transition-colors">Clear Selection</button>
+                            <button onClick={() => { setStatusFilter([]); setPage(1); }} className="w-full mt-1.5 pt-1.5 border-t border-[#F0F0F0] text-[11px] font-medium text-text-light hover:text-primary text-center py-1 transition-colors">Clear Selection</button>
                         )}
                     </PopoverContent>
                 </Popover>
@@ -239,7 +239,7 @@ export default function AdminOrdersPage() {
                     <PopoverTrigger asChild>
                         <Button
                             variant="outline"
-                            className={`h-9 px-3 border-[#E0E0E0] bg-white hover:bg-[#FAFAFA] hover:border-[#C2185B]/40 text-[13px] font-medium justify-start ${!dateRange?.from && "text-[#555]"} `}
+                            className={`h-9 px-3 border-input bg-popover hover:bg-surface-2 hover:border-primary/40 text-[13px] font-medium justify-start ${!dateRange?.from && "text-muted-foreground"} `}
                         >
                             <CalendarIcon className="mr-2 h-4 w-4 opacity-70" />
                             {dateRange?.from ? (
@@ -268,11 +268,11 @@ export default function AdminOrdersPage() {
                 </Popover>
 
                 {/* View toggle */}
-                <div className="flex bg-[#F4F0F8] rounded-lg p-0.5 ml-auto">
+                <div className="flex bg-muted rounded-lg p-0.5 ml-auto">
                     <TooltipProvider>
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger asChild>
-                                <button onClick={() => setViewMode("table")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "table" ? "bg-white text-[#0D0D0D] shadow-sm" : "text-[#999]"}`}>
+                                <button onClick={() => setViewMode("table")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "table" ? "bg-popover text-foreground shadow-sm" : "text-text-light"}`}>
                                     <List size={14} />
                                 </button>
                             </TooltipTrigger>
@@ -282,7 +282,7 @@ export default function AdminOrdersPage() {
                     <TooltipProvider>
                         <Tooltip delayDuration={300}>
                             <TooltipTrigger asChild>
-                                <button onClick={() => setViewMode("kanban")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "kanban" ? "bg-white text-[#0D0D0D] shadow-sm" : "text-[#999]"}`}>
+                                <button onClick={() => setViewMode("kanban")} className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${viewMode === "kanban" ? "bg-popover text-foreground shadow-sm" : "text-text-light"}`}>
                                     <LayoutGrid size={14} />
                                 </button>
                             </TooltipTrigger>
@@ -296,27 +296,27 @@ export default function AdminOrdersPage() {
             {(statusFilter.length > 0 || typeFilter || searchQuery || dateRange?.from || dateRange?.to) && (
                 <div className="flex flex-wrap items-center gap-2 mb-4">
                     {statusFilter.map(s => (
-                        <button key={s} onClick={() => toggleStatus(s)} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#C2185B]/8 text-[#C2185B] text-[11px] font-medium hover:bg-[#C2185B]/15 transition-colors">
+                        <button key={s} onClick={() => toggleStatus(s)} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/8 text-primary text-[11px] font-medium hover:bg-primary/15 transition-colors">
                             {ORDER_STATUS[s]?.label || s} <X size={12} />
                         </button>
                     ))}
                     {typeFilter && (
-                        <button onClick={() => { setTypeFilter(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#6A1B9A]/8 text-[#6A1B9A] text-[11px] font-medium hover:bg-[#6A1B9A]/15 transition-colors">
+                        <button onClick={() => { setTypeFilter(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent-purple/8 text-accent-purple text-[11px] font-medium hover:bg-accent-purple/15 transition-colors">
                             Type: {ORDER_TYPES[typeFilter]?.label || ORDER_TYPES[typeFilter]?.short || typeFilter} <X size={12} />
                         </button>
                     )}
                     {searchQuery && (
-                        <button onClick={() => { setSearchQuery(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#1565C0]/8 text-[#1565C0] text-[11px] font-medium hover:bg-[#1565C0]/15 transition-colors">
+                        <button onClick={() => { setSearchQuery(""); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-status-info/8 text-status-info text-[11px] font-medium hover:bg-status-info/15 transition-colors">
                             {searchQuery} <X size={12} />
                         </button>
                     )}
                     {(dateRange?.from || dateRange?.to) && (
-                        <button onClick={() => { setDateRange({ from: undefined, to: undefined }); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#2E7D32]/8 text-[#2E7D32] text-[11px] font-medium hover:bg-[#2E7D32]/15 transition-colors">
+                        <button onClick={() => { setDateRange({ from: undefined, to: undefined }); setPage(1); }} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-status-success/8 text-status-success text-[11px] font-medium hover:bg-status-success/15 transition-colors">
                             {dateRange?.from ? fmtDate(dateRange.from) : "..."} → {dateRange?.to ? fmtDate(dateRange.to) : "..."} <X size={12} />
                         </button>
                     )}
                     <button onClick={() => { setStatusFilter([]); setTypeFilter(""); setSearchQuery(""); setDateRange({ from: undefined, to: undefined }); setPage(1); }}
-                        className="text-[11px] text-[#999] hover:text-[#C2185B] font-medium transition-colors">
+                        className="text-[11px] text-text-light hover:text-primary font-medium transition-colors">
                         Clear all
                     </button>
                 </div>
@@ -332,17 +332,17 @@ export default function AdminOrdersPage() {
                         <div className="space-y-3 lg:hidden">
                             {orders.map((order) => (
                                 <Link key={order.id} href={`/admin/orders/${order.id}`}
-                                    className="flex items-center justify-between p-4 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
+                                    className="flex items-center justify-between p-4 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <p className="font-mono text-xs text-[#C2185B]">{order.orderNumber}</p>
+                                            <p className="font-mono text-xs text-primary">{order.orderNumber}</p>
                                             <StatusPill status={order.status} size="small" />
                                         </div>
-                                        <p className="text-sm font-medium text-[#0D0D0D] truncate">{order.client?.fullName || "—"}</p>
-                                        <p className="text-xs text-[#999] mt-0.5">{ORDER_TYPES[order.orderType]?.short || "—"} • {new Date(order.createdAt).toLocaleDateString("en-NG")}</p>
+                                        <p className="text-sm font-medium text-foreground truncate">{order.client?.fullName || "—"}</p>
+                                        <p className="text-xs text-text-light mt-0.5">{ORDER_TYPES[order.orderType]?.short || "—"} • {new Date(order.createdAt).toLocaleDateString("en-NG")}</p>
                                     </div>
                                     <div className="text-right shrink-0 ml-3">
-                                        {order.totalAgreedFee ? <p className="text-sm font-mono font-semibold text-[#0D0D0D]">{formatCurrency(order.totalAgreedFee)}</p> : null}
+                                        {order.totalAgreedFee ? <p className="text-sm font-mono font-semibold text-foreground">{formatCurrency(order.totalAgreedFee)}</p> : null}
                                         <ChevronRight size={14} className="text-[#D0D0D0] ml-auto mt-1" />
                                     </div>
                                 </Link>
@@ -350,45 +350,45 @@ export default function AdminOrdersPage() {
                         </div>
 
                         {/* Desktop table */}
-                        <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden hidden lg:block">
+                        <div className="rounded-xl border border-border bg-white overflow-hidden hidden lg:block">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
-                                            <th className="text-left text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none hover:text-[#0D0D0D] transition-colors" onClick={() => toggleSort("orderNumber")}>
+                                        <tr className="border-b border-border bg-surface-2">
+                                            <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("orderNumber")}>
                                                 <span className="flex items-center gap-1">Order # <SortIcon field="orderNumber" /></span>
                                             </th>
-                                            <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Client</th>
-                                            <th className="text-left text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none hover:text-[#0D0D0D] transition-colors" onClick={() => toggleSort("orderType")}>
+                                            <th className="text-left text-xs font-medium text-text-light py-3 px-4">Client</th>
+                                            <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("orderType")}>
                                                 <span className="flex items-center gap-1">Type <SortIcon field="orderType" /></span>
                                             </th>
-                                            <th className="text-left text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none hover:text-[#0D0D0D] transition-colors" onClick={() => toggleSort("status")}>
+                                            <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("status")}>
                                                 <span className="flex items-center gap-1">Status <SortIcon field="status" /></span>
                                             </th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none hover:text-[#0D0D0D] transition-colors" onClick={() => toggleSort("totalAgreedFee")}>
+                                            <th className="text-right text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("totalAgreedFee")}>
                                                 <span className="flex items-center gap-1 justify-end">Agreed Fee <SortIcon field="totalAgreedFee" /></span>
                                             </th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4">Total Paid</th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none hover:text-[#0D0D0D] transition-colors" onClick={() => toggleSort("createdAt")}>
+                                            <th className="text-right text-xs font-medium text-text-light py-3 px-4">Total Paid</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("createdAt")}>
                                                 <span className="flex items-center gap-1 justify-end">Date <SortIcon field="createdAt" /></span>
                                             </th>
-                                            <th className="text-right text-xs font-medium text-[#999] py-3 px-4 w-24">Action</th>
+                                            <th className="text-right text-xs font-medium text-text-light py-3 px-4 w-24">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {orders.map((order) => {
                                             return (
-                                                <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors group">
-                                                    <td className="py-3 px-4"><Link href={`/admin/orders/${order.id}`} className="font-mono-data text-xs text-[#C2185B] hover:underline">{order.orderNumber}</Link></td>
+                                                <tr key={order.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-surface-2 transition-colors group">
+                                                    <td className="py-3 px-4"><Link href={`/admin/orders/${order.id}`} className="font-mono-data text-xs text-primary hover:underline">{order.orderNumber}</Link></td>
                                                     <td className="py-3 px-4">{order.client?.fullName || "—"}</td>
-                                                    <td className="py-3 px-4 text-xs text-[#555]">{ORDER_TYPES[order.orderType]?.short || "—"}</td>
+                                                    <td className="py-3 px-4 text-xs text-muted-foreground">{ORDER_TYPES[order.orderType]?.short || "—"}</td>
                                                     <td className="py-3 px-4"><StatusPill status={order.status} size="small" /></td>
                                                     <td className="py-3 px-4 text-right font-mono-data">{order.totalAgreedFee ? formatCurrency(order.totalAgreedFee) : "—"}</td>
-                                                    <td className="py-3 px-4 text-right font-mono-data text-[#555]">{formatCurrency(order.totalPaid)}</td>
-                                                    <td className="py-3 px-4 text-right text-xs text-[#999]">{new Date(order.createdAt).toLocaleDateString("en-NG")}</td>
+                                                    <td className="py-3 px-4 text-right font-mono-data text-muted-foreground">{formatCurrency(order.totalPaid)}</td>
+                                                    <td className="py-3 px-4 text-right text-xs text-text-light">{new Date(order.createdAt).toLocaleDateString("en-NG")}</td>
                                                     <td className="py-3 px-4 text-right">
                                                         <Link href={`/admin/orders/${order.id}`}
-                                                            className="text-xs text-[#C2185B] font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
+                                                            className="text-xs text-primary font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity inline-flex items-center gap-1">
                                                             Manage <ArrowRight size={10} />
                                                         </Link>
                                                     </td>
@@ -403,11 +403,11 @@ export default function AdminOrdersPage() {
                         {/* Pagination */}
                         {totalPages > 1 && (
                             <div className="flex items-center justify-center gap-2 mt-6">
-                                <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="gap-1 text-[#555]">
+                                <Button variant="outline" size="sm" onClick={() => setPage(Math.max(1, page - 1))} disabled={page <= 1} className="gap-1 text-muted-foreground">
                                     <ChevronLeft size={14} /> Prev
                                 </Button>
-                                <span className="text-xs text-[#999]">Page {page} of {totalPages}</span>
-                                <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="gap-1 text-[#555]">
+                                <span className="text-xs text-text-light">Page {page} of {totalPages}</span>
+                                <Button variant="outline" size="sm" onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page >= totalPages} className="gap-1 text-muted-foreground">
                                     Next <ChevronRight size={14} />
                                 </Button>
                             </div>
@@ -430,11 +430,11 @@ export default function AdminOrdersPage() {
                                     return (
                                         <div key={col.key} className="w-[280px] shrink-0 flex flex-col h-[65vh]">
                                             <div className="flex items-center justify-between mb-2 px-1 shrink-0">
-                                                <h3 className="text-[10px] font-semibold text-[#555] uppercase tracking-wider">{col.label}</h3>
-                                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#F4F0F8] text-[#999] font-mono-data">{colOrders.length}</span>
+                                                <h3 className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{col.label}</h3>
+                                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-muted text-text-light font-mono-data">{colOrders.length}</span>
                                             </div>
                                             <div
-                                                className={`space-y-2 flex-1 overflow-y-auto custom-scrollbar px-1 pb-4 rounded-xl transition-colors border-2 ${isDragOver ? "bg-[#C2185B]/5 border-[#C2185B]" : "border-transparent"}`}
+                                                className={`space-y-2 flex-1 overflow-y-auto custom-scrollbar px-1 pb-4 rounded-xl transition-colors border-2 ${isDragOver ? "bg-primary/5 border-primary" : "border-transparent"}`}
                                                 onDragOver={(e) => handleDragOver(e, col.key)}
                                                 onDragLeave={handleDragLeave}
                                                 onDrop={(e) => handleDrop(e, col.key)}
@@ -448,24 +448,24 @@ export default function AdminOrdersPage() {
                                                             onDragStart={(e) => handleDragStart(e, order.id, col.key)}
                                                             onDragEnd={handleDragEnd}
                                                             className={`block p-3 rounded-xl border bg-white transition-all shadow-[0_1px_2px_rgba(0,0,0,0.02)]
-                                                                ${isDragging ? "opacity-50 scale-95" : "opacity-100 hover:border-[#C2185B]/30 hover:shadow-sm"} 
-                                                                ${isUpdating ? "opacity-60 grayscale pointer-events-none" : "border-[rgba(0,0,0,0.06)] cursor-grab active:cursor-grabbing"}`}
+                                                                ${isDragging ? "opacity-50 scale-95" : "opacity-100 hover:border-primary/30 hover:shadow-sm"} 
+                                                                ${isUpdating ? "opacity-60 grayscale pointer-events-none" : "border-border cursor-grab active:cursor-grabbing"}`}
                                                         >
                                                             <div className="flex items-center justify-between mb-1.5">
                                                                 <div className="flex items-center gap-1.5">
-                                                                    <p className="text-[10px] font-mono-data text-[#C2185B] font-medium">{order.orderNumber}</p>
-                                                                    {isUpdating && <Loader2 size={10} className="animate-spin text-[#999]" />}
+                                                                    <p className="text-[10px] font-mono-data text-primary font-medium">{order.orderNumber}</p>
+                                                                    {isUpdating && <Loader2 size={10} className="animate-spin text-text-light" />}
                                                                 </div>
-                                                                {order.totalAgreedFee && <span className="text-[10px] text-[#0D0D0D] font-mono-data font-semibold">{formatCurrency(order.totalAgreedFee)}</span>}
+                                                                {order.totalAgreedFee && <span className="text-[10px] text-foreground font-mono-data font-semibold">{formatCurrency(order.totalAgreedFee)}</span>}
                                                             </div>
-                                                            <p className="text-sm font-semibold text-[#0D0D0D] mb-1 truncate">{order.client?.fullName || "Client"}</p>
-                                                            <p className="text-[11px] text-[#555] truncate">{order.style?.name || ORDER_TYPES[order.orderType]?.short || "—"}</p>
+                                                            <p className="text-sm font-semibold text-foreground mb-1 truncate">{order.client?.fullName || "Client"}</p>
+                                                            <p className="text-[11px] text-muted-foreground truncate">{order.style?.name || ORDER_TYPES[order.orderType]?.short || "—"}</p>
                                                         </Link>
                                                     );
                                                 })}
                                                 {colOrders.length === 0 && (
-                                                    <div className="p-4 rounded-xl border border-dashed border-[#E0E0E0] text-center pointer-events-none">
-                                                        <p className="text-[11px] text-[#999]">{isDragOver ? "Drop Here" : "Empty"}</p>
+                                                    <div className="p-4 rounded-xl border border-dashed border-input text-center pointer-events-none">
+                                                        <p className="text-[11px] text-text-light">{isDragOver ? "Drop Here" : "Empty"}</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -484,16 +484,16 @@ export default function AdminOrdersPage() {
                             return (
                                 <div key={col.key}>
                                     <div className="flex items-center justify-between mb-2">
-                                        <h3 className="text-xs font-semibold text-[#555] uppercase tracking-wider">{col.label}</h3>
-                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F4F0F8] text-[#999] font-mono-data">{colOrders.length}</span>
+                                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{col.label}</h3>
+                                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted text-text-light font-mono-data">{colOrders.length}</span>
                                     </div>
                                     <div className="space-y-2">
                                         {colOrders.map((order) => (
                                             <Link key={order.id} href={`/admin/orders/${order.id}`}
-                                                className="flex items-center justify-between p-3 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
+                                                className="flex items-center justify-between p-3 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors">
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-[10px] font-mono-data text-[#999]">{order.orderNumber}</p>
-                                                    <p className="text-sm font-medium text-[#0D0D0D] truncate">{order.client?.fullName}</p>
+                                                    <p className="text-[10px] font-mono-data text-text-light">{order.orderNumber}</p>
+                                                    <p className="text-sm font-medium text-foreground truncate">{order.client?.fullName}</p>
                                                 </div>
                                                 <div className="text-right shrink-0 ml-3">
                                                     {order.totalAgreedFee ? <p className="text-xs font-mono-data font-medium">{formatCurrency(order.totalAgreedFee)}</p> : null}

@@ -107,8 +107,9 @@ export default function OrderDetailPage() {
             const { data } = await api.get(`/chat/${id}`);
             return data.data?.messages || data.data || [];
         },
+        staleTime: 0,
         // SSE handles real-time; keep light polling as fallback
-        refetchInterval: 15000,
+        refetchInterval: 60000,
     });
 
     // ─── Mutations ───
@@ -147,7 +148,7 @@ export default function OrderDetailPage() {
         onSuccess: () => {
             setChatMessage("");
             setChatAttachment(null);
-            setChatAttachmentPreview(null);
+            setChatAttachmentPreview((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
             queryClient.invalidateQueries({ queryKey: ["chat", id] });
         },
     });
@@ -176,6 +177,7 @@ export default function OrderDetailPage() {
             setPayAmount("");
             setPayType("INSTALLMENT");
             setPayProof(null);
+            if (payProofPreview) URL.revokeObjectURL(payProofPreview);
             setPayProofPreview(null);
             setPayNotes("");
             queryClient.invalidateQueries({ queryKey: ["order", id] });
@@ -185,14 +187,18 @@ export default function OrderDetailPage() {
 
     // Auto-scroll chat
     useEffect(() => {
-        if (chatContainerRef.current && (mobileChatOpen || window.innerWidth >= 1024)) {
-            // Slight delay to allow display:block to render layout before scrolling
-            setTimeout(() => {
-                if (chatContainerRef.current) {
-                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-                }
-            }, 10);
-        }
+        if (!chatContainerRef.current) return;
+        // On mobile, only scroll when the chat panel is open.
+        // On desktop (lg+), the chat is always visible — check via CSS media query
+        // rather than window.innerWidth to be SSR-safe and respond to resize.
+        const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+        if (!mobileChatOpen && !isDesktop) return;
+
+        requestAnimationFrame(() => {
+            if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
+        });
     }, [chatMessages, mobileChatOpen]);
 
     // Intersection Observer to mark messages as read
@@ -247,7 +253,7 @@ export default function OrderDetailPage() {
     if (!order) {
         return (
             <div className="text-center py-12">
-                <p className="text-[#555]">Order not found.</p>
+                <p className="text-muted-foreground">Order not found.</p>
             </div>
         );
     }
@@ -299,7 +305,10 @@ export default function OrderDetailPage() {
         const file = e.target.files?.[0];
         if (file) {
             setChatAttachment(file);
-            setChatAttachmentPreview(URL.createObjectURL(file));
+            setChatAttachmentPreview((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(file);
+            });
         }
     };
 
@@ -307,7 +316,10 @@ export default function OrderDetailPage() {
         const file = e.target.files?.[0];
         if (file) {
             setPayProof(file);
-            setPayProofPreview(URL.createObjectURL(file));
+            setPayProofPreview((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(file);
+            });
         }
     };
 
@@ -323,12 +335,12 @@ export default function OrderDetailPage() {
             <div className="flex items-center gap-1.5 text-sm mb-6">
                 <Link
                     href="/client/orders"
-                    className="inline-flex items-center gap-1 text-[#999] hover:text-[#C2185B] transition-colors"
+                    className="inline-flex items-center gap-1 text-text-light hover:text-primary transition-colors"
                 >
                     <ArrowLeft size={14} /> My Orders
                 </Link>
-                <ChevronRight size={12} className="text-[#E0E0E0]" />
-                <span className="font-mono-data text-[#0D0D0D] font-medium">{order.orderNumber}</span>
+                <ChevronRight size={12} className="text-input" />
+                <span className="font-mono-data text-foreground font-medium">{order.orderNumber}</span>
             </div>
 
             {/* ─── Two-column layout: Left 65%, Right 35% ─── */}
@@ -337,14 +349,14 @@ export default function OrderDetailPage() {
                 <div className="lg:col-span-3 space-y-6">
 
                     {/* ── Order Status Card with Vertical Timeline ── */}
-                    <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
+                    <div className="p-6 rounded-xl border border-border bg-white">
                         <div className="flex items-start justify-between gap-4 mb-6">
                             <div className="min-w-0">
-                                <p className="text-xs font-mono-data text-[#999] mb-1">{order.orderNumber}</p>
-                                <h1 className="text-xl font-bold text-[#0D0D0D] truncate">
+                                <p className="text-xs font-mono-data text-text-light mb-1">{order.orderNumber}</p>
+                                <h1 className="text-xl font-bold text-foreground truncate">
                                     {order.style?.name || order.items?.[0]?.readyToWear?.name || typeConfig.label || "Order"}
                                 </h1>
-                                <p className="text-sm text-[#555] mt-1">{typeConfig.label}</p>
+                                <p className="text-sm text-muted-foreground mt-1">{typeConfig.label}</p>
                             </div>
                             <StatusPill status={order.status} />
                         </div>
@@ -370,42 +382,42 @@ export default function OrderDetailPage() {
                                         <div className="flex flex-col items-center">
                                             <div
                                                 className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${isCompleted
-                                                    ? "bg-[#2E7D32] border-[#2E7D32]"
+                                                    ? "bg-status-success border-[#2E7D32]"
                                                     : isCurrent
-                                                        ? "bg-[#C2185B] border-[#C2185B]"
-                                                        : "bg-white border-[#E0E0E0]"
+                                                        ? "bg-primary border-primary"
+                                                        : "bg-white border-input"
                                                     }`}
                                             >
                                                 {isCompleted && <Check size={10} className="text-white" />}
                                             </div>
                                             {i < timelineStages.length - 1 && (
-                                                <div className={`w-0.5 flex-1 min-h-[32px] ${isCompleted ? "bg-[#2E7D32]" : "bg-[#E0E0E0]"}`} />
+                                                <div className={`w-0.5 flex-1 min-h-[32px] ${isCompleted ? "bg-status-success" : "bg-[#E0E0E0]"}`} />
                                             )}
                                         </div>
 
                                         {/* Label + timestamp */}
                                         <div className={`pb-5 ${i === timelineStages.length - 1 ? "pb-0" : ""}`}>
                                             <p className={`text-sm font-medium ${isCurrent
-                                                ? "text-[#C2185B]"
+                                                ? "text-primary"
                                                 : isCompleted
-                                                    ? "text-[#0D0D0D]"
-                                                    : "text-[#999]"
+                                                    ? "text-foreground"
+                                                    : "text-text-light"
                                                 }`}>
                                                 {stage.label}
                                             </p>
 
                                             {showDetailedStatus && (
-                                                <p className="text-[11px] font-bold text-[#C2185B] mt-0.5 uppercase tracking-wider">
+                                                <p className="text-[11px] font-bold text-primary mt-0.5 uppercase tracking-wider">
                                                     Status: {actualStatusLabel}
                                                 </p>
                                             )}
 
                                             {(isCurrent || isCompleted) && !showDetailedStatus && (
-                                                <p className="text-xs text-[#999] mt-0.5">{stage.description}</p>
+                                                <p className="text-xs text-text-light mt-0.5">{stage.description}</p>
                                             )}
 
                                             {historyEntry && (
-                                                <p className="text-[10px] text-[#999] mt-0.5 font-mono-data">
+                                                <p className="text-[10px] text-text-light mt-0.5 font-mono-data">
                                                     {new Date(historyEntry.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                                 </p>
                                             )}
@@ -417,8 +429,8 @@ export default function OrderDetailPage() {
 
                         {/* Admin status note */}
                         {order.statusHistory?.[order.statusHistory.length - 1]?.note && (
-                            <div className="mt-4 p-3 rounded-lg bg-[#F4F0F8]">
-                                <p className="text-xs text-[#555] italic">
+                            <div className="mt-4 p-3 rounded-lg bg-muted">
+                                <p className="text-xs text-muted-foreground italic">
                                     &ldquo;{order.statusHistory[0].note}&rdquo;
                                 </p>
                             </div>
@@ -430,10 +442,10 @@ export default function OrderDetailPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="p-6 rounded-xl border-2 border-[#C2185B]/20 bg-[#F8E8F0]/30"
+                            className="p-6 rounded-xl border-2 border-primary/20 bg-[#F8E8F0]/30"
                         >
-                            <h3 className="text-base font-semibold text-[#0D0D0D] mb-3">Quote from Studio</h3>
-                            <p className="text-2xl font-bold font-mono-data text-[#C2185B] mb-4">
+                            <h3 className="text-base font-semibold text-foreground mb-3">Quote from Studio</h3>
+                            <p className="text-2xl font-bold font-mono-data text-primary mb-4">
                                 {formatCurrency(order.totalAgreedFee)}
                             </p>
 
@@ -441,14 +453,14 @@ export default function OrderDetailPage() {
                                 <button
                                     onClick={() => respondToQuote.mutate({ action: "ACCEPT" })}
                                     disabled={respondToQuote.isPending}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors text-sm"
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors text-sm"
                                 >
                                     <CheckCircle2 size={16} /> Accept Quote
                                 </button>
                                 <button
                                     onClick={() => setShowNegotiateForm(!showNegotiateForm)}
                                     disabled={respondToQuote.isPending}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border border-[rgba(0,0,0,0.12)] text-[#555] font-semibold hover:bg-[#F4F0F8] transition-colors text-sm"
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg border border-[rgba(0,0,0,0.12)] text-muted-foreground font-semibold hover:bg-muted transition-colors text-sm"
                                 >
                                     <XCircle size={16} /> Decline & Negotiate
                                 </button>
@@ -462,18 +474,18 @@ export default function OrderDetailPage() {
                                         exit={{ height: 0, opacity: 0 }}
                                         className="overflow-hidden"
                                     >
-                                        <div className="pt-3 border-t border-[rgba(0,0,0,0.06)]">
-                                            <label className="text-xs font-medium text-[#555] mb-1.5 block">Your counteroffer or note</label>
+                                        <div className="pt-3 border-t border-border">
+                                            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Your counteroffer or note</label>
                                             <textarea
                                                 value={negotiateNote}
                                                 onChange={(e) => setNegotiateNote(e.target.value)}
                                                 placeholder="Explain why you'd like a different price, or suggest an alternative amount..."
-                                                className="w-full h-20 px-3 py-2 text-sm border border-[#E0E0E0] rounded-lg focus:border-[#C2185B] outline-none resize-none"
+                                                className="w-full h-20 px-3 py-2 text-sm border border-input rounded-lg focus:border-ring outline-none resize-none"
                                             />
                                             <button
                                                 onClick={() => respondToQuote.mutate({ action: "DECLINE", negotiationNote: negotiateNote || "Client declined" })}
                                                 disabled={respondToQuote.isPending}
-                                                className="mt-2 px-4 py-2 rounded-lg bg-[#1A1A2E] text-white text-sm font-semibold hover:bg-[#2A2A40] transition-colors"
+                                                className="mt-2 px-4 py-2 rounded-lg bg-secondary text-white text-sm font-semibold hover:bg-secondary/80 transition-colors"
                                             >
                                                 Send Negotiation
                                             </button>
@@ -485,8 +497,8 @@ export default function OrderDetailPage() {
                     )}
 
                     {/* ── Order Details Card ── */}
-                    <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Order Details</h3>
+                    <div className="p-6 rounded-xl border border-border bg-white">
+                        <h3 className="text-sm font-semibold text-foreground mb-4">Order Details</h3>
                         <div className="space-y-3 text-sm">
                             {[
                                 { l: "Order Type", v: typeConfig.label },
@@ -496,53 +508,53 @@ export default function OrderDetailPage() {
                                 (!isModel3) && {
                                     l: "Measurements",
                                     v: order.measurementId || order.measurement
-                                        ? <span className="inline-flex items-center gap-1 text-[#2E7D32]"><CheckCircle2 size={12} /> Linked</span>
-                                        : <span className="inline-flex items-center gap-1 text-[#E65100]"><AlertCircle size={12} /> Not linked</span>
+                                        ? <span className="inline-flex items-center gap-1 text-status-success"><CheckCircle2 size={12} /> Linked</span>
+                                        : <span className="inline-flex items-center gap-1 text-status-warning"><AlertCircle size={12} /> Not linked</span>
                                 },
                                 order.deliveryAddress && { l: "Delivery Address", v: order.deliveryAddress },
                                 order.deliveryFee && { l: "Delivery Fee", v: <span className="font-mono-data">{formatCurrency(order.deliveryFee)}</span> },
                                 { l: "Created", v: new Date(order.createdAt).toLocaleDateString("en-NG", { dateStyle: "long" }) },
                             ].filter(Boolean).map(({ l, v }) => (
                                 <div key={l} className="flex items-start justify-between gap-4">
-                                    <span className="text-[#999] shrink-0">{l}</span>
-                                    <span className="overflow-x-auto whitespace-nowrap no-scrollbar font-medium text-[#0D0D0D] text-right ml-2 max-w-[200px]">{v}</span>
+                                    <span className="text-text-light shrink-0">{l}</span>
+                                    <span className="overflow-x-auto whitespace-nowrap no-scrollbar font-medium text-foreground text-right ml-2 max-w-[200px]">{v}</span>
                                 </div>
                             ))}
                         </div>
 
                         {/* Custom description */}
                         {order.customStyleDescription && (
-                            <div className="mt-4 pt-3 border-t border-[rgba(0,0,0,0.06)]">
-                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Custom Description</p>
-                                <p className="text-xs text-[#555] leading-relaxed">{order.customStyleDescription}</p>
+                            <div className="mt-4 pt-3 border-t border-border">
+                                <p className="text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">Custom Description</p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{order.customStyleDescription}</p>
                             </div>
                         )}
 
                         {/* Fabric notes */}
                         {order.fabricNotes && (
-                            <div className="mt-3 pt-3 border-t border-[rgba(0,0,0,0.06)]">
-                                <p className="text-[10px] font-semibold text-[#999] uppercase tracking-wider mb-1.5">Fabric Notes</p>
-                                <p className="text-xs text-[#555] leading-relaxed">{order.fabricNotes}</p>
+                            <div className="mt-3 pt-3 border-t border-border">
+                                <p className="text-[10px] font-semibold text-text-light uppercase tracking-wider mb-1.5">Fabric Notes</p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{order.fabricNotes}</p>
                             </div>
                         )}
 
                         {/* Model 3 — order items list */}
                         {isModel3 && order.items?.length > 0 && (
-                            <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.06)]">
-                                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Order Items</h4>
+                            <div className="mt-5 pt-5 border-t border-border">
+                                <h4 className="text-xs font-semibold text-text-light uppercase tracking-wider mb-3">Order Items</h4>
                                 <div className="space-y-3">
                                     {order.items.map((item, i) => (
-                                        <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[#FAFAFA]">
+                                        <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-surface-2">
                                             {item.readyToWear?.images?.[0] && (
-                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-[#F4F0F8] shrink-0">
+                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
                                                     <Image src={item.readyToWear.images[0]} alt={item.readyToWear?.name || ""} fill className="object-cover" />
                                                 </div>
                                             )}
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-[#0D0D0D] truncate">{item.readyToWear?.name || "Item"}</p>
-                                                <p className="text-xs text-[#999]">Size: {item.selectedSize} · Qty: {item.quantity}</p>
+                                                <p className="text-sm font-medium text-foreground truncate">{item.readyToWear?.name || "Item"}</p>
+                                                <p className="text-xs text-text-light">Size: {item.selectedSize} · Qty: {item.quantity}</p>
                                             </div>
-                                            <span className="text-sm font-mono-data font-semibold text-[#0D0D0D]">
+                                            <span className="text-sm font-mono-data font-semibold text-foreground">
                                                 {formatCurrency(item.priceAtPurchase)}
                                             </span>
                                         </div>
@@ -553,8 +565,8 @@ export default function OrderDetailPage() {
 
                         {/* Style image */}
                         {order.style?.images?.[0] && (
-                            <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.06)]">
-                                <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F4F0F8]">
+                            <div className="mt-5 pt-5 border-t border-border">
+                                <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-muted">
                                     {/* blurred background */}
                                     <Image src={order.style.images[0]} alt={order.style.name} fill className="object-cover blur-xl scale-110 opacity-100" />
                                     <Image src={order.style.images[0]} alt={order.style.name} fill className="object-contain" />
@@ -564,11 +576,11 @@ export default function OrderDetailPage() {
 
                         {/* Custom style images */}
                         {order.customStyleImages?.length > 0 && (
-                            <div className="mt-5 pt-5 border-t border-[rgba(0,0,0,0.06)]">
-                                <h4 className="text-xs font-semibold text-[#999] uppercase tracking-wider mb-3">Reference Images</h4>
+                            <div className="mt-5 pt-5 border-t border-border">
+                                <h4 className="text-xs font-semibold text-text-light uppercase tracking-wider mb-3">Reference Images</h4>
                                 <div className="grid grid-cols-3 gap-2">
                                     {order.customStyleImages.map((img, i) => (
-                                        <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-[#F4F0F8] cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setLightboxImage(img)}>
+                                        <div key={img} className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setLightboxImage(img)}>
                                             <Image src={img} alt={`Reference ${i + 1}`} fill className="object-cover" />
                                         </div>
                                     ))}
@@ -579,37 +591,37 @@ export default function OrderDetailPage() {
 
                     {/* Client notes */}
                     {order.clientNotes && (
-                        <div className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                            <h3 className="text-sm font-semibold text-[#0D0D0D] mb-2">Client Notes</h3>
-                            <p className="text-sm text-[#555] leading-relaxed">{order.clientNotes}</p>
+                        <div className="p-5 rounded-xl border border-border bg-white">
+                            <h3 className="text-sm font-semibold text-foreground mb-2">Client Notes</h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed">{order.clientNotes}</p>
                         </div>
                     )}
 
                     {/* ── Payment History Card ── */}
-                    <div className="p-6 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white">
-                        <h3 className="text-sm font-semibold text-[#0D0D0D] mb-4">Payment History</h3>
+                    <div className="p-6 rounded-xl border border-border bg-white">
+                        <h3 className="text-sm font-semibold text-foreground mb-4">Payment History</h3>
 
                         {/* Progress bar: paid vs agreed */}
                         {agreedFee > 0 && (
                             <div className="mb-5">
                                 <div className="flex justify-between text-xs mb-1.5">
-                                    <span className="text-[#999]">
-                                        Paid <span className="font-mono-data font-semibold text-[#2E7D32]">{formatCurrency(totalPaid)}</span>
+                                    <span className="text-text-light">
+                                        Paid <span className="font-mono-data font-semibold text-status-success">{formatCurrency(totalPaid)}</span>
                                     </span>
-                                    <span className="text-[#999]">
-                                        of <span className="font-mono-data font-semibold text-[#0D0D0D]">{formatCurrency(agreedFee)}</span>
+                                    <span className="text-text-light">
+                                        of <span className="font-mono-data font-semibold text-foreground">{formatCurrency(agreedFee)}</span>
                                     </span>
                                 </div>
-                                <div className="w-full h-2 rounded-full bg-[#F4F0F8]">
+                                <div className="w-full h-2 rounded-full bg-muted">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${paymentPercent}%` }}
                                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                                        className="h-full rounded-full bg-[#2E7D32]"
+                                        className="h-full rounded-full bg-status-success"
                                     />
                                 </div>
                                 {outstanding > 0 && (
-                                    <p className="text-xs font-mono-data text-[#E65100] mt-1.5">
+                                    <p className="text-xs font-mono-data text-status-warning mt-1.5">
                                         {formatCurrency(outstanding)} outstanding
                                     </p>
                                 )}
@@ -618,18 +630,18 @@ export default function OrderDetailPage() {
 
                         {/* Payment list */}
                         {payments.length === 0 ? (
-                            <p className="text-sm text-[#999] text-center py-4">No payments recorded yet.</p>
+                            <p className="text-sm text-text-light text-center py-4">No payments recorded yet.</p>
                         ) : (
                             <div className="space-y-2">
                                 {payments.map((p) => {
                                     const pStatus = PAYMENT_STATUS[p.status] || {};
                                     return (
-                                        <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-[#FAFAFA]">
+                                        <div key={p.id} className="flex items-center justify-between p-3 rounded-lg bg-surface-2">
                                             <div>
-                                                <p className="text-sm font-mono-data font-semibold text-[#0D0D0D]">
+                                                <p className="text-sm font-mono-data font-semibold text-foreground">
                                                     {formatCurrency(p.amount)}
                                                 </p>
-                                                <p className="text-[10px] text-[#999] mt-0.5">
+                                                <p className="text-[10px] text-text-light mt-0.5">
                                                     {p.paymentType === "FULL" ? "Full Payment" : "Installment"} · {new Date(p.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}
                                                 </p>
                                             </div>
@@ -644,7 +656,7 @@ export default function OrderDetailPage() {
                         {isPayable && (
                             <button
                                 onClick={() => setShowPayForm(true)}
-                                className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-[#2E7D32] text-white font-semibold hover:bg-[#1B5E20] transition-colors text-sm"
+                                className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-status-success text-white font-semibold hover:bg-[#1B5E20] transition-colors text-sm"
                             >
                                 <CreditCard size={16} /> Submit Payment
                             </button>
@@ -663,26 +675,26 @@ export default function OrderDetailPage() {
                         }}
                     >
                         <div
-                            className={`absolute bottom-0 left-0 right-0 h-[100dvh] lg:static lg:h-[calc(100vh-145px)] flex flex-col rounded-t-2xl lg:rounded-xl border-0 lg:border border-[rgba(0,0,0,0.06)] bg-white lg:overflow-hidden lg:sticky lg:top-[72px] transform transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileChatOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'
+                            className={`absolute bottom-0 left-0 right-0 h-[100dvh] lg:static lg:h-[calc(100vh-145px)] flex flex-col rounded-t-2xl lg:rounded-xl border-0 lg:border border-border bg-background lg:overflow-hidden lg:sticky lg:top-[72px] transform transition-transform duration-400 ease-[cubic-bezier(0.16,1,0.3,1)] ${mobileChatOpen ? 'translate-y-0' : 'translate-y-full lg:translate-y-0'
                                 }`}
                         >
                             {/* Chat header */}
-                            <div className="px-5 py-3 border-b border-[rgba(0,0,0,0.06)] flex items-center gap-2 bg-white shrink-0">
-                                <MessageSquare size={16} className="text-[#C2185B]" />
-                                <h3 className="text-sm font-semibold text-[#0D0D0D]">Order Chat</h3>
-                                <span className="text-[10px] text-[#999] ml-auto">{messages.length} messages</span>
-                                <button className="lg:hidden ml-2 p-1.5 rounded-full hover:bg-[#F4F0F8] text-[#555] transition-colors" onClick={() => setMobileChatOpen(false)}>
+                            <div className="px-5 py-3 border-b border-border flex items-center gap-2 bg-white shrink-0">
+                                <MessageSquare size={16} className="text-primary" />
+                                <h3 className="text-sm font-semibold text-foreground">Order Chat</h3>
+                                <span className="text-[10px] text-text-light ml-auto">{messages.length} messages</span>
+                                <button className="lg:hidden ml-2 p-1.5 rounded-full hover:bg-muted text-muted-foreground transition-colors" onClick={() => setMobileChatOpen(false)}>
                                     <X size={16} />
                                 </button>
                             </div>
 
                             {/* Messages */}
-                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-[#FAFAFA]">
+                            <div ref={chatContainerRef} className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-3 bg-surface-2">
                                 {messages.length === 0 ? (
                                     <div className="flex flex-col items-center justify-center h-full text-center">
                                         <MessageSquare size={24} className="text-[#E0E0E0] mb-2" />
-                                        <p className="text-sm text-[#999]">No messages yet.</p>
-                                        <p className="text-xs text-[#999] mt-1">Send a message to start the conversation.</p>
+                                        <p className="text-sm text-text-light">No messages yet.</p>
+                                        <p className="text-xs text-text-light mt-1">Send a message to start the conversation.</p>
                                     </div>
                                 ) : (
                                     messages.map((msg, idx) => {
@@ -694,7 +706,7 @@ export default function OrderDetailPage() {
                                             <div key={msg.id} className="flex flex-col gap-3">
                                                 {showDateSeparator && (
                                                     <div className="flex items-center justify-center my-1">
-                                                        <span className="px-3 py-1 bg-[#F4F0F8] rounded-full text-[10px] font-semibold text-[#999] tracking-wider uppercase">
+                                                        <span className="px-3 py-1 bg-muted rounded-full text-[10px] font-semibold text-text-light tracking-wider uppercase">
                                                             {new Date(msg.createdAt).toLocaleDateString("en-NG", {
                                                                 weekday: "short",
                                                                 day: "numeric",
@@ -710,8 +722,8 @@ export default function OrderDetailPage() {
                                                 >
                                                     <div
                                                         className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm ${msg.senderRole === "CLIENT"
-                                                            ? "bg-[#C2185B] text-white rounded-br-md"
-                                                            : "bg-white text-[#0D0D0D] rounded-bl-md shadow-sm border border-[rgba(0,0,0,0.06)]"
+                                                            ? "bg-primary text-primary-foreground rounded-br-md"
+                                                            : "bg-white text-foreground rounded-bl-md shadow-sm border border-border"
                                                             }`}
                                                     >
                                                         {/* Image attachments — clickable for lightbox */}
@@ -719,11 +731,11 @@ export default function OrderDetailPage() {
                                                             <div className="mb-2 grid gap-1">
                                                                 {msg.attachments.map((img, i) => (
                                                                     <button
-                                                                        key={i}
+                                                                        key={img}
                                                                         onClick={() => setLightboxImage(img)}
-                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted hover:opacity-80 transition-opacity"
                                                                     >
-                                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                                        <Image src={img} alt="Chat Attachment" fill className="object-cover" />
                                                                     </button>
                                                                 ))}
                                                             </div>
@@ -733,17 +745,17 @@ export default function OrderDetailPage() {
                                                             <div className="mb-2 grid gap-1">
                                                                 {msg.images.map((img, i) => (
                                                                     <button
-                                                                        key={i}
+                                                                        key={img}
                                                                         onClick={() => setLightboxImage(img)}
-                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F4F0F8] hover:opacity-80 transition-opacity"
+                                                                        className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted hover:opacity-80 transition-opacity"
                                                                     >
-                                                                        <Image src={img} alt="" fill className="object-cover" />
+                                                                        <Image src={img} alt="Chat Attachment" fill className="object-cover" />
                                                                     </button>
                                                                 ))}
                                                             </div>
                                                         )}
                                                         {msg.message && <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>}
-                                                        <div className={`flex items-center justify-end gap-1 mt-1 ${msg.senderRole === "CLIENT" ? "text-white/70" : "text-[#999]"}`}>
+                                                        <div className={`flex items-center justify-end gap-1 mt-1 ${msg.senderRole === "CLIENT" ? "text-white/70" : "text-text-light"}`}>
                                                             <span className="text-[10px]">
                                                                 {new Date(msg.createdAt).toLocaleTimeString("en-NG", { hour: "2-digit", minute: "2-digit" })}
                                                             </span>
@@ -763,14 +775,14 @@ export default function OrderDetailPage() {
 
                             {/* Attachment preview */}
                             {chatAttachmentPreview && (
-                                <div className="px-3 pt-2 bg-white border-t border-[rgba(0,0,0,0.06)]">
+                                <div className="px-3 pt-2 bg-white border-t border-border">
                                     <div className="relative inline-block">
-                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-[#F4F0F8]">
+                                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted">
                                             <Image src={chatAttachmentPreview} alt="Attachment" fill className="object-cover" />
                                         </div>
                                         <button
                                             onClick={() => { setChatAttachment(null); setChatAttachmentPreview(null); }}
-                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#C62828] text-white flex items-center justify-center"
+                                            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-destructive text-primary-foreground flex items-center justify-center"
                                         >
                                             <X size={10} />
                                         </button>
@@ -779,7 +791,7 @@ export default function OrderDetailPage() {
                             )}
 
                             {/* Chat input */}
-                            <div className="px-3 py-3 border-t border-[rgba(0,0,0,0.06)] bg-white flex gap-2 items-end">
+                            <div className="px-3 py-3 border-t border-border bg-white flex gap-2 items-end">
                                 <input
                                     ref={fileInputRef}
                                     type="file"
@@ -789,7 +801,7 @@ export default function OrderDetailPage() {
                                 />
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="h-10 w-10 rounded-full flex items-center justify-center text-[#999] hover:bg-[#F4F0F8] transition-colors shrink-0"
+                                    className="h-10 w-10 rounded-full flex items-center justify-center text-text-light hover:bg-muted transition-colors shrink-0"
                                 >
                                     <Paperclip size={16} />
                                 </button>
@@ -799,12 +811,12 @@ export default function OrderDetailPage() {
                                     onChange={(e) => setChatMessage(e.target.value)}
                                     onKeyDown={(e) => e.key === "Enter" && (chatMessage.trim() || chatAttachment) && handleSendMessage()}
                                     placeholder="Type a message..."
-                                    className="flex-1 h-10 px-3.5 text-sm border border-[#E0E0E0] rounded-full focus:border-[#C2185B] outline-none bg-[#FAFAFA]"
+                                    className="flex-1 h-10 px-3.5 text-sm border border-input rounded-full focus:border-ring outline-none bg-surface-2"
                                 />
                                 <button
                                     onClick={handleSendMessage}
                                     disabled={(!chatMessage.trim() && !chatAttachment) || sendMessage.isPending}
-                                    className="h-10 w-10 rounded-full bg-[#C2185B] text-white flex items-center justify-center hover:bg-[#A01548] disabled:opacity-50 transition-colors shrink-0"
+                                    className="h-10 w-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 transition-colors shrink-0"
                                 >
                                     <Send size={16} />
                                 </button>
@@ -819,20 +831,20 @@ export default function OrderDetailPage() {
 
 
             {/* ─── Mobile Sticky Bottom Action Bar ─── */}
-            <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-[rgba(0,0,0,0.06)] z-40 lg:hidden flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+            <div className="fixed bottom-16 left-0 right-0 p-4 bg-white border-t border-border z-40 lg:hidden flex gap-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
                 <button
                     onClick={() => setMobileChatOpen(true)}
-                    className="flex flex-1 items-center justify-center gap-2 py-3 rounded-xl border border-[rgba(0,0,0,0.12)] bg-[#F4F0F8] text-[#0D0D0D] font-semibold hover:bg-[#E8E4EC] transition-colors text-sm relative"
+                    className="flex flex-1 items-center justify-center gap-2 py-3 rounded-xl border border-[rgba(0,0,0,0.12)] bg-muted text-foreground font-semibold hover:bg-[#E8E4EC] transition-colors text-sm relative"
                 >
                     <MessageSquare size={16} /> Chat
                     {messages.filter(m => !m.isRead && m.senderRole !== "CLIENT").length > 0 && (
-                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#C2185B]"></span>
+                        <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary"></span>
                     )}
                 </button>
                 {isPayable && (
                     <button
                         onClick={() => setShowPayForm(true)}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#2E7D32] text-white font-semibold hover:bg-[#1B5E20] transition-colors text-sm shrink-0"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-status-success text-white font-semibold hover:bg-[#1B5E20] transition-colors text-sm shrink-0"
                     >
                         <CreditCard size={16} /> Pay
                     </button>
@@ -841,7 +853,7 @@ export default function OrderDetailPage() {
                     <button
                         onClick={() => respondToQuote.mutate({ action: "ACCEPT" })}
                         disabled={respondToQuote.isPending}
-                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#C2185B] text-white font-semibold hover:bg-[#A01548] transition-colors text-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-colors text-sm"
                     >
                         <CheckCircle2 size={16} /> Accept Quote
                     </button>
@@ -856,7 +868,7 @@ export default function OrderDetailPage() {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                        className="fixed bottom-[160px] lg:bottom-8 right-4 z-30 w-10 h-10 rounded-full bg-[#1A1A2E] text-white shadow-lg flex items-center justify-center hover:bg-[#2A2A40] transition-colors"
+                        className="fixed bottom-[160px] lg:bottom-8 right-4 z-30 w-10 h-10 rounded-full bg-secondary text-white shadow-lg flex items-center justify-center hover:bg-secondary/80 transition-colors"
                     >
                         <ArrowUp size={16} />
                     </motion.button>
@@ -884,7 +896,7 @@ export default function OrderDetailPage() {
                                 onClick={() => setLightboxImage(null)}
                                 className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center"
                             >
-                                <X size={16} className="text-[#0D0D0D]" />
+                                <X size={16} className="text-foreground" />
                             </button>
                             <div className="relative w-full h-[70vh] rounded-xl overflow-hidden bg-black">
                                 <Image src={lightboxImage} alt="" fill className="object-contain" />
@@ -912,11 +924,11 @@ export default function OrderDetailPage() {
                             transition={{ type: "spring", damping: 25, stiffness: 200 }}
                             className="relative w-full max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh]"
                         >
-                            <div className="px-6 py-4 border-b border-[rgba(0,0,0,0.06)] flex items-center justify-between shrink-0 bg-white">
-                                <h3 className="text-lg font-bold text-[#0D0D0D]">Submit Payment</h3>
+                            <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0 bg-white">
+                                <h3 className="text-lg font-bold text-foreground">Submit Payment</h3>
                                 <button
                                     onClick={() => setShowPayForm(false)}
-                                    className="p-2 rounded-full hover:bg-[#F4F0F8] transition-colors text-[#555]"
+                                    className="p-2 rounded-full hover:bg-muted transition-colors text-muted-foreground"
                                 >
                                     <X size={20} />
                                 </button>
@@ -925,27 +937,27 @@ export default function OrderDetailPage() {
                             <div className="p-6 overflow-y-auto custom-scrollbar">
                                 <div className="space-y-5">
                                     {/* Outstanding balance highlight */}
-                                    <div className="p-4 rounded-xl bg-[#F4F0F8] border border-[rgba(0,0,0,0.04)] text-center">
-                                        <p className="text-xs text-[#555] mb-1">Outstanding Balance</p>
-                                        <p className="text-2xl font-bold font-mono-data text-[#C2185B]">
+                                    <div className="p-4 rounded-xl bg-muted border border-[rgba(0,0,0,0.04)] text-center">
+                                        <p className="text-xs text-muted-foreground mb-1">Outstanding Balance</p>
+                                        <p className="text-2xl font-bold font-mono-data text-primary">
                                             {formatCurrency(outstanding)}
                                         </p>
                                     </div>
 
                                     {/* Amount */}
                                     <div>
-                                        <label className="text-sm font-medium text-[#0D0D0D] mb-1.5 flex justify-between">
+                                        <label className="text-sm font-medium text-foreground mb-1.5 flex justify-between">
                                             <span>Amount to Pay</span>
                                         </label>
                                         <div className="relative">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-mono-data text-[#999]">₦</span>
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-mono-data text-text-light">₦</span>
                                             <input
                                                 type="number"
                                                 max={outstanding}
                                                 value={payAmount}
                                                 onChange={(e) => setPayAmount(e.target.value)}
                                                 placeholder={outstanding.toString()}
-                                                className="w-full h-12 pl-10 pr-4 text-base font-mono-data border border-[#E0E0E0] rounded-xl focus:border-[#C2185B] outline-none transition-colors"
+                                                className="w-full h-12 pl-10 pr-4 text-base font-mono-data border border-input rounded-xl focus:border-ring outline-none transition-colors"
                                             />
                                         </div>
                                     </div>
@@ -953,15 +965,15 @@ export default function OrderDetailPage() {
                                     {/* Payment type — hide for Model 3 */}
                                     {!isModel3 && (
                                         <div>
-                                            <label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">Payment Type</label>
+                                            <label className="text-sm font-medium text-foreground mb-1.5 block">Payment Type</label>
                                             <div className="flex gap-3">
                                                 {[{ v: "INSTALLMENT", l: "Installment" }, { v: "FULL", l: "Full Payment" }].map((t) => (
                                                     <button
                                                         key={t.v}
                                                         onClick={() => setPayType(t.v)}
                                                         className={`flex-1 py-3 rounded-xl text-sm font-semibold border-2 transition-colors ${payType === t.v
-                                                            ? "border-[#C2185B] bg-[#C2185B]/5 text-[#C2185B]"
-                                                            : "border-[#E0E0E0] text-[#555] hover:bg-[#F4F0F8]"
+                                                            ? "border-primary bg-primary/5 text-primary"
+                                                            : "border-input text-muted-foreground hover:bg-muted"
                                                             }`}
                                                     >
                                                         {t.l}
@@ -973,7 +985,7 @@ export default function OrderDetailPage() {
 
                                     {/* Proof upload */}
                                     <div>
-                                        <label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">Payment Receipt (Optional)</label>
+                                        <label className="text-sm font-medium text-foreground mb-1.5 block">Payment Receipt (Optional)</label>
                                         <input
                                             ref={proofInputRef}
                                             type="file"
@@ -982,12 +994,12 @@ export default function OrderDetailPage() {
                                             className="hidden"
                                         />
                                         {payProofPreview ? (
-                                            <div className="relative w-full h-40 rounded-xl overflow-hidden bg-[#FAFAFA] border border-[#E0E0E0] group">
+                                            <div className="relative w-full h-40 rounded-xl overflow-hidden bg-surface-2 border border-input group">
                                                 <Image src={payProofPreview} alt="Proof" fill className="object-contain" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); setPayProof(null); setPayProofPreview(null); }}
-                                                        className="px-4 py-2 bg-white rounded-lg text-sm font-semibold text-[#C62828] hover:bg-gray-100 flex items-center gap-2"
+                                                        className="px-4 py-2 bg-white rounded-lg text-sm font-semibold text-destructive hover:bg-gray-100 flex items-center gap-2"
                                                     >
                                                         <X size={16} /> Remove
                                                     </button>
@@ -996,7 +1008,7 @@ export default function OrderDetailPage() {
                                         ) : (
                                             <button
                                                 onClick={() => proofInputRef.current?.click()}
-                                                className="w-full py-8 rounded-xl border-2 border-dashed border-[#E0E0E0] hover:border-[#C2185B] hover:bg-[#C2185B]/5 text-[#999] hover:text-[#C2185B] flex flex-col items-center gap-2 transition-colors"
+                                                className="w-full py-8 rounded-xl border-2 border-dashed border-input hover:border-primary hover:bg-primary/5 text-text-light hover:text-primary flex flex-col items-center gap-2 transition-colors"
                                             >
                                                 <Upload size={24} />
                                                 <span className="text-sm font-medium">Upload Screenshot</span>
@@ -1007,27 +1019,27 @@ export default function OrderDetailPage() {
 
                                     {/* Notes */}
                                     <div>
-                                        <label className="text-sm font-medium text-[#0D0D0D] mb-1.5 block">Reference Note (Optional)</label>
+                                        <label className="text-sm font-medium text-foreground mb-1.5 block">Reference Note (Optional)</label>
                                         <input
                                             type="text"
                                             value={payNotes}
                                             onChange={(e) => setPayNotes(e.target.value)}
                                             placeholder="e.g. Transfer from GTBank..."
-                                            className="w-full h-12 px-4 text-sm border border-[#E0E0E0] rounded-xl focus:border-[#C2185B] outline-none transition-colors"
+                                            className="w-full h-12 px-4 text-sm border border-input rounded-xl focus:border-ring outline-none transition-colors"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="p-6 border-t border-[rgba(0,0,0,0.06)] bg-[#FAFAFA] shrink-0">
+                            <div className="p-6 border-t border-border bg-surface-2 shrink-0">
                                 <button
                                     onClick={handleSubmitPayment}
                                     disabled={submitPayment.isPending || !payAmount || parseFloat(payAmount) > outstanding}
-                                    className="w-full h-12 rounded-xl bg-[#2E7D32] text-white font-bold hover:bg-[#1B5E20] disabled:opacity-50 transition-colors text-base flex items-center justify-center gap-2"
+                                    className="w-full h-12 rounded-xl bg-status-success text-white font-bold hover:bg-[#1B5E20] disabled:opacity-50 transition-colors text-base flex items-center justify-center gap-2"
                                 >
                                     {submitPayment.isPending ? "Submitting..." : (
                                         <>
-                                            Submit {payAmount ? formatCurrency(payAmount) : ""}
+                                            Submit {parseFloat(payAmount) > 0 ? formatCurrency(parseFloat(payAmount)) : ""}
                                         </>
                                     )}
                                 </button>

@@ -2,6 +2,27 @@ import "dotenv/config";
 import app from "./app.js";
 import prisma from "./config/prisma.js";
 
+// ─── Required Environment Variable Check ───────────────────────────────────
+// Fail fast on startup if critical config is missing rather than crashing
+// mid-request or issuing tokens that never expire.
+
+const REQUIRED_ENV_VARS = [
+  "DATABASE_URL",
+  "JWT_SECRET",
+  "JWT_EXPIRES_IN",
+  "JWT_REFRESH_SECRET",
+  "JWT_REFRESH_EXPIRES_IN",
+];
+
+const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
+if (missing.length > 0) {
+  console.error(
+    `❌ Missing required environment variables: ${missing.join(", ")}\n` +
+    `   Copy backend/.env.example to backend/.env and fill in the values.`
+  );
+  process.exit(1);
+}
+
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "0.0.0.0";
 

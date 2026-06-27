@@ -188,8 +188,8 @@ export default function AdminLayout({ children }) {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#FAFAFA]">
-                <div className="w-8 h-8 border-3 border-[#C2185B]/30 border-t-[#C2185B] rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-surface-2">
+                <div className="w-8 h-8 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
             </div>
         );
     }
@@ -272,10 +272,10 @@ export default function AdminLayout({ children }) {
     ];
 
     return (
-        <div className="flex min-h-screen bg-[#FAFAFA]">
+        <div className="flex min-h-screen bg-surface-2">
             {/* ─── Desktop Sidebar ─── */}
             <aside
-                className="hidden lg:flex flex-col fixed top-0 bottom-0 left-0 z-50 bg-[#1A1A2E] overflow-hidden"
+                className="hidden lg:flex flex-col fixed top-0 bottom-0 left-0 z-50 bg-sidebar overflow-hidden"
                 style={{
                     width: collapsed ? COLLAPSED_W : EXPANDED_W,
                     transition: "width 300ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -284,7 +284,7 @@ export default function AdminLayout({ children }) {
                 {/* Brand */}
                 <div className="h-16 flex items-center px-3 shrink-0 overflow-hidden">
 
-                    {collapsed ? <Logo style={{ fill: "#C2185B" }} className="w-10 h-10" /> : <LogoWithName style={{ fill: "#C2185B" }} className="tracking-tight" />}
+                    {collapsed ? <Logo style={{ fill: 'var(--color-brand-primary)' }} className="w-10 h-10" /> : <LogoWithName style={{ fill: 'var(--color-brand-primary)' }} className="tracking-tight" />}
 
                 </div>
                 <Separator className="bg-white/8 shrink-0" />
@@ -313,13 +313,13 @@ export default function AdminLayout({ children }) {
                                                 href={item.href}
                                                 title={collapsed ? item.label : undefined}
                                                 className={`flex items-center rounded-lg overflow-hidden transition-all duration-150 relative ${isActive
-                                                    ? "bg-[#C2185B]/12 text-white"
+                                                    ? "bg-primary/12 text-primary-foreground"
                                                     : "text-white/50 hover:text-white hover:bg-white/5"
                                                     }`}
                                             >
                                                 {/* Active indicator — 4px Primary left border */}
                                                 {isActive && (
-                                                    <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#C2185B]" />
+                                                    <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-primary" />
                                                 )}
                                                 <div className="w-10 h-10 flex items-center justify-center shrink-0">
                                                     <item.icon size={20} />
@@ -380,7 +380,7 @@ export default function AdminLayout({ children }) {
                 <div className="px-3 py-3 shrink-0 overflow-hidden">
                     <div className="flex items-center justify-between">
                         <Link href="/admin/profile" className="flex items-center">
-                        <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden relative">
+                        <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0 overflow-hidden relative">
                             {(user?.avatarUrl || user?.profilePicture) ? (
                                 <Image src={user.avatarUrl || user.profilePicture} alt="" fill className="object-cover" />
                             ) : (
@@ -401,7 +401,7 @@ export default function AdminLayout({ children }) {
                             <button
                                 onClick={logout}
                                 title="Logout"
-                                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-[#C62828] hover:bg-white/5 transition-colors shrink-0"
+                                className="w-8 h-8 rounded-lg flex items-center justify-center text-white/30 hover:text-destructive hover:bg-white/5 transition-colors shrink-0"
                             >
                                 <LogOut size={16} />
                             </button>
@@ -411,7 +411,7 @@ export default function AdminLayout({ children }) {
                         <button
                             onClick={logout}
                             title="Logout"
-                            className="w-10 h-10 mx-auto mt-1 flex items-center justify-center rounded-lg text-white/30 hover:text-[#C62828] hover:bg-white/5 transition-colors"
+                            className="w-10 h-10 mx-auto mt-1 flex items-center justify-center rounded-lg text-white/30 hover:text-destructive hover:bg-white/5 transition-colors"
                         >
                             <LogOut size={16} />
                         </button>
@@ -428,15 +428,15 @@ export default function AdminLayout({ children }) {
                 }}
             >
                 {/* ─── Top bar (visible on ALL screens) ─── */}
-                <header className="flex items-center justify-between h-14 px-4 sm:px-6 bg-white border-b border-[rgba(0,0,0,0.06)] sticky top-0 z-40">
+                <header className="flex items-center justify-between h-14 px-4 sm:px-6 bg-background border-b border-border sticky top-0 z-40">
                     {/* Left: breadcrumb on desktop, brand on mobile */}
                     <div className="flex items-center gap-3">
                         <div className="lg:hidden w-8 h-8 flex items-center justify-center text-white font-bold text-xs shrink-0">
                             {<Link href="/">
-                                <Logo style={{ fill: "#C2185B" }} className="w-8 h-8" />
+                                <Logo style={{ fill: 'var(--color-brand-primary)' }} className="w-8 h-8" />
                             </Link>}
                         </div>
-                        <h2 className="text-sm font-semibold text-[#0D0D0D] capitalize hidden sm:block">
+                        <h2 className="text-sm font-semibold text-foreground capitalize hidden sm:block">
                             {breadcrumb}
                         </h2>
                     </div>
@@ -446,13 +446,13 @@ export default function AdminLayout({ children }) {
                         {/* Cmd+K trigger for top bar */}
                         <button
                             onClick={() => { setCmdOpen(true); setCmdQuery(""); }}
-                            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] text-xs text-[#999] hover:text-[#555] hover:border-[rgba(0,0,0,0.15)] transition-colors"
+                            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[rgba(0,0,0,0.08)] text-xs text-text-light hover:text-muted-foreground hover:border-[rgba(0,0,0,0.15)] transition-colors"
                         >
                             <Search size={13} />
                             <span>Search...</span>
-                            <kbd className="text-[10px] bg-[#F4F0F8] px-1.5 py-0.5 rounded font-mono-data">⌘K</kbd>
+                            <kbd className="text-[10px] bg-muted px-1.5 py-0.5 rounded font-mono-data">⌘K</kbd>
                         </button>
-                        <Link href="/" className="hidden sm:flex text-xs text-[#999] hover:text-[#C2185B] transition-colors font-medium items-center gap-1">
+                        <Link href="/" className="hidden sm:flex text-xs text-text-light hover:text-primary transition-colors font-medium items-center gap-1">
                             <ExternalLink size={12} /> View Site
                         </Link>
                         <NotificationBellButton onClick={() => setNotifOpen(true)} />
@@ -465,7 +465,7 @@ export default function AdminLayout({ children }) {
             </div>
 
             {/* ─── Mobile Bottom Nav ─── */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(0,0,0,0.06)] flex items-center justify-around h-16 px-1">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border flex items-center justify-around h-16 px-1">
                 {[
                     { href: "/admin/dashboard", icon: LayoutDashboard, label: "Home" },
                     { href: "/admin/orders", icon: ShoppingBag, label: "Orders" },
@@ -477,7 +477,7 @@ export default function AdminLayout({ children }) {
                         <Link
                             key={link.href}
                             href={link.href}
-                            className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] transition-colors ${isActive ? "text-[#C2185B]" : "text-[#999]"}`}
+                            className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] transition-colors ${isActive ? "text-primary" : "text-text-light"}`}
                         >
                             <link.icon size={20} />
                             <span className="text-[10px] font-medium">{link.label}</span>
@@ -487,7 +487,7 @@ export default function AdminLayout({ children }) {
                 {/* More button */}
                 <button
                     onClick={() => setMoreOpen(true)}
-                    className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] ${moreOpen ? "text-[#C2185B]" : "text-[#999]"}`}
+                    className={`flex flex-col items-center gap-0.5 py-1 px-2 min-w-[48px] ${moreOpen ? "text-primary" : "text-text-light"}`}
                 >
                     <MoreHorizontal size={20} />
                     <span className="text-[10px] font-medium">More</span>
@@ -510,12 +510,12 @@ export default function AdminLayout({ children }) {
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
                             transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl max-h-[70vh] overflow-y-auto lg:hidden"
+                            className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl max-h-[70vh] overflow-y-auto lg:hidden"
                         >
                             <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                                <h3 className="text-sm font-bold text-[#0D0D0D]">More</h3>
-                                <button onClick={() => setMoreOpen(false)} className="p-1.5 rounded-lg hover:bg-[#F4F0F8]">
-                                    <X size={16} className="text-[#999]" />
+                                <h3 className="text-sm font-bold text-foreground">More</h3>
+                                <button onClick={() => setMoreOpen(false)} className="p-1.5 rounded-lg hover:bg-muted">
+                                    <X size={16} className="text-text-light" />
                                 </button>
                             </div>
                             <div className="px-3 pb-6 grid grid-cols-3 gap-2">
@@ -527,8 +527,8 @@ export default function AdminLayout({ children }) {
                                             href={item.href}
                                             onClick={() => setMoreOpen(false)}
                                             className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl transition-colors ${isActive
-                                                ? "bg-[#C2185B]/10 text-[#C2185B]"
-                                                : "text-[#555] hover:bg-[#F4F0F8]"
+                                                ? "bg-primary/10 text-primary"
+                                                : "text-muted-foreground hover:bg-muted"
                                                 }`}
                                         >
                                             <item.icon size={20} />
@@ -539,14 +539,14 @@ export default function AdminLayout({ children }) {
                                 <Link
                                     href="/"
                                     onClick={() => setMoreOpen(false)}
-                                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[#555] hover:bg-[#F4F0F8] transition-colors"
+                                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-muted-foreground hover:bg-muted transition-colors"
                                 >
                                     <ExternalLink size={20} />
                                     <span className="text-[11px] font-medium text-center leading-tight">View Site</span>
                                 </Link>
                                 <button
                                     onClick={() => { setMoreOpen(false); logout(); }}
-                                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[#C62828] hover:bg-[#FFEBEE] transition-colors"
+                                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-destructive hover:bg-[#FFEBEE] transition-colors"
                                 >
                                     <LogOut size={20} />
                                     <span className="text-[11px] font-medium text-center leading-tight">Logout</span>
@@ -578,17 +578,17 @@ export default function AdminLayout({ children }) {
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Search input */}
-                            <div className="flex items-center gap-3 px-5 py-4 border-b border-[rgba(0,0,0,0.06)]">
-                                <Search size={18} className="text-[#999] shrink-0" />
+                            <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
+                                <Search size={18} className="text-text-light shrink-0" />
                                 <input
                                     ref={cmdInputRef}
                                     type="text"
                                     value={cmdQuery}
                                     onChange={(e) => setCmdQuery(e.target.value)}
                                     placeholder="Search pages, settings..."
-                                    className="flex-1 text-sm text-[#0D0D0D] bg-transparent outline-none placeholder-[#999]"
+                                    className="flex-1 text-sm text-foreground bg-transparent outline-none placeholder-[#999]"
                                 />
-                                <kbd className="text-[10px] text-[#999] bg-[#F4F0F8] px-2 py-1 rounded font-mono-data shrink-0">ESC</kbd>
+                                <kbd className="text-[10px] text-text-light bg-muted px-2 py-1 rounded font-mono-data shrink-0">ESC</kbd>
                             </div>
 
                             {/* Results */}
@@ -596,16 +596,16 @@ export default function AdminLayout({ children }) {
                                 {Object.keys(cmdSections).length === 0 ? (
                                     <div className="py-8 text-center flex flex-col items-center justify-center">
                                         {isSearching ? (
-                                            <div className="w-5 h-5 border-2 border-[#C2185B] border-t-transparent rounded-full animate-spin mb-3 text-[#C2185B]" />
+                                            <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3 text-primary" />
                                         ) : (
                                             <Search size={24} className="text-[#CCC] mb-2" />
                                         )}
-                                        <p className="text-sm text-[#999]">{isSearching ? "Searching database..." : "No results found"}</p>
+                                        <p className="text-sm text-text-light">{isSearching ? "Searching database..." : "No results found"}</p>
                                     </div>
                                 ) : (
                                     Object.entries(cmdSections).map(([sectionName, items]) => (
                                         <div key={sectionName} className="mb-2 last:mb-0">
-                                            <p className="px-5 py-1.5 text-[10px] font-semibold text-[#555] bg-[#FAFAFA] uppercase tracking-wider sticky top-0 z-10">{sectionName}</p>
+                                            <p className="px-5 py-1.5 text-[10px] font-semibold text-muted-foreground bg-surface-2 uppercase tracking-wider sticky top-0 z-10">{sectionName}</p>
                                             <div className="py-1">
                                                 {items.map((item) => {
                                                     const isActive = pathname === item.href;
@@ -614,18 +614,18 @@ export default function AdminLayout({ children }) {
                                                             key={item.href}
                                                             onClick={() => handleCmdSelect(item.href)}
                                                             className={`w-full flex items-center gap-3 px-5 py-2.5 text-sm transition-colors group ${isActive
-                                                                ? "bg-[#C2185B]/8 text-[#C2185B]"
-                                                                : "text-[#0D0D0D] hover:bg-[#F4F0F8]"
+                                                                ? "bg-primary/8 text-primary"
+                                                                : "text-foreground hover:bg-muted"
                                                                 }`}
                                                         >
-                                                            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isActive ? "bg-[#C2185B]/10" : "bg-white border border-[rgba(0,0,0,0.06)] group-hover:bg-white"}`}>
-                                                                <item.icon size={14} className={isActive ? "text-[#C2185B]" : "text-[#555] group-hover:text-[#0D0D0D]"} />
+                                                            <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isActive ? "bg-primary/10" : "bg-white border border-border group-hover:bg-white"}`}>
+                                                                <item.icon size={14} className={isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"} />
                                                             </div>
                                                             <div className="flex flex-col items-start min-w-0">
                                                                 <span className="font-medium truncate">{item.label}</span>
-                                                                {item.subtext && <span className="text-[11px] text-[#999] truncate mt-0.5">{item.subtext}</span>}
+                                                                {item.subtext && <span className="text-[11px] text-text-light truncate mt-0.5">{item.subtext}</span>}
                                                             </div>
-                                                            {isActive && <span className="ml-auto text-[10px] text-[#C2185B]/60 font-medium bg-[#C2185B]/10 px-1.5 py-0.5 rounded">Current</span>}
+                                                            {isActive && <span className="ml-auto text-[10px] text-primary/60 font-medium bg-primary/10 px-1.5 py-0.5 rounded">Current</span>}
                                                         </button>
                                                     );
                                                 })}
@@ -636,10 +636,10 @@ export default function AdminLayout({ children }) {
                             </div>
 
                             {/* Footer hint */}
-                            <div className="px-5 py-2.5 border-t border-[rgba(0,0,0,0.06)] flex items-center gap-4 text-[10px] text-[#999]">
-                                <span className="flex items-center gap-1"><kbd className="bg-[#F4F0F8] px-1 py-0.5 rounded font-mono-data">↑↓</kbd> Navigate</span>
-                                <span className="flex items-center gap-1"><kbd className="bg-[#F4F0F8] px-1 py-0.5 rounded font-mono-data">↵</kbd> Open</span>
-                                <span className="flex items-center gap-1"><kbd className="bg-[#F4F0F8] px-1 py-0.5 rounded font-mono-data">Esc</kbd> Close</span>
+                            <div className="px-5 py-2.5 border-t border-border flex items-center gap-4 text-[10px] text-text-light">
+                                <span className="flex items-center gap-1"><kbd className="bg-muted px-1 py-0.5 rounded font-mono-data">↑↓</kbd> Navigate</span>
+                                <span className="flex items-center gap-1"><kbd className="bg-muted px-1 py-0.5 rounded font-mono-data">↵</kbd> Open</span>
+                                <span className="flex items-center gap-1"><kbd className="bg-muted px-1 py-0.5 rounded font-mono-data">Esc</kbd> Close</span>
                             </div>
                         </motion.div>
                     </>
@@ -656,13 +656,13 @@ export default function AdminLayout({ children }) {
 function NavItem({ icon: Icon, label, textCls, collapsed, onClick, href, hoverColor = "hover:text-white", pathname }) {
     const isActive = pathname && href && (pathname === href || pathname.startsWith(href + "/"));
     const cls = `flex items-center rounded-lg overflow-hidden transition-colors duration-150 w-full relative ${isActive
-        ? "bg-[#C2185B]/12 text-white"
+        ? "bg-primary/12 text-primary-foreground"
         : `text-white/40 ${hoverColor} hover:bg-white/5`
         }`;
 
     const inner = (
         <>
-            {isActive && <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-[#C2185B]" />}
+            {isActive && <div className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r-full bg-primary" />}
             <div className="w-10 h-10 flex items-center justify-center shrink-0">
                 <Icon size={20} />
             </div>

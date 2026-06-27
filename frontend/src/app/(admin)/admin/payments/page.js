@@ -140,8 +140,8 @@ export default function AdminPaymentsPage() {
     const SortIcon = ({ col }) => {
         if (sortKey !== col) return <ChevronsUpDown size={11} className="text-[#CCC] inline ml-0.5" />;
         return sortDir === "asc"
-            ? <ChevronUp size={11} className="text-[#C2185B] inline ml-0.5" />
-            : <ChevronDown size={11} className="text-[#C2185B] inline ml-0.5" />;
+            ? <ChevronUp size={11} className="text-primary inline ml-0.5" />
+            : <ChevronDown size={11} className="text-primary inline ml-0.5" />;
     };
 
     const sortedPayments = useMemo(() => {
@@ -173,10 +173,10 @@ export default function AdminPaymentsPage() {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
                     <div>
-                        <h1 className="text-2xl font-bold text-[#0D0D0D]">Payments</h1>
-                        <p className="text-sm text-[#999]">{totalCount} total payments</p>
+                        <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+                        <p className="text-sm text-text-light">{totalCount} total payments</p>
                     </div>
-                    <Button onClick={() => setShowExportModal(true)} variant="outline" className="gap-1.5 text-[#555] h-9">
+                    <Button onClick={() => setShowExportModal(true)} variant="outline" className="gap-1.5 text-muted-foreground h-9">
                         <Download size={14} /> Export
                     </Button>
                 </div>
@@ -194,7 +194,7 @@ export default function AdminPaymentsPage() {
                         <PopoverTrigger asChild>
                             <Button
                                 variant="outline"
-                                className={`h-9 border-[#E0E0E0] bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange?.from && "text-muted-foreground"}`}
+                                className={`h-9 border-input bg-white hover:bg-white text-sm font-normal justify-start ${!dateRange?.from && "text-muted-foreground"}`}
                             >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {dateRange?.from ? (
@@ -218,7 +218,7 @@ export default function AdminPaymentsPage() {
                     {(dateRange?.from || dateRange?.to || orderTypeFilter) && (
                         <Button
                             variant="ghost"
-                            className="h-9 text-xs text-[#999] hover:text-[#C2185B]"
+                            className="h-9 text-xs text-text-light hover:text-primary"
                             onClick={() => { setDateRange({ from: undefined, to: undefined }); setOrderTypeFilter(""); }}
                         >
                             Clear filters
@@ -227,15 +227,15 @@ export default function AdminPaymentsPage() {
                 </div>
 
                 {/* Status tabs with animated indicator */}
-                <div className="relative flex gap-1 mb-6 bg-[#F4F0F8] rounded-lg p-1 overflow-x-auto">
+                <div className="relative flex gap-1 mb-6 bg-muted rounded-lg p-1 overflow-x-auto">
                     {TABS.map(tab => (
                         <button key={tab.v} onClick={() => setStatusFilter(tab.v)}
-                            className={`relative flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 z-[1] ${statusFilter === tab.v ? "text-[#0D0D0D]" : "text-[#999] hover:text-[#555]"}`}>
+                            className={`relative flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 z-[1] ${statusFilter === tab.v ? "text-foreground" : "text-text-light hover:text-muted-foreground"}`}>
                             {tab.l}
                             {statusFilter === tab.v && (
                                 <motion.div
                                     layoutId="paymentTabBg"
-                                    className="absolute inset-0 bg-white rounded-md shadow-sm -z-[1]"
+                                    className="absolute inset-0 bg-popover rounded-md shadow-sm -z-[1]"
                                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                                 />
                             )}
@@ -274,30 +274,30 @@ export default function AdminPaymentsPage() {
                                             initial="hidden"
                                             animate="visible"
                                             variants={staggerChild}
-                                            className="p-5 rounded-xl border border-[rgba(0,0,0,0.06)] bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors"
+                                            className="p-5 rounded-xl border border-border bg-white hover:border-[rgba(0,0,0,0.12)] transition-colors"
                                         >
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-[#C2185B] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                                                    <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
                                                         {pay.client?.fullName?.charAt(0) || "?"}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-semibold text-[#0D0D0D]">{pay.client?.fullName || "Client"}</p>
-                                                        <p className="text-[10px] font-mono-data text-[#999]">{pay.order?.orderNumber || "—"}</p>
+                                                        <p className="text-sm font-semibold text-foreground">{pay.client?.fullName || "Client"}</p>
+                                                        <p className="text-[10px] font-mono-data text-text-light">{pay.order?.orderNumber || "—"}</p>
                                                     </div>
                                                 </div>
-                                                <p className="text-lg font-bold font-mono-data text-[#C2185B]">{formatCurrency(pay.amount)}</p>
+                                                <p className="text-lg font-bold font-mono-data text-primary">{formatCurrency(pay.amount)}</p>
                                             </div>
 
-                                            <div className="flex items-center gap-3 mb-3 text-xs text-[#999]">
+                                            <div className="flex items-center gap-3 mb-3 text-xs text-text-light">
                                                 <span>{new Date(pay.createdAt).toLocaleDateString("en-NG", { dateStyle: "medium" })}</span>
                                                 {pay.paymentType && (
-                                                    <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-[#F4F0F8] text-[#555]">
+                                                    <span className="text-[9px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                                                         {pay.paymentType?.replace(/_/g, " ")}
                                                     </span>
                                                 )}
                                                 {pay.proofUrl && (
-                                                    <button onClick={() => setProofPreview(pay.proofUrl)} className="text-[#C2185B] font-semibold hover:underline flex items-center gap-1">
+                                                    <button onClick={() => setProofPreview(pay.proofUrl)} className="text-primary font-semibold hover:underline flex items-center gap-1">
                                                         <Eye size={12} /> View Proof
                                                     </button>
                                                 )}
@@ -305,11 +305,11 @@ export default function AdminPaymentsPage() {
 
                                             <div className="flex gap-2">
                                                 <button onClick={() => confirmPayment.mutate(pay.id)} disabled={confirmPayment.isPending}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#E8F5E9] text-[#2E7D32] text-xs font-semibold hover:bg-[#C8E6C9] transition-colors disabled:opacity-60">
+                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#E8F5E9] text-status-success text-xs font-semibold hover:bg-[#C8E6C9] transition-colors disabled:opacity-60">
                                                     <CheckCircle2 size={14} /> Confirm
                                                 </button>
                                                 <button onClick={() => { setRejectModal(pay.id); setRejectionReason(""); }}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#FFEBEE] text-[#C62828] text-xs font-semibold hover:bg-[#FFCDD2] transition-colors">
+                                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-[#FFEBEE] text-destructive text-xs font-semibold hover:bg-[#FFCDD2] transition-colors">
                                                     <XCircle size={14} /> Reject
                                                 </button>
                                             </div>
@@ -319,11 +319,11 @@ export default function AdminPaymentsPage() {
                             </div>
                         ) : (
                             /* Full Table for CONFIRMED / REJECTED / ALL */
-                            <div className="rounded-xl border border-[rgba(0,0,0,0.06)] bg-white overflow-hidden">
+                            <div className="rounded-xl border border-border bg-white overflow-hidden">
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-[rgba(0,0,0,0.06)] bg-[#FAFAFA]">
+                                            <tr className="border-b border-border bg-surface-2">
                                                 {[
                                                     { key: "client", label: "Client", align: "left" },
                                                     { key: "order", label: "Order", align: "left" },
@@ -332,29 +332,29 @@ export default function AdminPaymentsPage() {
                                                     { key: "date", label: "Date", align: "left" },
                                                 ].map(col => (
                                                     <th key={col.key} onClick={() => handleSort(col.key)}
-                                                        className={`text-xs font-medium text-[#999] py-3 px-4 cursor-pointer select-none whitespace-nowrap hover:text-[#C2185B] transition-colors ${col.align === "right" ? "text-right" : "text-left"}`}>
+                                                        className={`text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none whitespace-nowrap hover:text-primary transition-colors ${col.align === "right" ? "text-right" : "text-left"}`}>
                                                         {col.label}<SortIcon col={col.key} />
                                                     </th>
                                                 ))}
-                                                <th className="text-left text-xs font-medium text-[#999] py-3 px-4">Proof</th>
+                                                <th className="text-left text-xs font-medium text-text-light py-3 px-4">Proof</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {sortedPayments.map(pay => {
                                                 const cfg = PAYMENT_STATUS[pay.status] || {};
                                                 return (
-                                                    <tr key={pay.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-[#FAFAFA] transition-colors">
+                                                    <tr key={pay.id} className="border-b border-[rgba(0,0,0,0.03)] hover:bg-surface-2 transition-colors">
                                                         <td className="py-3 px-4 font-medium">{pay.client?.fullName || "—"}</td>
-                                                        <td className="py-3 px-4 font-mono-data text-xs text-[#555]">{pay.order?.orderNumber || "—"}</td>
+                                                        <td className="py-3 px-4 font-mono-data text-xs text-muted-foreground">{pay.order?.orderNumber || "—"}</td>
                                                         <td className="py-3 px-4 text-right font-mono-data font-semibold">{formatCurrency(pay.amount)}</td>
                                                         <td className="py-3 px-4">
                                                             <span className="text-xs px-2.5 py-0.5 rounded-full font-semibold" style={{ backgroundColor: cfg.bg, color: cfg.text }}>{cfg.label}</span>
                                                         </td>
-                                                        <td className="py-3 px-4 text-xs text-[#999]">{new Date(pay.createdAt).toLocaleDateString("en-NG")}</td>
+                                                        <td className="py-3 px-4 text-xs text-text-light">{new Date(pay.createdAt).toLocaleDateString("en-NG")}</td>
                                                         <td className="py-3 px-4">
                                                             {pay.proofUrl ? (
-                                                                <button onClick={() => setProofPreview(pay.proofUrl)} className="text-xs text-[#C2185B] font-semibold hover:underline flex items-center gap-1"><Eye size={12} /> View</button>
-                                                            ) : <span className="text-xs text-[#999]">—</span>}
+                                                                <button onClick={() => setProofPreview(pay.proofUrl)} className="text-xs text-primary font-semibold hover:underline flex items-center gap-1"><Eye size={12} /> View</button>
+                                                            ) : <span className="text-xs text-text-light">—</span>}
                                                         </td>
                                                     </tr>
                                                 );
@@ -372,7 +372,7 @@ export default function AdminPaymentsPage() {
                                     variant="outline"
                                     onClick={() => fetchNextPage()}
                                     disabled={isFetchingNextPage}
-                                    className="h-10 px-6 gap-2 text-sm font-semibold text-[#C2185B] border-[#C2185B]/30 hover:bg-[#C2185B]/5"
+                                    className="h-10 px-6 gap-2 text-sm font-semibold text-primary border-primary/30 hover:bg-primary/5"
                                 >
                                     {isFetchingNextPage ? (
                                         <><Loader2 size={14} className="animate-spin" /> Loading...</>
@@ -401,7 +401,7 @@ export default function AdminPaymentsPage() {
                             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }}
                                 className="relative max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
                                 <button onClick={() => setProofPreview(null)} className="absolute -top-3 -right-3 z-10 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center">
-                                    <X size={16} className="text-[#0D0D0D]" />
+                                    <X size={16} className="text-foreground" />
                                 </button>
                                 <div className="relative aspect-square rounded-xl overflow-hidden bg-white">
                                     <Image src={proofPreview} alt="Proof" fill className="object-contain" />
@@ -418,16 +418,16 @@ export default function AdminPaymentsPage() {
                             className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setRejectModal(null)}>
                             <motion.div initial={{ scale: 0.97 }} animate={{ scale: 1 }} exit={{ scale: 0.97 }}
                                 className="bg-white rounded-xl p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                                <h3 className="text-lg font-bold text-[#0D0D0D] mb-1">Reject Payment</h3>
-                                <p className="text-sm text-[#555] mb-4">Please provide a reason for rejection.</p>
+                                <h3 className="text-lg font-bold text-foreground mb-1">Reject Payment</h3>
+                                <p className="text-sm text-muted-foreground mb-4">Please provide a reason for rejection.</p>
                                 <textarea value={rejectionReason} onChange={(e) => setRejectionReason(e.target.value)}
                                     placeholder="e.g. Proof is unclear, amount doesn't match..."
-                                    className="w-full h-24 px-3 py-2 text-sm border border-[rgba(0,0,0,0.12)] rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-[#C2185B]/30 focus:border-[#C2185B] resize-none transition-all" />
-                                {rejectionReason.length > 0 && rejectionReason.length < 5 && <p className="text-xs text-[#C62828] mt-1">Min 5 characters</p>}
+                                    className="w-full h-24 px-3 py-2 text-sm border border-[rgba(0,0,0,0.12)] rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring/30 focus:border-ring resize-none transition-all" />
+                                {rejectionReason.length > 0 && rejectionReason.length < 5 && <p className="text-xs text-destructive mt-1">Min 5 characters</p>}
                                 <div className="flex gap-2 mt-4">
                                     <Button variant="outline" onClick={() => setRejectModal(null)} className="flex-1 h-9">Cancel</Button>
                                     <Button onClick={() => rejectPayment.mutate(rejectModal)} disabled={rejectionReason.length < 5 || rejectPayment.isPending}
-                                        className="flex-1 h-9 bg-[#C62828] text-white hover:bg-[#B71C1C] gap-1.5">
+                                        className="flex-1 h-9 bg-destructive text-primary-foreground hover:bg-destructive/90 gap-1.5">
                                         <XCircle size={14} /> {rejectPayment.isPending ? "..." : "Reject"}
                                     </Button>
                                 </div>
@@ -444,20 +444,20 @@ export default function AdminPaymentsPage() {
                             <motion.div initial={{ scale: 0.97 }} animate={{ scale: 1 }} exit={{ scale: 0.97 }}
                                 className="bg-white rounded-xl p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-between mb-5">
-                                    <h3 className="text-lg font-bold text-[#0D0D0D]">Export Payments</h3>
-                                    <button onClick={() => setShowExportModal(false)}><X size={18} className="text-[#999]" /></button>
+                                    <h3 className="text-lg font-bold text-foreground">Export Payments</h3>
+                                    <button onClick={() => setShowExportModal(false)}><X size={18} className="text-text-light" /></button>
                                 </div>
                                 <div className="space-y-4">
                                     {/* Format selector */}
                                     <div>
-                                        <p className="text-xs text-[#999] mb-2">Format</p>
+                                        <p className="text-xs text-text-light mb-2">Format</p>
                                         <div className="flex gap-2">
                                             <button onClick={() => setExportFormat("csv")}
-                                                className={`flex-1 py-2 rounded-lg text-sm font-semibold border-2 transition-colors ${exportFormat === "csv" ? "border-[#C2185B] bg-[#C2185B]/5 text-[#C2185B]" : "border-[#E0E0E0] text-[#555]"}`}>
+                                                className={`flex-1 py-2 rounded-lg text-sm font-semibold border-2 transition-colors ${exportFormat === "csv" ? "border-primary bg-primary/5 text-primary" : "border-input text-muted-foreground"}`}>
                                                 <Download size={14} className="inline mr-1" /> CSV
                                             </button>
                                             <button onClick={() => setExportFormat("pdf")}
-                                                className={`flex-1 py-2 rounded-lg text-sm font-semibold border-2 transition-colors ${exportFormat === "pdf" ? "border-[#C2185B] bg-[#C2185B]/5 text-[#C2185B]" : "border-[#E0E0E0] text-[#555]"}`}>
+                                                className={`flex-1 py-2 rounded-lg text-sm font-semibold border-2 transition-colors ${exportFormat === "pdf" ? "border-primary bg-primary/5 text-primary" : "border-input text-muted-foreground"}`}>
                                                 <FileText size={14} className="inline mr-1" /> PDF
                                             </button>
                                         </div>
@@ -465,12 +465,12 @@ export default function AdminPaymentsPage() {
 
                                     {/* Date range picker */}
                                     <div>
-                                        <p className="text-xs text-[#999] mb-2">Date Range (optional)</p>
+                                        <p className="text-xs text-text-light mb-2">Date Range (optional)</p>
                                         <Popover>
                                             <PopoverTrigger asChild>
                                                 <Button
                                                     variant="outline"
-                                                    className={`w-full h-9 border-[#E0E0E0] bg-white hover:bg-white text-sm font-normal justify-start ${!exportDateRange?.from && "text-muted-foreground"}`}
+                                                    className={`w-full h-9 border-input bg-white hover:bg-white text-sm font-normal justify-start ${!exportDateRange?.from && "text-muted-foreground"}`}
                                                 >
                                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                                     {exportDateRange?.from ? (
@@ -496,7 +496,7 @@ export default function AdminPaymentsPage() {
                                     {/* Include Summary (custom checkbox) */}
                                     {exportFormat === "pdf" && (
                                         <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setExportIncludeSummary(!exportIncludeSummary)}>
-                                            <div className={`w-5 h-5 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${exportIncludeSummary ? "bg-[#C2185B] border-[#C2185B]" : "border-[#D0D0D0] group-hover:border-[#C2185B]/50"}`}>
+                                            <div className={`w-5 h-5 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${exportIncludeSummary ? "bg-primary border-primary" : "border-[#D0D0D0] group-hover:border-primary/50"}`}>
                                                 {exportIncludeSummary && (
                                                     <motion.svg initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 500, damping: 30 }}
                                                         width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -509,11 +509,11 @@ export default function AdminPaymentsPage() {
                                                     </motion.svg>
                                                 )}
                                             </div>
-                                            <span className="text-sm text-[#555]">Include summary</span>
+                                            <span className="text-sm text-muted-foreground">Include summary</span>
                                         </label>
                                     )}
                                 </div>
-                                <Button onClick={handleExport} disabled={exporting} className="w-full mt-5 bg-[#C2185B] text-white hover:bg-[#A01548] h-10 gap-2">
+                                <Button onClick={handleExport} disabled={exporting} className="w-full mt-5 bg-primary text-primary-foreground hover:bg-primary/90 h-10 gap-2">
                                     {exporting ? <><Loader2 size={14} className="animate-spin" /> Exporting...</> : <><Download size={14} /> Export</>}
                                 </Button>
                             </motion.div>

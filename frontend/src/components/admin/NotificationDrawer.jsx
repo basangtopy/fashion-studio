@@ -93,14 +93,14 @@ export default function NotificationDrawer({ open, onClose }) {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                        className="fixed top-0 right-0 h-full w-full max-w-[380px] bg-white shadow-xl z-50 flex flex-col"
+                        className="fixed top-0 right-0 h-full w-full max-w-[380px] bg-card shadow-xl z-50 flex flex-col"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between px-5 h-14 border-b border-[rgba(0,0,0,0.06)] shrink-0">
+                        <div className="flex items-center justify-between px-5 h-14 border-b border-border shrink-0">
                             <div className="flex items-center gap-2">
-                                <h3 className="text-sm font-bold text-[#0D0D0D]">Notifications</h3>
+                                <h3 className="text-sm font-bold text-foreground">Notifications</h3>
                                 {unreadCount > 0 && (
-                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#C2185B] text-white font-bold min-w-[18px] text-center">
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground font-bold min-w-[18px] text-center">
                                         {unreadCount}
                                     </span>
                                 )}
@@ -109,13 +109,13 @@ export default function NotificationDrawer({ open, onClose }) {
                                 {unreadCount > 0 && (
                                     <button
                                         onClick={() => markAllRead.mutate()}
-                                        className="text-xs text-[#C2185B] font-medium hover:underline flex items-center gap-1"
+                                        className="text-xs text-primary font-medium hover:underline flex items-center gap-1"
                                     >
                                         <CheckCheck size={14} /> Read all
                                     </button>
                                 )}
-                                <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#F4F0F8] transition-colors">
-                                    <X size={16} className="text-[#999]" />
+                                <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+                                    <X size={16} className="text-text-light" />
                                 </button>
                             </div>
                         </div>
@@ -125,7 +125,7 @@ export default function NotificationDrawer({ open, onClose }) {
                             {notifications.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full px-6 text-center">
                                     <Bell size={32} className="text-[#E0E0E0] mb-3" />
-                                    <p className="text-sm text-[#999]">No notifications yet</p>
+                                    <p className="text-sm text-text-light">No notifications yet</p>
                                 </div>
                             ) : (
                                 <div className="py-2">
@@ -135,24 +135,24 @@ export default function NotificationDrawer({ open, onClose }) {
                                             <button
                                                 key={n.id}
                                                 onClick={() => handleNotificationClick(n)}
-                                                className={`w-full text-left flex items-start gap-3 px-5 py-3 hover:bg-[#FAFAFA] transition-colors ${!n.isRead ? "bg-[#FFF5F8]" : ""}`}
+                                                className={`w-full text-left flex items-start gap-3 px-5 py-3 hover:bg-surface-2 transition-colors ${!n.isRead ? "bg-[#FFF5F8]" : ""}`}
                                             >
-                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${!n.isRead ? "bg-[#C2185B]/10 text-[#C2185B]" : "bg-[#F4F0F8] text-[#999]"}`}>
+                                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${!n.isRead ? "bg-primary/10 text-primary" : "bg-muted text-text-light"}`}>
                                                     <Icon size={14} />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className={`text-sm leading-snug ${!n.isRead ? "text-[#0D0D0D] font-medium" : "text-[#555]"}`}>
+                                                    <p className={`text-sm leading-snug ${!n.isRead ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                                                         {n.title || n.message}
                                                     </p>
                                                     {n.message && n.title && (
-                                                        <p className="text-xs text-[#999] mt-0.5 truncate">{n.message}</p>
+                                                        <p className="text-xs text-text-light mt-0.5 truncate">{n.message}</p>
                                                     )}
-                                                    <p className="text-[10px] text-[#999] mt-1">
+                                                    <p className="text-[10px] text-text-light mt-1">
                                                         {formatRelativeTime(n.createdAt)}
                                                     </p>
                                                 </div>
                                                 {!n.isRead && (
-                                                    <div className="w-2 h-2 rounded-full bg-[#C2185B] shrink-0 mt-2" />
+                                                    <div className="w-2 h-2 rounded-full bg-primary shrink-0 mt-2" />
                                                 )}
                                             </button>
                                         );
@@ -181,10 +181,10 @@ export function NotificationBellButton({ onClick, className = "" }) {
     const unreadCount = data?.unreadCount || (Array.isArray(data?.notifications || data) ? (data?.notifications || data).filter((n) => !n.isRead).length : 0);
 
     return (
-        <button onClick={onClick} className={`relative w-9 h-9 rounded-lg bg-[#F4F0F8] flex items-center justify-center text-[#555] hover:bg-[#E8E4EC] transition-colors ${className}`}>
+        <button onClick={onClick} className={`relative w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-[#E8E4EC] transition-colors ${className}`}>
             <Bell size={16} />
             {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-[#C2185B] text-white text-[10px] font-bold flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
                     {unreadCount > 9 ? "9+" : unreadCount}
                 </span>
             )}

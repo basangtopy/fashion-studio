@@ -23,12 +23,12 @@ export default function PaymentInfoCard({ orderNumber, grandTotal, compact = fal
     ];
 
     return (
-        <div className="rounded-xl bg-[#1A1A2E] text-white overflow-hidden">
+        <div className="rounded-xl bg-secondary text-white overflow-hidden">
             {/* Header */}
             <div className="px-5 pt-5 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-2.5 mb-1">
-                    <div className="w-8 h-8 rounded-lg bg-[#C2185B]/20 flex items-center justify-center shrink-0">
-                        <CreditCard size={15} className="text-[#C2185B]" />
+                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                        <CreditCard size={15} className="text-primary" />
                     </div>
                     <h3 className="font-semibold text-sm">Payment Details</h3>
                 </div>
@@ -53,7 +53,7 @@ export default function PaymentInfoCard({ orderNumber, grandTotal, compact = fal
                             title="Copy"
                         >
                             {copiedField === key ? (
-                                <Check size={12} className="text-[#C2185B]" />
+                                <Check size={12} className="text-primary" />
                             ) : (
                                 <Copy size={12} className="text-white/40" />
                             )}
@@ -71,7 +71,7 @@ export default function PaymentInfoCard({ orderNumber, grandTotal, compact = fal
                     <ol className="space-y-2.5">
                         {paymentInfo.instructions.map((step, i) => (
                             <li key={i} className="flex gap-2.5">
-                                <span className="shrink-0 w-5 h-5 rounded-full bg-[#C2185B]/20 text-[#C2185B] text-[10px] font-bold flex items-center justify-center mt-0.5">
+                                <span className="shrink-0 w-5 h-5 rounded-full bg-primary/20 text-primary text-[10px] font-bold flex items-center justify-center mt-0.5">
                                     {i + 1}
                                 </span>
                                 <p className="text-xs text-white/60 leading-relaxed">{step}</p>
