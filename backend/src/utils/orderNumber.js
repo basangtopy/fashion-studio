@@ -3,27 +3,33 @@ import prisma from "../config/prisma.js";
 // Generates a human-readable order number: ORD-2026-0042
 // Format: ORD-{YEAR}-{4-digit sequence padded with zeros}
 // The sequence resets each year — so ORD-2026-0001 and ORD-2027-0001 can both exist
-// Uses SELECT ... FOR UPDATE via a raw query to serialize concurrent generation
-// and prevent two transactions from reading the same "last" value simultaneously.
 //
-// Accepts an optional transaction client (tx) so it can be called INSIDE
-// a Prisma interactive transaction — this prevents race conditions where
-// two concurrent requests generate the same order number.
+// Concurrency: takes a transaction-scoped Postgres advisory lock so concurrent
+// order-creation transactions serialize here. A plain SELECT ... FOR UPDATE is
+// not enough because it can't lock rows that don't exist yet — two concurrent
+// FIRST orders of a year would both read "no rows" and both mint ...-0001.
+// The advisory lock is released automatically when the transaction commits/rolls back.
+//
+// Must be called INSIDE a Prisma interactive transaction (pass the tx client)
+// so the advisory lock is scoped to that transaction.
 
 export const generateOrderNumber = async (tx) => {
   const year = new Date().getFullYear();
   const prefix = `ORD-${year}-`;
 
-  // Lock the matching rows so concurrent transactions queue here instead of
-  // both reading the same last sequence number.
+  // Serialize all concurrent order-number generation on a single named lock.
+  // Held until the surrounding transaction ends.
+  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext('order_number_gen'))`;
+
+  // Fetch the highest existing order number for the current year.
+  // Table is "orders" (Prisma @@map), not "Order".
   // $queryRaw returns an array of row objects.
   const rows = await tx.$queryRaw`
     SELECT "orderNumber"
-    FROM "Order"
+    FROM "orders"
     WHERE "orderNumber" LIKE ${prefix + "%"}
     ORDER BY "orderNumber" DESC
     LIMIT 1
-    FOR UPDATE
   `;
 
   let nextSequence = 1;
