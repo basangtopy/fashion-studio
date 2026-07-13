@@ -5,6 +5,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import passport from "./config/passport.js";
 
+import prisma from "./config/prisma.js";
 import routes from "./routes/index.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
@@ -43,12 +44,26 @@ if (process.env.NODE_ENV === "development") {
 }
 
 // ─── Health Check ─────────────────────────────────────────────────────────
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    environment: process.env.NODE_ENV,
-    timestamp: new Date().toISOString(),
-  });
+// Verifies DB connectivity so platform health probes fail when Postgres is down
+// (rather than reporting "ok" while every real request 500s).
+app.get("/health", async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.status(200).json({
+      status: "ok",
+      database: "connected",
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error("[HEALTH] Database check failed:", err.message);
+    res.status(503).json({
+      status: "degraded",
+      database: "unreachable",
+      environment: process.env.NODE_ENV,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 // ─── API Routes ───────────────────────────────────────────────────────────

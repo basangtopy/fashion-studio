@@ -1,7 +1,26 @@
 import prisma from "../config/prisma.js";
 import { sendToUser } from "../utils/sseManager.js";
-import { sendEmail } from "./email.service.js";
-import { sendWhatsApp } from "./whatsapp.service.js";
+import { sendEmail as _sendEmail } from "./email.service.js";
+import { sendWhatsApp as _sendWhatsApp } from "./whatsapp.service.js";
+
+// ─── Non-blocking dispatch ─────────────────────────────────────────────────
+// Email/WhatsApp are best-effort side effects. We fire them without waiting so
+// the HTTP response (order status change, payment confirm, etc.) doesn't hang
+// on an SMTP/Twilio round-trip. These return nothing, so the existing
+// `await sendEmail(...)` call sites resolve immediately while the real send
+// runs detached. The .catch guards against sync throws and stray rejections —
+// important because a rejected promise would otherwise hit the process-level
+// unhandledRejection handler and shut the server down.
+const sendEmail = (args) => {
+  Promise.resolve()
+    .then(() => _sendEmail(args))
+    .catch((err) => console.error("[NOTIFY EMAIL]", err?.message || err));
+};
+const sendWhatsApp = (args) => {
+  Promise.resolve()
+    .then(() => _sendWhatsApp(args))
+    .catch((err) => console.error("[NOTIFY WHATSAPP]", err?.message || err));
+};
 import {
   orderPlacedTemplate,
   orderStatusTemplate,

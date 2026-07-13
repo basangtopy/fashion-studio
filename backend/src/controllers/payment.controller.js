@@ -241,6 +241,25 @@ export const confirmPayment = async (req, res) => {
 
   // Atomic: confirm payment + recalculate totalPaid in a single transaction
   const { confirmed, newTotalPaid } = await prisma.$transaction(async (tx) => {
+    // Guard: don't let confirmed payments exceed the agreed total.
+    // Checked inside the transaction so concurrent confirmations can't both slip past.
+    if (payment.order.totalAgreedFee != null) {
+      const prior = await tx.payment.aggregate({
+        where: { orderId: payment.orderId, status: "CONFIRMED" },
+        _sum: { amount: true },
+      });
+      const projected =
+        Number(prior._sum.amount ?? 0) + Number(payment.amount);
+      if (projected > Number(payment.order.totalAgreedFee)) {
+        throw new AppError(
+          `Confirming this payment would exceed the agreed total of ₦${Number(
+            payment.order.totalAgreedFee,
+          ).toLocaleString()}.`,
+          400,
+        );
+      }
+    }
+
     const confirmedPayment = await tx.payment.update({
       where: { id: payment.id },
       data: {
@@ -351,6 +370,17 @@ export const logOfflinePayment = async (req, res) => {
       `Payments cannot be logged for orders with status: ${order.status}`,
       400,
     );
+  }
+
+  // Guard: an offline payment can't push confirmed total past the agreed fee
+  if (order.totalAgreedFee != null) {
+    const outstanding = Number(order.totalAgreedFee) - Number(order.totalPaid);
+    if (Number(amount) > outstanding) {
+      throw new AppError(
+        `Amount exceeds outstanding balance. Outstanding: ₦${outstanding.toLocaleString()}`,
+        400,
+      );
+    }
   }
 
   // Offline payments are created as CONFIRMED immediately
@@ -490,6 +520,16 @@ export const getFinanceSummary = async (req, res) => {
     ...orderFilter,
   };
 
+  // Reusable raw-SQL fragments for the grouped revenue queries below.
+  // Aggregating in the DB avoids loading every confirmed payment into memory.
+  const fromDate = dateFilter.createdAt?.gte ?? null;
+  const toDate = dateFilter.createdAt?.lte ?? null;
+  const dateSql = Prisma.sql`
+    ${fromDate ? Prisma.sql`AND p."createdAt" >= ${fromDate}` : Prisma.empty}
+    ${toDate ? Prisma.sql`AND p."createdAt" <= ${toDate}` : Prisma.empty}
+  `;
+  const typeSql = type ? Prisma.sql`AND o."orderType" = ${type}` : Prisma.empty;
+
   // Run all summary queries in parallel
   const [
     totalRevenue,
@@ -523,21 +563,17 @@ export const getFinanceSummary = async (req, res) => {
       _count: { id: true },
     }),
 
-    // Revenue broken down by order type (MODEL_1, MODEL_2, MODEL_3)
-    // groupBy doesn't support nested relations, so we query orders directly
-    prisma.order.findMany({
-      where: {
-        payments: { some: { status: "CONFIRMED", ...dateFilter } },
-        ...(type ? { orderType: type } : {}),
-      },
-      select: {
-        orderType: true,
-        payments: {
-          where: { status: "CONFIRMED" },
-          select: { amount: true },
-        },
-      },
-    }),
+    // Revenue broken down by order type (MODEL_1, MODEL_2, MODEL_3).
+    // groupBy can't span the payment→order relation, so aggregate in raw SQL.
+    prisma.$queryRaw`
+      SELECT o."orderType" AS "orderType", COALESCE(SUM(p.amount), 0) AS amount
+      FROM "payments" p
+      JOIN "orders" o ON o.id = p."orderId"
+      WHERE p.status = 'CONFIRMED'
+        ${dateSql}
+        ${typeSql}
+      GROUP BY o."orderType"
+    `,
 
     // 5 most recent confirmed payments for a "recent activity" widget
     prisma.payment.findMany({
@@ -570,13 +606,20 @@ export const getFinanceSummary = async (req, res) => {
       LIMIT 20
     `,
 
-    // Revenue time-series: fetch all confirmed payments with their dates
-    // for building daily revenue breakdown
-    prisma.payment.findMany({
-      where: confirmedFilter,
-      select: { amount: true, confirmedAt: true, createdAt: true },
-      orderBy: { confirmedAt: "asc" },
-    }),
+    // Revenue time-series: aggregate confirmed payments into daily buckets in
+    // the DB (date_trunc) rather than pulling every row to group in JS.
+    prisma.$queryRaw`
+      SELECT
+        to_char(date_trunc('day', COALESCE(p."confirmedAt", p."createdAt")), 'YYYY-MM-DD') AS date,
+        COALESCE(SUM(p.amount), 0) AS "totalRevenue"
+      FROM "payments" p
+      JOIN "orders" o ON o.id = p."orderId"
+      WHERE p.status = 'CONFIRMED'
+        ${dateSql}
+        ${typeSql}
+      GROUP BY 1
+      ORDER BY 1 ASC
+    `,
 
     // Orders by status: count orders grouped by status (within date range if specified)
     prisma.order.groupBy({
@@ -596,15 +639,10 @@ export const getFinanceSummary = async (req, res) => {
     }),
   ]);
 
-  // Process revenue by order type
+  // Process revenue by order type (raw rows: { orderType, amount })
   const revenueByType = { MODEL_1: 0, MODEL_2: 0, MODEL_3: 0 };
-  for (const order of revenueByOrderType) {
-    const orderTotal = order.payments.reduce(
-      (sum, p) => sum + Number(p.amount),
-      0,
-    );
-    revenueByType[order.orderType] =
-      (revenueByType[order.orderType] || 0) + orderTotal;
+  for (const row of revenueByOrderType) {
+    revenueByType[row.orderType] = Number(row.amount);
   }
 
   // Process payment type breakdown
@@ -616,17 +654,11 @@ export const getFinanceSummary = async (req, res) => {
     };
   }
 
-  // Build revenue time-series (grouped by day)
-  const revenueMap = {};
-  for (const p of confirmedPaymentsRaw) {
-    const dateKey = (p.confirmedAt || p.createdAt)
-      .toISOString()
-      .split("T")[0];
-    revenueMap[dateKey] = (revenueMap[dateKey] || 0) + Number(p.amount);
-  }
-  const revenueTimeSeries = Object.entries(revenueMap)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([date, totalRevenue]) => ({ date, totalRevenue }));
+  // Revenue time-series already aggregated per day and ordered by the DB
+  const revenueTimeSeries = confirmedPaymentsRaw.map((r) => ({
+    date: r.date,
+    totalRevenue: Number(r.totalRevenue),
+  }));
 
   // Build orders-by-status array for pie/donut chart
   const ordersByStatus = orderStatusCounts.map((row) => ({
