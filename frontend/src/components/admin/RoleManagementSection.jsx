@@ -229,13 +229,13 @@ function PasswordConfirmModal({ open, onClose, user, targetRole, onSuccess }) {
         },
     });
 
-    // Reset state when modal opens
+    // Auto-focus the password input on open. State starts fresh each time
+    // because the parent only mounts this modal while a user is selected, so
+    // no explicit reset is needed here.
     useEffect(() => {
         if (open) {
-            setPassword("");
-            setShowPassword(false);
-            // Auto-focus the password input
-            setTimeout(() => inputRef.current?.focus(), 100);
+            const t = setTimeout(() => inputRef.current?.focus(), 100);
+            return () => clearTimeout(t);
         }
     }, [open]);
 

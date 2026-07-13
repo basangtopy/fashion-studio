@@ -62,10 +62,15 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Close any open menus when the route changes. This intentionally reacts to
+    // the router (covering link clicks AND browser back/forward), which is a
+    // legitimate external-system sync, so the set-state-in-effect rule is waived.
+    /* eslint-disable react-hooks/set-state-in-effect */
     useEffect(() => {
         setMobileMenuOpen(false);
         setMegaMenuOpen(false);
     }, [pathname]);
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     // Close mega menu on outside click
     useEffect(() => {

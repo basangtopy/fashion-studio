@@ -164,7 +164,7 @@ export default function NotificationDrawer({ open, onClose }) {
                                         <Bell size={24} className="text-text-light" />
                                     </div>
                                     <p className="text-sm font-medium text-muted-foreground">No notifications yet</p>
-                                    <p className="text-xs text-text-light mt-1">We'll notify you when something important happens</p>
+                                    <p className="text-xs text-text-light mt-1">We&apos;ll notify you when something important happens</p>
                                 </div>
                             ) : (
                                 <div>

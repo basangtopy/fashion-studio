@@ -46,6 +46,13 @@ const KANBAN_GROUPS = [
     { key: "CANCELLED", label: "Cancelled" },
 ];
 
+// Declared at module scope (not inside the page component) so it isn't
+// re-created on every render. Sort state is passed in as props.
+function SortIcon({ field, sortBy, sortDir }) {
+    if (sortBy !== field) return <ArrowUpDown size={12} className="text-[#BDBDBD]" />;
+    return sortDir === "asc" ? <ArrowUp size={12} className="text-primary" /> : <ArrowDown size={12} className="text-primary" />;
+}
+
 export default function AdminOrdersPage() {
     const [viewMode, setViewMode] = useState(() => {
         if (typeof window !== "undefined") return localStorage.getItem("admin-orders-view") || "table";
@@ -97,11 +104,6 @@ export default function AdminOrdersPage() {
             setSortDir("desc");
         }
         setPage(1);
-    };
-
-    const SortIcon = ({ field }) => {
-        if (sortBy !== field) return <ArrowUpDown size={12} className="text-[#BDBDBD]" />;
-        return sortDir === "asc" ? <ArrowUp size={12} className="text-primary" /> : <ArrowDown size={12} className="text-primary" />;
     };
 
     const toggleStatus = (val) => {
@@ -356,21 +358,21 @@ export default function AdminOrdersPage() {
                                     <thead>
                                         <tr className="border-b border-border bg-surface-2">
                                             <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("orderNumber")}>
-                                                <span className="flex items-center gap-1">Order # <SortIcon field="orderNumber" /></span>
+                                                <span className="flex items-center gap-1">Order # <SortIcon field="orderNumber" sortBy={sortBy} sortDir={sortDir} /></span>
                                             </th>
                                             <th className="text-left text-xs font-medium text-text-light py-3 px-4">Client</th>
                                             <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("orderType")}>
-                                                <span className="flex items-center gap-1">Type <SortIcon field="orderType" /></span>
+                                                <span className="flex items-center gap-1">Type <SortIcon field="orderType" sortBy={sortBy} sortDir={sortDir} /></span>
                                             </th>
                                             <th className="text-left text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("status")}>
-                                                <span className="flex items-center gap-1">Status <SortIcon field="status" /></span>
+                                                <span className="flex items-center gap-1">Status <SortIcon field="status" sortBy={sortBy} sortDir={sortDir} /></span>
                                             </th>
                                             <th className="text-right text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("totalAgreedFee")}>
-                                                <span className="flex items-center gap-1 justify-end">Agreed Fee <SortIcon field="totalAgreedFee" /></span>
+                                                <span className="flex items-center gap-1 justify-end">Agreed Fee <SortIcon field="totalAgreedFee" sortBy={sortBy} sortDir={sortDir} /></span>
                                             </th>
                                             <th className="text-right text-xs font-medium text-text-light py-3 px-4">Total Paid</th>
                                             <th className="text-right text-xs font-medium text-text-light py-3 px-4 cursor-pointer select-none hover:text-foreground transition-colors" onClick={() => toggleSort("createdAt")}>
-                                                <span className="flex items-center gap-1 justify-end">Date <SortIcon field="createdAt" /></span>
+                                                <span className="flex items-center gap-1 justify-end">Date <SortIcon field="createdAt" sortBy={sortBy} sortDir={sortDir} /></span>
                                             </th>
                                             <th className="text-right text-xs font-medium text-text-light py-3 px-4 w-24">Action</th>
                                         </tr>

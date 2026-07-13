@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, Mail, Phone, Lock, Save, Camera, Shield, CheckCircle2, AlertTriangle, Calendar, Eye, EyeOff, LogOut } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -460,15 +460,24 @@ export default function ClientProfilePage() {
 }
 
 // Custom Date of Birth Picker using highly premium Shadcn Selects (Day/Month/Year)
-function DobPicker({ value, onChange, disabled }) {
-    const [local, setLocal] = useState({ y: "", m: "", d: "" });
+function parseDob(value) {
+    if (value && value.includes("-")) {
+        const [y, m, d] = value.split("-");
+        return { y, m, d };
+    }
+    return { y: "", m: "", d: "" };
+}
 
-    useEffect(() => {
-        if (value && value.includes("-")) {
-            const [y, m, d] = value.split("-");
-            setLocal({ y, m, d });
-        }
-    }, [value]);
+function DobPicker({ value, onChange, disabled }) {
+    const [local, setLocal] = useState(() => parseDob(value));
+
+    // Re-sync when the incoming value changes (e.g. profile loads/resets),
+    // adjusting state during render instead of in an effect.
+    const [prevValue, setPrevValue] = useState(value);
+    if (value !== prevValue) {
+        setPrevValue(value);
+        setLocal(parseDob(value));
+    }
 
     const handleChange = (key, val) => {
         const newLocal = { ...local, [key]: val };

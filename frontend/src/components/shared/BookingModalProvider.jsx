@@ -18,6 +18,9 @@ function BookingModalLogic({ children }) {
         if (!loading && isAuthenticated) {
             const action = searchParams.get("action");
             if (action === "book_appointment") {
+                // Opening from a URL signal (and cleaning the URL below) is a
+                // legitimate external-system sync effect.
+                // eslint-disable-next-line react-hooks/set-state-in-effect
                 setIsOpen(true);
 
                 // Clean the URL so it doesn't pop open again automatically on refresh

@@ -47,9 +47,6 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - name: Lint
-        # Non-blocking: surfaces lint issues without failing the job. The build
-        # below is the gate. Tackle the pre-existing lint debt separately.
-        continue-on-error: true
         run: npm run lint
       - name: Build
         run: npm run build
