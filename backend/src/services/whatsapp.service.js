@@ -1,19 +1,30 @@
 import twilio from "twilio";
 
+// Lazily create a single Twilio client the first time it's needed and reuse it
+// across all sends. Returns null when credentials aren't configured so callers
+// can skip silently.
+let client = null;
+const getClient = () => {
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+    return null;
+  }
+  if (!client) {
+    client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN,
+    );
+  }
+  return client;
+};
 
 // phone should be in E.164 format: +2348012345678
 // Twilio will prepend 'whatsapp:' to it
 export const sendWhatsApp = async ({ to, body }) => {
-  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+  const client = getClient();
+  if (!client) {
     // Not yet configured — skip silently
     return { skipped: true };
   }
-
-  // Initialise Twilio client
-  const client = twilio(
-    process.env.TWILIO_ACCOUNT_SID,
-    process.env.TWILIO_AUTH_TOKEN,
-  );
 
   // Ensure the number is in E.164 format
   const formattedTo = to.startsWith("+") ? to : `+${to}`;
