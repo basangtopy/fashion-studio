@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Loader2, PencilLine } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -10,25 +10,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+// Wrapper mounts the form only while open, so the inner component initializes
+// its state directly from `client` (no effect syncing props into state).
 export default function EditClientModal({ open, onClose, client }) {
+    if (!open) return null;
+    return <EditClientForm onClose={onClose} client={client} />;
+}
+
+function EditClientForm({ onClose, client }) {
     const toast = useToast();
     const queryClient = useQueryClient();
-    const [form, setForm] = useState({
-        fullName: "", email: "", phone: "", sex: "", dateOfBirth: "", address: "",
-    });
-
-    useEffect(() => {
-        if (client && open) {
-            setForm({
-                fullName: client.fullName || "",
-                email: client.email || "",
-                phone: client.phone || "",
-                sex: client.sex || "",
-                dateOfBirth: client.dateOfBirth ? client.dateOfBirth.split("T")[0] : "",
-                address: client.address || "",
-            });
-        }
-    }, [client, open]);
+    const [form, setForm] = useState(() => ({
+        fullName: client?.fullName || "",
+        email: client?.email || "",
+        phone: client?.phone || "",
+        sex: client?.sex || "",
+        dateOfBirth: client?.dateOfBirth ? client.dateOfBirth.split("T")[0] : "",
+        address: client?.address || "",
+    }));
 
     const mutation = useMutation({
         mutationFn: async (data) => {
@@ -57,10 +56,8 @@ export default function EditClientModal({ open, onClose, client }) {
         },
     });
 
-    if (!open) return null;
-
     return (
-        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+        <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className="max-w-md p-0 overflow-hidden border-0 gap-0">
                 <DialogHeader className="px-6 py-4 border-b border-border bg-popover text-left shrink-0">
                     <DialogTitle className="flex items-center gap-2 text-sm font-bold text-foreground">

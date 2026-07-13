@@ -358,7 +358,7 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                             <p className="text-sm font-semibold text-status-info mb-1">What happens next?</p>
                             <p className="text-xs text-status-info/80 leading-relaxed">
                                 Our studio will review your order and send you a quote within 24 hours. Once
-                                you approve the quote, you'll make a payment (full or installment) and
+                                you approve the quote, you&apos;ll make a payment (full or installment) and
                                 production begins.
                             </p>
                         </div>
@@ -375,7 +375,7 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                             </div>
                             <div>
                                 <p className="text-sm font-semibold text-primary">Book Fitting Appointment</p>
-                                <p className="text-xs text-text-light">You indicated you'd like an in-studio fitting.</p>
+                                <p className="text-xs text-text-light">You indicated you&apos;d like an in-studio fitting.</p>
                             </div>
                             <ArrowRight size={14} className="text-primary ml-auto shrink-0" />
                         </button>
@@ -391,7 +391,7 @@ function OrderCreatedState({ order, measurementChoice, onBookFitting }) {
                             </div>
                             <div>
                                 <p className="text-sm font-semibold text-status-info">Update My Measurements</p>
-                                <p className="text-xs text-text-light">You indicated you'd like to update your measurements.</p>
+                                <p className="text-xs text-text-light">You indicated you&apos;d like to update your measurements.</p>
                             </div>
                             <ArrowRight size={14} className="text-status-info ml-auto shrink-0" />
                         </Link>
@@ -1024,7 +1024,7 @@ function NewOrderContent() {
                                 <p className="text-xs text-muted-foreground leading-relaxed">
                                     Use this space to share any specifics about your order — preferred length,
                                     lining, event occasion, color adjustments, or anything else your tailor
-                                    should know. <strong className="text-foreground">The more detail you provide, the closer we'll get to your vision on the first try.</strong>
+                                    should know. <strong className="text-foreground">The more detail you provide, the closer we&apos;ll get to your vision on the first try.</strong>
                                 </p>
                             </div>
                             <Textarea
@@ -1105,8 +1105,8 @@ function NewOrderContent() {
                         </p>
                         <p className="text-xs text-text-light leading-relaxed">
                             Bespoke orders are priced after our studio reviews your specifications.
-                            You'll receive a personalised quote within 24 hours — no surprise costs.
-                            Payment (full or installment) is only required once you've approved the quote.
+                            You&apos;ll receive a personalised quote within 24 hours — no surprise costs.
+                            Payment (full or installment) is only required once you&apos;ve approved the quote.
                         </p>
                     </div>
                 </motion.div>

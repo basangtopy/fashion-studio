@@ -66,7 +66,7 @@ function AnimatedStat({ label, value, icon: Icon, color, isCurrency, index = 0 }
 }
 
 export default function AdminFinancePage() {
-    const presets = useMemo(getDatePresets, []);
+    const presets = useMemo(() => getDatePresets(), []);
     const [datePreset, setDatePreset] = useState("this_month");
     const [dateRange, setDateRange] = useState({ from: undefined, to: undefined });
     const [outstandingPage, setOutstandingPage] = useState(1);

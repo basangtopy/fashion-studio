@@ -89,7 +89,7 @@ function OrderCreatedState({ order }) {
             >
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Order Placed!</h1>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                    Your order has been received. Make your payment to confirm it and we'll get to work right away.
+                    Your order has been received. Make your payment to confirm it and we&apos;ll get to work right away.
                 </p>
             </motion.div>
 
@@ -158,7 +158,7 @@ function OrderCreatedState({ order }) {
                                 Make the full payment of{" "}
                                 <span className="font-bold font-mono">{formatCurrency(grandTotal)}</span> using the
                                 account details on the payment info card. Then open your order page and send your payment proof via the
-                                payment section. We'll confirm and process your order shortly after.
+                                payment section. We&apos;ll confirm and process your order shortly after.
                             </p>
                         </div>
                     </div>
@@ -205,7 +205,9 @@ export default function CheckoutPage() {
 
     const [fulfillmentMethod, setFulfillmentMethod] = useState("PICKUP");
     const [useProfileAddress, setUseProfileAddress] = useState(true);
-    const [deliveryAddress, setDeliveryAddress] = useState("");
+    // Pre-fill from the profile address. The (client) layout only renders this
+    // page after auth resolves, so `user` is already available on first render.
+    const [deliveryAddress, setDeliveryAddress] = useState(() => user?.address || "");
     const [clientNotes, setClientNotes] = useState("");
     const [authorised, setAuthorised] = useState(false);
     const [placedOrder, setPlacedOrder] = useState(null); // order created state
@@ -215,13 +217,6 @@ export default function CheckoutPage() {
         (sum, item) => sum + Number(item.readyToWear?.price || 0) * item.quantity,
         0
     );
-
-    // Pre-fill delivery address from user profile
-    useEffect(() => {
-        if (user?.address) {
-            setDeliveryAddress(user.address);
-        }
-    }, [user]);
 
     // Redirect if cart is empty (only after loading is done)
     useEffect(() => {

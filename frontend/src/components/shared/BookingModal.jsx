@@ -378,7 +378,7 @@ export function BookingModal({ isOpen, onOpenChange }) {
                             {/* Links */}
                             <div className="flex items-center justify-between">
                                 <p className="text-[11px] leading-relaxed" style={{ color: 'var(--color-text-light)' }}>
-                                    This is a request — we'll contact you to confirm.
+                                    This is a request — we&apos;ll contact you to confirm.
                                 </p>
                                 <Link
                                     href="/client/appointments"

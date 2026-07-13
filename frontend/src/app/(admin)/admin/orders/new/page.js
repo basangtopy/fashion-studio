@@ -509,7 +509,7 @@ function NewOrderForm() {
                                             <div className="flex items-center justify-between bg-surface-2 p-5 rounded-xl border border-border">
                                                 <div>
                                                     <Label className="text-sm font-semibold text-foreground flex items-center gap-2 mb-1">Use Saved Measurements</Label>
-                                                    <p className="text-xs text-muted-foreground">Bind backend calculations to client's existing measurement profile.</p>
+                                                    <p className="text-xs text-muted-foreground">Bind backend calculations to client&apos;s existing measurement profile.</p>
                                                 </div>
                                                 <button type="button" onClick={() => setForm({ ...form, useSavedMeasurements: !form.useSavedMeasurements })}
                                                     className={`w-12 h-7 rounded-full relative transition-colors ${form.useSavedMeasurements ? "bg-primary" : "bg-[#E0E0E0]"}`}>

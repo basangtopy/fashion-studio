@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Ruler, Loader2, Plus, Check } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -37,6 +37,8 @@ const LOWER_FIELDS = [
  *                              disclaimer checkbox and appends disclaimerSigned
  *                              to every API call so the backend accepts it.
  */
+// Wrapper mounts the form only while open, so the inner component initializes
+// its state directly from `existingMeasurement` (no effect syncing props).
 export default function MeasurementFormModal({
     open,
     onClose,
@@ -44,37 +46,37 @@ export default function MeasurementFormModal({
     existingMeasurement = null,
     isClient = false,
 }) {
+    if (!open) return null;
+    return (
+        <MeasurementForm
+            onClose={onClose}
+            clientId={clientId}
+            existingMeasurement={existingMeasurement}
+            isClient={isClient}
+        />
+    );
+}
+
+function MeasurementForm({ onClose, clientId, existingMeasurement, isClient }) {
     const toast = useToast();
     const queryClient = useQueryClient();
     const isUpdate = !!existingMeasurement;
 
-    const [fields, setFields] = useState({});
-    const [notes, setNotes] = useState("");
-    const [customParams, setCustomParams] = useState([]);
+    const [fields, setFields] = useState(() => {
+        if (!existingMeasurement) return {};
+        const vals = {};
+        [...UPPER_FIELDS, ...LOWER_FIELDS].forEach(({ key }) => {
+            if (existingMeasurement[key] != null) vals[key] = existingMeasurement[key];
+        });
+        return vals;
+    });
+    const [notes, setNotes] = useState(() => existingMeasurement?.notes || "");
+    const [customParams, setCustomParams] = useState(() =>
+        existingMeasurement?.customParams && typeof existingMeasurement.customParams === "object"
+            ? Object.entries(existingMeasurement.customParams).map(([k, v]) => ({ key: k, value: String(v) }))
+            : []
+    );
     const [disclaimerSigned, setDisclaimerSigned] = useState(false);
-
-    // Pre-fill from existing measurement
-    useEffect(() => {
-        if (existingMeasurement) {
-            const vals = {};
-            [...UPPER_FIELDS, ...LOWER_FIELDS].forEach(({ key }) => {
-                if (existingMeasurement[key] != null) vals[key] = existingMeasurement[key];
-            });
-            setFields(vals);
-            setNotes(existingMeasurement.notes || "");
-            if (existingMeasurement.customParams && typeof existingMeasurement.customParams === "object") {
-                setCustomParams(
-                    Object.entries(existingMeasurement.customParams).map(([k, v]) => ({ key: k, value: String(v) }))
-                );
-            }
-        } else {
-            setFields({});
-            setNotes("");
-            setCustomParams([]);
-        }
-        // Reset disclaimer whenever the modal content changes
-        setDisclaimerSigned(false);
-    }, [existingMeasurement, open]);
 
     const mutation = useMutation({
         mutationFn: async () => {
@@ -129,13 +131,11 @@ export default function MeasurementFormModal({
         },
     });
 
-    if (!open) return null;
-
     // Client mode: save is disabled until the disclaimer is signed
     const canSave = isClient ? disclaimerSigned && !mutation.isPending : !mutation.isPending;
 
     return (
-        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+        <Dialog open onOpenChange={(isOpen) => !isOpen && onClose()}>
             <DialogContent className="max-w-xl p-0 border-0 gap-0 overflow-hidden flex flex-col max-h-[90vh]">
                 <DialogHeader className="flex flex-row items-center justify-between px-6 py-4 border-b border-border bg-popover text-left shrink-0">
                     <DialogTitle className="flex items-center gap-2 text-sm font-bold text-foreground">
