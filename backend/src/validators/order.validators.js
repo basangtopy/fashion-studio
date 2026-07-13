@@ -5,7 +5,7 @@ import { z } from "zod";
 export const createOrderSchema = z
   .object({
     orderType: z.enum(["MODEL_1", "MODEL_2", "MODEL_3"], {
-      required_error: "Order type is required",
+      error: "Order type is required",
     }),
 
     // Style selection (Model 1 & 2) — either a catalog style or a custom description
@@ -41,7 +41,7 @@ export const createOrderSchema = z
 
     // Fulfillment
     fulfillmentMethod: z.enum(["PICKUP", "DELIVERY"], {
-      required_error: "Fulfillment method is required",
+      error: "Fulfillment method is required",
     }),
 
     deliveryAddress: z.string().max(500).trim().optional(),
@@ -98,7 +98,7 @@ export const createOrderSchema = z
 
 export const quoteOrderSchema = z.object({
   totalAgreedFee: z
-    .number({ required_error: "Quote amount is required" })
+    .number({ error: "Quote amount is required" })
     .positive("Quote must be a positive number"),
 
   adminNotes: z.string().max(1000).trim().optional(),
@@ -132,7 +132,7 @@ export const updateStatusSchema = z.object({
       "COMPLETED",
       "CANCELLED",
     ],
-    { required_error: "Status is required" },
+    { error: "Status is required" },
   ),
 
   note: z.string().max(500).trim().optional(),
@@ -143,7 +143,7 @@ export const updateStatusSchema = z.object({
 
 export const deliveryFeeSchema = z.object({
   deliveryFee: z
-    .number({ required_error: "Delivery fee is required" })
+    .number({ error: "Delivery fee is required" })
     .min(0, "Delivery fee cannot be negative"),
 
   deliveryAddress: z.string().max(500).trim().optional(),

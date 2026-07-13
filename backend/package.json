@@ -19,7 +19,7 @@
   "license": "ISC",
   "type": "module",
   "engines": {
-    "node": ">=22.6.0"
+    "node": ">=22.18.0"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.2",
