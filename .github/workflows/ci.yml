@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: Backend (validate)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      # prisma generate reads the config's env("DATABASE_URL"); a dummy value is
+      # enough since generate never connects to the database.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci # runs `prisma generate` via postinstall
+      - name: Validate Prisma schema
+        run: npx prisma validate
+      - name: Syntax-check all source files
+        run: |
+          for f in $(find src -name '*.js'); do
+            node --check "$f"
+          done
+
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - name: Lint
+        # Non-blocking: surfaces lint issues without failing the job. The build
+        # below is the gate. Tackle the pre-existing lint debt separately.
+        continue-on-error: true
+        run: npm run lint
+      - name: Build
+        run: npm run build
