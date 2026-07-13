@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const addToCartSchema = z.object({
   readyToWearId: z.string({
-    required_error: "Ready-to-wear item ID is required",
+    error: "Ready-to-wear item ID is required",
   }),
 
   selectedSize: z
-    .string({ required_error: "Size is required" })
+    .string({ error: "Size is required" })
     .min(1, "Size cannot be empty")
     .trim(),
 
@@ -20,15 +20,17 @@ export const addToCartSchema = z.object({
 
 export const updateCartItemSchema = z.object({
   quantity: z
-    .number({ required_error: "Quantity is required" })
+    .number({ error: "Quantity is required" })
     .int("Quantity must be a whole number")
     .min(1, "Quantity must be at least 1"),
 });
 
 export const checkoutSchema = z.object({
   fulfillmentMethod: z.enum(["PICKUP", "DELIVERY"], {
-    required_error: "Fulfillment method is required",
-    invalid_type_error: "Fulfillment method must be PICKUP or DELIVERY",
+    error: (issue) =>
+      issue.input === undefined
+        ? "Fulfillment method is required"
+        : "Fulfillment method must be PICKUP or DELIVERY",
   }),
 
   deliveryAddress: z

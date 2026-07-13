@@ -4,19 +4,19 @@ import { z } from "zod";
 
 export const createStyleSchema = z.object({
   name: z
-    .string({ required_error: "Style name is required" })
+    .string({ error: "Style name is required" })
     .min(2, "Name must be at least 2 characters")
     .max(100)
     .trim(),
 
   description: z
-    .string({ required_error: "Description is required" })
+    .string({ error: "Description is required" })
     .min(10, "Description must be at least 10 characters")
     .max(2000)
     .trim(),
 
   category: z
-    .string({ required_error: "Category is required" })
+    .string({ error: "Category is required" })
     .min(2)
     .max(50)
     .trim(),
@@ -65,31 +65,31 @@ export const updateStyleSchema = z.object({
 
 export const createReadyToWearSchema = z.object({
   name: z
-    .string({ required_error: "Item name is required" })
+    .string({ error: "Item name is required" })
     .min(2)
     .max(100)
     .trim(),
 
   description: z
-    .string({ required_error: "Description is required" })
+    .string({ error: "Description is required" })
     .min(10)
     .max(2000)
     .trim(),
 
   price: z
-    .string({ required_error: "Price is required" })
+    .string({ error: "Price is required" })
     .transform((val) => parseFloat(val))
     .refine((val) => !isNaN(val) && val > 0, "Price must be a positive number"),
 
   category: z
-    .string({ required_error: "Category is required" })
+    .string({ error: "Category is required" })
     .min(2)
     .max(50)
     .trim(),
 
   // Sizes sent as a JSON string from multipart form e.g. '["S","M","L","XL"]'
   availableSizes: z
-    .string({ required_error: "Available sizes are required" })
+    .string({ error: "Available sizes are required" })
     .transform((val) => {
       try {
         const parsed = JSON.parse(val);
@@ -158,7 +158,7 @@ export const createPortfolioSchema = z.object({
   title: z.string().min(2).max(100).trim().optional(),
   description: z.string().max(1000).trim().optional(),
   category: z
-    .string({ required_error: "Category is required" })
+    .string({ error: "Category is required" })
     .min(2)
     .max(50)
     .trim(),

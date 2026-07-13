@@ -36,11 +36,11 @@ export const updateProfileSchema = z
 export const changePasswordSchema = z
   .object({
     currentPassword: z.string({
-      required_error: "Current password is required",
+      error: "Current password is required",
     }),
 
     newPassword: z
-      .string({ required_error: "New password is required" })
+      .string({ error: "New password is required" })
       .min(8, "Password must be at least 8 characters")
       .regex(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
@@ -48,7 +48,7 @@ export const changePasswordSchema = z
       ),
 
     confirmPassword: z.string({
-      required_error: "Please confirm your new password",
+      error: "Please confirm your new password",
     }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -64,7 +64,7 @@ export const updateProfilePictureSchema = z.object({});
 
 export const createClientSchema = z.object({
   fullName: z
-    .string({ required_error: "Full name is required" })
+    .string({ error: "Full name is required" })
     .min(2)
     .max(100)
     .trim(),
@@ -75,11 +75,11 @@ export const createClientSchema = z.object({
     .trim(),
 
   phone: z
-    .string({ required_error: "Phone number is required" })
+    .string({ error: "Phone number is required" })
     .regex(/^\+?[0-9]{10,15}$/, "Please provide a valid phone number"),
 
   sex: z.enum(["MALE", "FEMALE", "OTHER"], {
-    required_error: "Sex is required",
+    error: "Sex is required",
   }),
 
   dateOfBirth: z.iso.date().optional(),
@@ -88,11 +88,13 @@ export const createClientSchema = z.object({
 
 export const changeUserRoleSchema = z.object({
   newRole: z.enum(["STAFF_ADMIN", "CLIENT"], {
-    required_error: "New role is required",
-    invalid_type_error: "Role must be either STAFF_ADMIN or CLIENT",
+    error: (issue) =>
+      issue.input === undefined
+        ? "New role is required"
+        : "Role must be either STAFF_ADMIN or CLIENT",
   }),
 
   confirmPassword: z
-    .string({ required_error: "Password confirmation is required" })
+    .string({ error: "Password confirmation is required" })
     .min(1, "Password is required"),
 });

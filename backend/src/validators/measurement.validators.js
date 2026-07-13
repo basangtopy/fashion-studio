@@ -64,7 +64,7 @@ export const createAppointmentSchema = z.object({
 // Admin confirming/updating an appointment
 export const updateAppointmentSchema = z.object({
   status: z.enum(["REQUESTED", "CONFIRMED", "COMPLETED", "CANCELLED"], {
-    required_error: "Status is required",
+    error: "Status is required",
   }),
   confirmedDate: z.string().datetime().optional(),
   adminNotes: z.string().max(500).optional(),
